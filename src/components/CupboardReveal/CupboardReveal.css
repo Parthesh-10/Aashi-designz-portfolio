@@ -66,3 +66,13 @@
   opacity: 1;
   visibility: visible;
 }
+
+/* ============================================================
+   Mobile Layout (max-width: 767px)
+   Hide cupboard section on mobile per design spec
+   ============================================================ */
+@media (max-width: 767px) {
+  .cupboard-reveal-section {
+    display: none !important;
+  }
+}

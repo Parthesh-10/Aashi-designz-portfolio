@@ -2676,4 +2676,24 @@ textarea:focus {
     mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
   }
+
+  /* ======== SECTION S1: LOGO STRIP ======== */
+  .logos {
+    margin: 28px 0;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .logos:before,
+  .logos:after {
+    width: 45px;
+  }
+
+  .logos-slide img {
+    width: 100px;
+    height: 48px;
+    object-fit: contain;
+    margin: 0 12px;
+    filter: grayscale(100%) opacity(0.55);
+  }
 }
