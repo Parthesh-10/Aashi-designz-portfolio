@@ -1,0 +1,246 @@
+/* ==========================================================================
+   WhatIfSection Component CSS
+   Scoped styles for "From what if to what's next" section.
+   All classes prefixed with "whatif-" to avoid collisions.
+   ========================================================================== */
+
+.whatif-section {
+  width: 100%;
+  margin-top: 3.5rem;
+  margin-bottom: 4.5rem;
+  box-sizing: border-box;
+}
+
+.whatif-card {
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 40px;
+  background: linear-gradient(180deg, #f0ecf8 0%, #faf8fc 55%, #ffffff 100%);
+  border: 1px solid rgba(143, 109, 188, 0.2);
+  box-shadow: 0 16px 48px -12px rgba(143, 109, 188, 0.1);
+  padding: 56px 48px 52px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.whatif-heading {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: clamp(32px, 5.2vw, 68px);
+  color: #313944;
+  line-height: 1.15;
+  margin: 0 auto;
+  text-align: center;
+  max-width: 1050px;
+}
+
+.whatif-purple {
+  color: #8f6dbc;
+}
+
+.whatif-subheading {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  font-size: clamp(18px, 2.2vw, 28px);
+  color: #313944;
+  line-height: 1.3;
+  margin: 16px auto 52px;
+  text-align: center;
+  max-width: 900px;
+}
+
+.whatif-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 36px;
+  margin: 0 auto 52px;
+  box-sizing: border-box;
+}
+
+.whatif-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.whatif-icon-wrapper {
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+
+.whatif-icon {
+  height: 155px;
+  width: auto;
+  max-width: 160px;
+  object-fit: contain;
+  display: block;
+  will-change: transform;
+}
+
+.whatif-col:nth-child(1) .whatif-icon {
+  animation: whatif-float 3.6s ease-in-out infinite;
+}
+
+.whatif-col:nth-child(2) .whatif-icon {
+  animation: whatif-float 4.2s ease-in-out infinite 0.7s;
+}
+
+.whatif-col:nth-child(3) .whatif-icon {
+  animation: whatif-float 3.8s ease-in-out infinite 1.4s;
+}
+
+@keyframes whatif-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whatif-icon {
+    animation: none;
+  }
+}
+
+.whatif-col-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: clamp(24px, 2.4vw, 30px);
+  color: #313944;
+  line-height: 1.25;
+  margin: 0 0 14px 0;
+}
+
+.whatif-col-desc {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  font-size: clamp(15px, 1.18vw, 17px);
+  color: #8f6dbc;
+  line-height: 1.3;
+  margin: 0;
+  max-width: 320px;
+}
+
+.whatif-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.whatif-btn {
+  display: inline-block;
+  background-color: #e8f56b;
+  color: #313944;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: clamp(18px, 1.6vw, 22px);
+  padding: 14px 38px;
+  border-radius: 9999px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(232, 245, 107, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  line-height: 1.2;
+}
+
+.whatif-btn:hover {
+  background-color: #def057;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(222, 240, 87, 0.55);
+}
+
+.whatif-btn:active {
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .whatif-card {
+    padding: 48px 36px 44px;
+    border-radius: 32px;
+  }
+
+  .whatif-grid {
+    gap: 24px;
+    margin-bottom: 44px;
+  }
+
+  .whatif-icon-wrapper {
+    height: 135px;
+    margin-bottom: 18px;
+  }
+
+  .whatif-icon {
+    height: 130px;
+    max-width: 135px;
+  }
+}
+
+@media (max-width: 768px) {
+  .whatif-section {
+    margin-top: 2.5rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .whatif-card {
+    padding: 40px 24px 36px;
+    border-radius: 28px;
+  }
+
+  .whatif-subheading {
+    margin-top: 12px;
+    margin-bottom: 36px;
+  }
+
+  .whatif-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+
+  .whatif-icon-wrapper {
+    height: 125px;
+    margin-bottom: 14px;
+  }
+
+  .whatif-icon {
+    height: 120px;
+    max-width: 125px;
+  }
+
+  .whatif-col-desc {
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 520px) {
+  .whatif-section {
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .whatif-card {
+    padding: 32px 18px 28px;
+    border-radius: 24px;
+  }
+
+  .whatif-grid {
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+
+  .whatif-btn {
+    padding: 12px 30px;
+    font-size: 18px;
+  }
+}
+

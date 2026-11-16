@@ -1,0 +1,342 @@
+/* ============================================================
+   HeroIntro.css — intro overlay + pre-intro visibility gates
+   ============================================================ */
+
+/* ---- noscript fallback: immediately show everything ---- */
+@media (scripting: none) {
+  #hero-intro-overlay { display: none !important; }
+  .header.container[data-intro="playing"] .banner-bg-img,
+  .header.container[data-intro="playing"] .banner-label-left,
+  .header.container[data-intro="playing"] .banner-label-right,
+  .header.container[data-intro="playing"] .hi-aashi-text,
+  .header.container[data-intro="playing"] .hi-letter,
+  .header.container[data-intro="playing"] .banner-sparkles,
+  .header.container[data-intro="playing"] .banner-sparkle,
+  .header.container[data-intro="playing"] .headerContainer1,
+  .header.container[data-intro="playing"] .headerContainer2,
+  .header.container[data-intro="playing"] .headerContainer1 .dotContainer,
+  .header.container[data-intro="playing"] .heroHeadingInner,
+  body.intro-scroll-lock .navbar {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ---- prefers-reduced-motion: skip intro entirely with 300ms fade ---- */
+@media (prefers-reduced-motion: reduce) {
+  #hero-intro-overlay {
+    animation: introReducedFade 0.3s ease forwards !important;
+  }
+  .header.container[data-intro="playing"] .banner-bg-img,
+  .header.container[data-intro="playing"] .banner-label-left,
+  .header.container[data-intro="playing"] .banner-label-right,
+  .header.container[data-intro="playing"] .hi-aashi-text,
+  .header.container[data-intro="playing"] .hi-letter,
+  .header.container[data-intro="playing"] .banner-sparkles,
+  .header.container[data-intro="playing"] .banner-sparkle,
+  .header.container[data-intro="playing"] .headerContainer1,
+  .header.container[data-intro="playing"] .headerContainer2,
+  .header.container[data-intro="playing"] .headerContainer1 .dotContainer,
+  .header.container[data-intro="playing"] .heroHeadingInner,
+  body.intro-scroll-lock .navbar {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+@keyframes introReducedFade {
+  0% { opacity: 1; }
+  100% { opacity: 0; pointer-events: none; }
+}
+
+/* ============================================================
+   OVERLAY (0 - 3000ms)
+   ============================================================ */
+#hero-intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #1E1233;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: all;
+}
+
+/* ---- Dot grid (pure CSS gradients: 1px lines + dots at ~64px cells) ---- */
+#hero-intro-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, #CDBCF5 1.2px, transparent 1.2px),
+    linear-gradient(to right, rgba(205, 188, 245, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(205, 188, 245, 0.08) 1px, transparent 1px);
+  background-size: 64px 64px, 64px 64px, 64px 64px;
+  background-position: 0 0, 0 0, 0 0;
+  mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, black 15%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, black 15%, transparent 100%);
+  opacity: 0;
+  animation: introGridFadeIn 0.3s ease 0s forwards;
+  pointer-events: none;
+}
+@keyframes introGridFadeIn {
+  to { opacity: 1; }
+}
+
+/* ---- Typewriter label under center dot ---- */
+#intro-label-row {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #CDBCF5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  opacity: 0;
+  top: calc(50% + 26px);
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  user-select: none;
+  z-index: 2;
+}
+
+#intro-label-logo {
+  width: 16px;
+  height: 16px;
+  background-image: url("/img/icon/navInitialLogo.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+#intro-label-text {
+  display: inline-block;
+}
+
+/* Blinking block caret */
+#intro-label-caret {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  background: #AD89E8;
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: introCaret 0.55s step-end infinite;
+}
+@keyframes introCaret {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ============================================================
+   MORPHING ELEMENT (sliver -> dot -> line -> bar -> flood)
+   ============================================================ */
+#intro-morph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 12px;
+  margin-left: -1.5px;
+  margin-top: -6px;
+  border-radius: 3px;
+  background: #AD89E8;
+  box-shadow: 0 0 14px 4px rgba(173, 137, 232, 0.7), 0 0 28px 8px rgba(173, 137, 232, 0.35);
+  transform-origin: center center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ============================================================
+   PRE-INTRO VISIBILITY GATES: keyed to data-intro="playing"
+   ============================================================ */
+
+/* Banner elements pre-intro state */
+[data-intro="playing"] .banner-bg-img {
+  opacity: 0;
+}
+
+[data-intro="playing"] .banner-label-left {
+  opacity: 0;
+  transform: translateX(-28px);
+}
+
+[data-intro="playing"] .banner-label-right {
+  opacity: 0;
+  transform: translateX(28px);
+}
+
+[data-intro="playing"] .hi-letter {
+  transform: translateY(110%) skewY(6deg);
+  filter: blur(10px);
+  opacity: 0;
+}
+
+[data-intro="playing"] .banner-sparkles {
+  opacity: 1;
+}
+[data-intro="playing"] .banner-sparkle {
+  transform: translate(-50%, -50%) scale(0) rotate(-45deg);
+  opacity: 0;
+}
+
+/* Lavender pill (Available For Work) */
+[data-intro="playing"] .headerContainer1 .dotContainer {
+  opacity: 0;
+  transform: scale(0.85);
+}
+
+/* Heading lines masked initial state */
+.heroHeadingLine {
+  display: block;
+  overflow: hidden;
+}
+.heroHeadingInner {
+  display: block;
+  will-change: transform, opacity;
+}
+[data-intro="playing"] .heroHeadingInner {
+  transform: translateY(110%);
+  opacity: 0;
+}
+
+/* Description text */
+[data-intro="playing"] .headerContainer2 p {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+/* Work With Me button */
+[data-intro="playing"] .headerContainer2 .contact {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+/* Fixed Header Navbar */
+body.intro-scroll-lock .navbar {
+  opacity: 0;
+  transform: translateY(-16px);
+}
+
+/* ============================================================
+   ANIMATION REVEAL CLASSES (added by master clock)
+   ============================================================ */
+
+/* (A)b: Labels at 2600ms */
+.banner-label-left.intro-reveal-label,
+.banner-label-right.intro-reveal-label {
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+/* (A)c: Centered "Hi! I'm aashi" letters at 2650ms (stagger 55ms) */
+.hi-letter.intro-reveal-letter {
+  transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1),
+              filter 800ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 400ms ease;
+  transform: translateY(0) skewY(0deg) !important;
+  filter: blur(0) !important;
+  opacity: 1 !important;
+}
+
+/* (A)d: Sparkles at 2900ms (stagger 120ms) */
+.banner-sparkle.intro-reveal-sparkle {
+  transition: transform 550ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 450ms ease;
+  transform: translate(-50%, -50%) scale(1) rotate(0deg) !important;
+  opacity: 1 !important;
+}
+
+/* (A)e: Lavender pill pops in at 3100ms */
+.headerContainer1 .dotContainer.intro-revealed {
+  transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 400ms ease;
+  transform: scale(1) !important;
+  opacity: 1 !important;
+}
+
+/* ============================================================
+   (C) SECTION C ENTRANCE CLASSES (at 4000ms)
+   ============================================================ */
+
+/* Navbar */
+.navbar.intro-revealed {
+  transition: opacity 750ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 750ms cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* Heading lines (stagger 90ms) */
+.heroHeadingInner.intro-revealed {
+  transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 800ms ease;
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+}
+
+/* Description (+250ms) */
+.headerContainer2 p.intro-revealed {
+  transition: opacity 800ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* Button (+400ms) */
+.headerContainer2 .contact.intro-revealed {
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 700ms ease;
+  transform: scale(1) !important;
+  opacity: 1 !important;
+}
+
+/* ============================================================
+   SCROLL LOCK & LAYOUT
+   ============================================================ */
+.homeBanner {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+/* Align right-side hero content (description + CTA) towards the right */
+.headerContainer2 {
+  margin-left: auto !important;
+  width: fit-content !important;
+  max-width: 45%;
+  padding-right: 0 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.headerContainer2 p {
+  max-width: 25rem;
+}
+
+@media (max-width: 800px) {
+  .homeBanner {
+    flex-direction: column !important;
+  }
+  .headerContainer2 {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    padding-right: 1rem !important;
+  }
+}
+
+body.intro-scroll-lock {
+  overflow: hidden !important;
+  scrollbar-gutter: stable;
+}

@@ -1,0 +1,166 @@
+/* ==========================================================================
+   EmployeeSection Component CSS
+   Scoped styles for "Employee of the Era" static section.
+   All classes prefixed with "employee-" to avoid global style collisions.
+   ========================================================================== */
+
+.employee-section {
+  width: 100%;
+  margin-top: 3.5rem;
+  margin-bottom: 4.5rem;
+  box-sizing: border-box;
+}
+
+.employee-heading {
+  text-align: center;
+  color: #313944;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+  margin-bottom: 2.5rem;
+}
+
+.employee-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 28px;
+  max-width: 1240px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.employee-image-wrapper {
+  flex: 0 0 55%;
+  width: 55%;
+  max-width: 55%;
+  border-radius: 10px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background-color: #f4effa;
+  box-sizing: border-box;
+}
+
+.employee-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+}
+
+.employee-details {
+  flex: 1 1 45%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  box-sizing: border-box;
+}
+
+.employee-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 20px;
+}
+
+.employee-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(24px, 2.5vw, 30px);
+  font-weight: 700;
+  color: #313944;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.employee-role {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(16px, 1.4vw, 18px);
+  font-weight: 400;
+  color: #313944;
+  line-height: 1.2;
+}
+
+.employee-bio {
+  display: flex;
+  flex-direction: column;
+}
+
+.employee-bio p {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(15px, 1.15vw, 18px);
+  font-weight: 400;
+  color: #8f6dbc;
+  line-height: 1.45;
+  margin: 0 0 20px 0;
+}
+
+.employee-bio p:last-child {
+  margin-bottom: 0;
+}
+
+.employee-bio strong {
+  font-weight: 700;
+  color: inherit;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .employee-content {
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .employee-section {
+    margin-top: 2.5rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .employee-heading {
+    margin-bottom: 1.75rem;
+  }
+
+  .employee-content {
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .employee-image-wrapper {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .employee-details {
+    width: 100%;
+    padding-top: 0;
+  }
+
+  .employee-header {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .employee-section {
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .employee-heading {
+    margin-bottom: 1.5rem;
+  }
+
+  .employee-bio p {
+    font-size: 15px;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+}
+

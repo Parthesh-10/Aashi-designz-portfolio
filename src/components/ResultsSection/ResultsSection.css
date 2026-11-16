@@ -1,0 +1,289 @@
+.results-section {
+  width: 100%;
+  margin-top: 3.5rem;
+  margin-bottom: 4.5rem;
+  box-sizing: border-box;
+}
+
+.results-heading {
+  text-align: center;
+  color: #313944;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+  margin-bottom: 2.5rem;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Card Container */
+.results-card-wrapper {
+  width: 100%;
+  min-height: 195px;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   CARD FRONT FACE
+   ========================================= */
+.results-front {
+  width: 100%;
+  height: 100%;
+  padding: 22px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  overflow: hidden;
+  background: linear-gradient(135deg, #b88bf2 0%, #8b71d6 50%, #765ec4 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(118, 94, 196, 0.22);
+}
+
+/* Soft glowing blobs for front face */
+.results-front-glow1 {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 185, 230, 0.45) 0%, rgba(255, 185, 230, 0) 70%);
+  pointer-events: none;
+}
+
+.results-front-glow2 {
+  position: absolute;
+  bottom: -30px;
+  left: -20px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(140, 220, 255, 0.3) 0%, rgba(140, 220, 255, 0) 70%);
+  pointer-events: none;
+}
+
+.results-front-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.results-front-number {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(40px, 3.4vw, 56px);
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.results-front-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(13px, 1.1vw, 15px);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  margin-top: 8px;
+  line-height: 1.25;
+}
+
+/* Flip buttons */
+.results-flip-btn {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.results-flip-btn-dark {
+  background-color: #313944;
+  color: #ffffff;
+}
+
+.results-flip-btn-light {
+  background-color: #ffffff;
+  color: #313944;
+}
+
+.results-card-wrapper:hover .results-flip-btn {
+  transform: rotate(45deg);
+}
+
+/* =========================================
+   CARD BACK FACE
+   ========================================= */
+.results-back {
+  width: 100%;
+  height: 100%;
+  padding: 20px 14px 16px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, #a786e6 0%, #8a6ec9 55%, #765bba 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(118, 91, 186, 0.22);
+}
+
+/* Frosted blur patches for back face */
+.results-back-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255, 215, 240, 0.35) 0%, transparent 55%),
+    radial-gradient(circle at 85% 80%, rgba(180, 230, 255, 0.35) 0%, transparent 55%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.results-back-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(13px, 1.05vw, 15px);
+  font-weight: 700;
+  text-align: center;
+  color: #ffffff;
+  line-height: 1.25;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+  max-width: 90%;
+}
+
+.results-back-stats {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: auto;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.results-back-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 4px;
+}
+
+.results-stat-val {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 1.25vw, 17px);
+  color: #ffffff;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.results-stat-lbl {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(9.5px, 0.8vw, 11px);
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.2;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.results-stat-divider {
+  width: 1px;
+  height: 38px;
+  background: rgba(255, 255, 255, 0.4);
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* =========================================
+   RESPONSIVE BREAKPOINTS
+   ========================================= */
+@media (max-width: 1024px) {
+  .results-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .results-card-wrapper {
+    min-height: 200px;
+  }
+
+  .results-front-number {
+    font-size: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .results-section {
+    margin-top: 2.5rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .results-heading {
+    margin-bottom: 1.8rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .results-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 360px;
+  }
+
+  .results-card-wrapper {
+    min-height: 190px;
+  }
+
+  .results-front {
+    padding: 20px;
+  }
+
+  .results-front-number {
+    font-size: 44px;
+  }
+}
+
+@media (max-width: 380px) {
+  .results-grid {
+    max-width: 100%;
+  }
+
+  .results-card-wrapper {
+    min-height: 185px;
+  }
+
+  .results-front-number {
+    font-size: 38px;
+  }
+}
+
