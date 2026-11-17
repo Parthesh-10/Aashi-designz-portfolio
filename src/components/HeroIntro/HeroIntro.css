@@ -16,6 +16,7 @@
   .header.container[data-intro="playing"] .headerContainer2,
   .header.container[data-intro="playing"] .headerContainer1 .dotContainer,
   .header.container[data-intro="playing"] .heroHeadingInner,
+  .header.container[data-intro="playing"] .desktopHeroPortrait,
   body.intro-scroll-lock .navbar {
     opacity: 1 !important;
     transform: none !important;
@@ -39,6 +40,7 @@
   .header.container[data-intro="playing"] .headerContainer2,
   .header.container[data-intro="playing"] .headerContainer1 .dotContainer,
   .header.container[data-intro="playing"] .heroHeadingInner,
+  .header.container[data-intro="playing"] .desktopHeroPortrait,
   body.intro-scroll-lock .navbar {
     opacity: 1 !important;
     transform: none !important;
@@ -340,3 +342,92 @@ body.intro-scroll-lock {
   overflow: hidden !important;
   scrollbar-gutter: stable;
 }
+
+/* ============================================================
+   Desktop Hero Portrait & 3-Column Layout
+   ============================================================ */
+
+/* Base: hidden by default and on mobile (<= 767px) */
+.desktopHeroPortrait {
+  display: none !important;
+}
+
+/* Intro states for desktop portrait */
+[data-intro="playing"] .desktopHeroPortrait:not(.intro-revealed) {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.desktopHeroPortrait {
+  transition: opacity 800ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.desktopHeroPortrait.intro-revealed,
+[data-intro="done"] .desktopHeroPortrait {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* Desktop layout (>= 768px) */
+@media (min-width: 768px) {
+  .header.container {
+    padding-left: clamp(1.5rem, 3.8vw, 3.8vw) !important;
+    padding-right: clamp(1.5rem, 3.8vw, 3.8vw) !important;
+  }
+
+  .homeBanner {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-end !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    position: relative !important;
+    margin-top: 1.5rem !important;
+  }
+
+  .headerContainer1 {
+    flex: 1 1 0 !important;
+    max-width: 380px !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 1rem 0 0 !important;
+    align-self: flex-end !important;
+  }
+
+  .desktopHeroPortrait {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-end !important;
+    align-self: flex-end !important;
+    flex: 0 0 auto !important;
+    width: clamp(320px, 24vw, 420px) !important;
+    margin: 0 auto !important;
+    pointer-events: none !important;
+    user-select: none !important;
+    z-index: 10;
+  }
+
+  .desktopHeroPortraitImg {
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    aspect-ratio: 1356 / 1494;
+    object-fit: cover !important;
+    object-position: top center !important;
+    mask-image: linear-gradient(to bottom, black 72%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 72%, transparent 100%);
+  }
+
+  .headerContainer2 {
+    flex: 1 1 0 !important;
+    max-width: 380px !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 0 0 auto !important;
+    padding: 0 0 0 1rem !important;
+    align-self: flex-end !important;
+  }
+}
+

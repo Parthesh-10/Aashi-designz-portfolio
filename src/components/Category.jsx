@@ -179,30 +179,6 @@ export default function Category({ categoryDesc = [] }) {
     <div className="category">
       <h2 className="heading">WHAT I DO</h2>
 
-      {/* Mobile-only 2-column staggered collage — hidden on desktop via base CSS */}
-      <div className="m-collage" aria-hidden="true">
-        <div className="m-collage-col m-col-left">
-          <div className="m-collage-card m-card-1">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/dsfasdf.png" alt="" />
-          </div>
-          <div className="m-collage-card m-card-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/dfhasdlfasd.png" alt="" />
-          </div>
-        </div>
-        <div className="m-collage-col m-col-right">
-          <div className="m-collage-card m-card-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/hfsdfas.png" alt="" />
-          </div>
-          <div className="m-collage-card m-card-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/dfsdafsdlkfjs.png" alt="" />
-          </div>
-        </div>
-      </div>
-
       <div className="singleFolderContainer" ref={containerRef}>
         {FOLDER_TITLES.map((title, idx) => (
           <FolderItem

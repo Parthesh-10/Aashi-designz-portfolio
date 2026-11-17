@@ -55,16 +55,32 @@
 
 /* Mask wrapper around each individual letter */
 .hi-letter-mask {
-  display: inline-block;
+  display: inline-grid;
+  place-items: center;
   overflow: hidden;
   vertical-align: baseline;
   line-height: 1.15;
   padding: 0.1em 0;
   box-sizing: content-box;
+  cursor: pointer;
+}
+
+/* Invisible phantom bold glyph to rigidly lock mask width to resting bold weight */
+.hi-phantom {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-variation-settings: 'wght' 700;
+  line-height: 1.15;
+  user-select: none;
+  pointer-events: none;
 }
 
 /* The actual animating/hover letter */
 .hi-letter {
+  grid-area: 1 / 1;
+  text-align: center;
   display: inline-block;
   font-family: 'Outfit', sans-serif;
   font-variation-settings: 'wght' 700;
@@ -241,3 +257,58 @@
     display: none;
   }
 }
+
+/* ============================================================
+   Desktop Hero Adjustments (min-width: 768px)
+   ============================================================ */
+@media (min-width: 768px) {
+  /* Change A: Remove sparkles on desktop */
+  .banner-sparkles {
+    display: none !important;
+  }
+
+  /* Change B: Bigger, wider "Hi! I'm Aashi" spanning ~90-95% of viewport width */
+  .hi-aashi-text {
+    font-size: clamp(6.5rem, 14.7vw, 18.5rem);
+    font-weight: 700;
+  }
+}
+
+/* ============================================================
+   Per-Letter Hover (min-width: 768px and hover: hover)
+   ============================================================ */
+@media (min-width: 768px) and (hover: hover) {
+  .hi-letter,
+  .hi-letter.intro-reveal-letter {
+    transition: font-variation-settings 0.35s ease-out,
+                font-weight 0.35s ease-out,
+                transform 800ms cubic-bezier(0.22, 1, 0.36, 1),
+                filter 800ms cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 400ms ease;
+  }
+
+  /* Single hovered letter: thin weight (200) */
+  .header.container:not([data-intro="playing"]) .hi-letter-mask:hover .hi-letter {
+    font-weight: 200;
+    font-variation-settings: 'wght' 200;
+  }
+
+  /* Optional soft falloff on direct neighbors: medium weight (450) */
+  /* Next direct neighbor */
+  .header.container:not([data-intro="playing"]) .hi-letter-mask:hover + .hi-letter-mask .hi-letter,
+  .header.container:not([data-intro="playing"]) .hi-letter-mask:hover + .hi-space + .hi-letter-mask .hi-letter,
+  /* Previous direct neighbor */
+  .header.container:not([data-intro="playing"]) .hi-letter-mask:has(+ .hi-letter-mask:hover) .hi-letter,
+  .header.container:not([data-intro="playing"]) .hi-letter-mask:has(+ .hi-space + .hi-letter-mask:hover) .hi-letter {
+    font-weight: 450;
+    font-variation-settings: 'wght' 450;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hi-letter {
+    transition: none !important;
+  }
+}
+
+

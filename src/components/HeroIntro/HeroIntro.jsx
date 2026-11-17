@@ -63,6 +63,9 @@ export default function HeroIntro() {
 
     const btn = document.querySelector('.headerContainer2 .contact');
     if (btn) btn.classList.add('intro-revealed');
+
+    const portrait = document.querySelector('.desktopHeroPortrait');
+    if (portrait) portrait.classList.add('intro-revealed');
   }, []);
 
   // Typewriter effect under center dot
@@ -170,6 +173,12 @@ export default function HeroIntro() {
         line.classList.add('intro-revealed');
       }, idx * 90);
     });
+
+    // Portrait: fade + translateY (+200ms)
+    addTimeout(() => {
+      const portrait = document.querySelector('.desktopHeroPortrait');
+      if (portrait) portrait.classList.add('intro-revealed');
+    }, 200);
 
     // Description: fade + translateY 16px -> 0 (+250ms)
     addTimeout(() => {

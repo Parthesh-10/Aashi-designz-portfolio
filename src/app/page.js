@@ -41,6 +41,13 @@ export default function Home() {
               </span>
             </h1>
           </div>
+          <div className="desktopHeroPortrait" aria-hidden="true">
+            <img
+              src="/img/hero-portrait.png"
+              alt="Aashi"
+              className="desktopHeroPortraitImg"
+            />
+          </div>
           <div className="headerContainer2">
             <p>
               I work with startups and growing brands to create digital experiences

@@ -1,5 +1,4 @@
 'use client';
-import { useEffect, useRef, useCallback } from 'react';
 import './HeroBanner.css';
 
 const HI_TEXT = "Hi! I'm Aashi";
@@ -9,11 +8,6 @@ function buildLetters() {
 }
 
 const LETTERS = buildLetters();
-const REST_WEIGHT  = 700;
-const HOVER_WEIGHT = 200;
-const LERP_FACTOR  = 0.16;
-const RADIUS       = 140;
-const SETTLE_DELTA = 0.5;
 
 function SparkleSvg() {
   return (
@@ -44,149 +38,6 @@ function SparkleSvg() {
 }
 
 export default function HeroBanner() {
-  const containerRef    = useRef(null);
-  const letterRefs      = useRef([]);
-  const maskRefs        = useRef([]);
-  const rafRef          = useRef(null);
-  const weightsRef      = useRef(LETTERS.map(() => REST_WEIGHT));
-  const targetsRef      = useRef(LETTERS.map(() => REST_WEIGHT));
-  const cursorRef       = useRef({ x: -9999, y: -9999, inside: false });
-  const hoverActiveRef  = useRef(false);
-  const widthsLockedRef = useRef(false);
-
-  // Lock each letter's width to its resting-weight width to prevent layout shift
-  const lockWidths = useCallback(() => {
-    if (widthsLockedRef.current) return;
-    const masks = maskRefs.current;
-    const spans = letterRefs.current;
-    if (!masks.length || !spans.length) return;
-
-    // Ensure initial weight is rest weight
-    spans.forEach((s) => {
-      if (s) s.style.fontVariationSettings = `'wght' ${REST_WEIGHT}`;
-    });
-
-    // Synchronously measure and lock bounding widths
-    masks.forEach((m, idx) => {
-      const s = spans[idx];
-      if (m && s) {
-        const w = s.getBoundingClientRect().width;
-        if (w > 0) {
-          const wFixed = `${Math.ceil(w * 10) / 10}px`;
-          m.style.width = wFixed;
-          m.style.minWidth = wFixed;
-          s.style.width = wFixed;
-        }
-      }
-    });
-    widthsLockedRef.current = true;
-  }, []);
-
-  // Single rAF loop for smooth hover interpolation
-  const startRaf = useCallback(() => {
-    if (rafRef.current) return;
-    function loop() {
-      let settled = true;
-      const spans   = letterRefs.current;
-      const weights = weightsRef.current;
-      const targets = targetsRef.current;
-
-      for (let i = 0; i < spans.length; i++) {
-        const span = spans[i];
-        if (!span) continue;
-        const diff = targets[i] - weights[i];
-        if (Math.abs(diff) > SETTLE_DELTA) {
-          settled = false;
-          weights[i] += diff * LERP_FACTOR;
-        } else {
-          weights[i] = targets[i];
-        }
-        span.style.fontVariationSettings = `'wght' ${Math.round(weights[i])}`;
-      }
-
-      if (settled) {
-        rafRef.current = null;
-        return;
-      }
-      rafRef.current = requestAnimationFrame(loop);
-    }
-    rafRef.current = requestAnimationFrame(loop);
-  }, []);
-
-  // Update target weight per letter based on cursor distance
-  const updateTargets = useCallback(() => {
-    if (!hoverActiveRef.current) return;
-    const spans = letterRefs.current;
-    const { x: cx, y: cy, inside } = cursorRef.current;
-    const targets = targetsRef.current;
-
-    for (let i = 0; i < spans.length; i++) {
-      const span = spans[i];
-      if (!span || !inside) {
-        targets[i] = REST_WEIGHT;
-        continue;
-      }
-
-      const rect = span.getBoundingClientRect();
-      const mx   = rect.left + rect.width / 2;
-      const my   = rect.top + rect.height / 2;
-      const dist = Math.hypot(cx - mx, cy - my);
-
-      const t = Math.min(dist / RADIUS, 1);
-      const s = t * t * (3 - 2 * t); // smoothstep
-      targets[i] = REST_WEIGHT - (REST_WEIGHT - HOVER_WEIGHT) * (1 - s);
-    }
-  }, []);
-
-  const onPointerMove = useCallback((e) => {
-    cursorRef.current = { x: e.clientX, y: e.clientY, inside: true };
-    updateTargets();
-    startRaf();
-  }, [updateTargets, startRaf]);
-
-  const onPointerLeave = useCallback(() => {
-    cursorRef.current.inside = false;
-    targetsRef.current.fill(REST_WEIGHT);
-    startRaf();
-  }, [startRaf]);
-
-  useEffect(() => {
-    const isCoarse = window.matchMedia('(pointer: coarse)').matches;
-    const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (isCoarse || noMotion) return;
-
-    if (document.fonts) {
-      document.fonts.ready.then(lockWidths);
-    } else {
-      setTimeout(lockWidths, 200);
-    }
-
-    const heroWrapper = document.querySelector('.header.container');
-    const activateHover = () => { hoverActiveRef.current = true; };
-
-    let activateTimer = null;
-    if (heroWrapper && heroWrapper.dataset.intro === 'done') {
-      activateHover();
-    } else {
-      // Intro timeline: hover effect active from 3400ms
-      activateTimer = setTimeout(activateHover, 3400);
-    }
-
-    const container = containerRef.current;
-    if (!container) return;
-
-    container.addEventListener('pointermove', onPointerMove, { passive: true });
-    container.addEventListener('pointerleave', onPointerLeave, { passive: true });
-
-    return () => {
-      clearTimeout(activateTimer);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-      container.removeEventListener('pointermove', onPointerMove);
-      container.removeEventListener('pointerleave', onPointerLeave);
-    };
-  }, [lockWidths, onPointerMove, onPointerLeave]);
-
   return (
     <div className="banner-wrap">
       {/* Top Left Label */}
@@ -199,11 +50,10 @@ export default function HeroBanner() {
         /Brand Strategist/
       </div>
 
-      {/* Centered "Hi! I'm aashi" with per-letter masked wrappers */}
+      {/* Centered "Hi! I'm Aashi" with per-letter masked wrappers */}
       <p
         className="hi-aashi-text"
-        ref={containerRef}
-        aria-label="Hi! I'm aashi"
+        aria-label="Hi! I'm Aashi"
       >
         {LETTERS.map(({ ch, i }) => {
           if (ch === ' ') {
@@ -217,13 +67,12 @@ export default function HeroBanner() {
             <span
               key={i}
               className="hi-letter-mask"
-              ref={(el) => { maskRefs.current[i] = el; }}
               aria-hidden="true"
             >
-              <span
-                className="hi-letter"
-                ref={(el) => { letterRefs.current[i] = el; }}
-              >
+              <span className="hi-phantom" aria-hidden="true">
+                {ch}
+              </span>
+              <span className="hi-letter">
                 {ch}
               </span>
             </span>
@@ -251,4 +100,3 @@ export default function HeroBanner() {
 }
 
 export { HeroBanner };
-
