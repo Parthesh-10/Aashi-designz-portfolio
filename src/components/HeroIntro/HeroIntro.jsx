@@ -6,18 +6,12 @@ import './HeroIntro.css';
 // and across client-side router navigation back to home page
 let introHasPlayed = false;
 
-const LABEL_FULL   = 'aashi // brand & digital designer — 2026';
-const LABEL_MOBILE = 'aashi // 2026';
-const CHAR_DELAY   = 24; // ms per character
-
 export default function HeroIntro() {
   const [mounted, setMounted] = useState(true);
-  const overlayRef   = useRef(null);
-  const morphRef     = useRef(null);
-  const labelRowRef  = useRef(null);
-  const labelTextRef = useRef(null);
-  const rafRef       = useRef(null);
-  const timeoutsRef  = useRef([]);
+  const overlayRef       = useRef(null);
+  const curtainTopRef    = useRef(null);
+  const curtainBottomRef = useRef(null);
+  const timeoutsRef      = useRef([]);
 
   const addTimeout = useCallback((fn, delay) => {
     const tid = setTimeout(fn, delay);
@@ -68,99 +62,54 @@ export default function HeroIntro() {
     if (portrait) portrait.classList.add('intro-revealed');
   }, []);
 
-  // Typewriter effect under center dot
-  const startTypewriter = useCallback(() => {
-    const labelRow  = labelRowRef.current;
-    const labelText = labelTextRef.current;
-    if (!labelRow || !labelText) return;
-
-    const label = window.innerWidth < 480 ? LABEL_MOBILE : LABEL_FULL;
-    labelRow.style.opacity = '1';
-    labelText.textContent  = '';
-    let i = 0;
-
-    function typeChar() {
-      if (!labelRowRef.current || labelRowRef.current.style.opacity !== '1') return;
-      if (i <= label.length) {
-        labelText.textContent = label.slice(0, i);
-        i++;
-        addTimeout(typeChar, CHAR_DELAY);
-      }
-    }
-    typeChar();
-  }, [addTimeout]);
-
-  const hideTypewriter = useCallback(() => {
-    const labelRow = labelRowRef.current;
-    if (labelRow) {
-      labelRow.style.opacity = '0';
-      labelRow.animate(
-        [{ opacity: 1 }, { opacity: 0 }],
-        { duration: 200, fill: 'forwards' }
+  // Banner elements entrance during split
+  const triggerBannerReveal = useCallback(() => {
+    // (a) Background image fade in (700ms) with pure opacity (no heavy blur)
+    const bannerImg = document.querySelector('.banner-bg-img');
+    if (bannerImg) {
+      bannerImg.animate(
+        [{ opacity: 0 }, { opacity: 1 }],
+        { duration: 700, fill: 'forwards', easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
       );
     }
-  }, []);
 
-  // Banner elements sequence (2500 - 3300ms)
-  const triggerBannerReveal = useCallback((t0) => {
-    const now = performance.now();
-
-    // (a) 2500ms: Blurred background image fade in (900ms)
-    const bgDelay = Math.max(0, 2500 - (now - t0));
-    addTimeout(() => {
-      const bannerImg = document.querySelector('.banner-bg-img');
-      if (bannerImg) {
-        bannerImg.animate(
-          [
-            { opacity: 0, filter: 'blur(30px)', transform: 'scale(1.06)' },
-            { opacity: 1, filter: 'blur(0px)',  transform: 'scale(1)'    },
-          ],
-          { duration: 900, fill: 'forwards', easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
-        );
-      }
-    }, bgDelay);
-
-    // (b) 2600ms: Left and Right labels slide in (700ms)
-    const labelDelay = Math.max(0, 2600 - (now - t0));
+    // (b) Left and Right labels slide in (700ms)
     addTimeout(() => {
       const left  = document.querySelector('.banner-label-left');
       const right = document.querySelector('.banner-label-right');
       if (left)  left.classList.add('intro-reveal-label');
       if (right) right.classList.add('intro-reveal-label');
-    }, labelDelay);
+    }, 100);
 
-    // (c) 2650ms: Centered "Hi! I'm aashi" masked per-letter reveal (stagger 55ms, duration 800ms)
-    const hiDelay = Math.max(0, 2650 - (now - t0));
+    // (c) Centered "Hi! I'm aashi" masked per-letter reveal (stagger 45ms)
     addTimeout(() => {
       const letters = document.querySelectorAll('.hi-letter');
       letters.forEach((span, idx) => {
         addTimeout(() => {
           span.classList.add('intro-reveal-letter');
-        }, idx * 55);
+        }, idx * 45);
       });
-    }, hiDelay);
+    }, 150);
 
-    // (d) 2900ms: Sparkles pop in (stagger 120ms) then twinkle
-    const sparkDelay = Math.max(0, 2900 - (now - t0));
+    // (d) Sparkles pop in (stagger 100ms) then twinkle
     addTimeout(() => {
       const sparkles = document.querySelectorAll('.banner-sparkle');
       sparkles.forEach((s, idx) => {
         addTimeout(() => {
           s.classList.add('intro-reveal-sparkle');
-          addTimeout(() => s.classList.add('twinkle'), 500 + idx * 120);
-        }, idx * 120);
+          addTimeout(() => s.classList.add('twinkle'), 450 + idx * 100);
+        }, idx * 100);
       });
-    }, sparkDelay);
+    }, 350);
 
-    // (e) 3100ms: Lavender pill pops in (scale .85 -> 1)
-    const pillDelay = Math.max(0, 3100 - (now - t0));
+    // (e) Lavender pill pops in
     addTimeout(() => {
       const pill = document.querySelector('.headerContainer1 .dotContainer');
       if (pill) pill.classList.add('intro-revealed');
-    }, pillDelay);
+    }, 450);
   }, [addTimeout]);
 
-  // Section C entrance at 4000ms
+  // Section C entrance (Navbar, Heading lines, Portrait, Description, Contact button)
   const triggerSectionC = useCallback(() => {
     // Header navbar: translateY -16px -> 0 + fade
     const navbar = document.querySelector('.navbar');
@@ -209,178 +158,50 @@ export default function HeroIntro() {
     document.body.classList.add('intro-scroll-lock');
 
     const heroWrapper = document.querySelector('.header.container');
-    const morph = morphRef.current;
-    if (morph) {
-      morph.style.willChange = 'transform, opacity, border-radius, background, box-shadow, filter';
-    }
 
-    let p_sliverStarted = false;
-    let p_dotStarted    = false;
-    let p_typeStarted   = false;
-    let p_lineStarted   = false;
-    let p_barStarted    = false;
-    let p_floodStarted  = false;
-    let p_overlayFade   = false;
-    let p_bannerReveal  = false;
-    let p_introDone     = false;
-
-    const t0 = performance.now();
-
-    function tick(now) {
-      const t = now - t0;
-
-      // 0–300ms: sliver appears at center
-      if (!p_sliverStarted && t >= 0) {
-        p_sliverStarted = true;
-        if (morph) {
-          morph.animate(
-            [
-              { opacity: 0, transform: 'translateY(-28vh) scaleY(1)' },
-              { opacity: 1, transform: 'translateY(-28vh) scaleY(1)' },
-            ],
-            { duration: 100, fill: 'forwards', easing: 'ease-out' }
-          );
-        }
+    // 1100ms: Split curtains start sliding apart (after 0.3s hold + 0.6s line draw + 0.2s pause)
+    addTimeout(() => {
+      if (overlayRef.current) {
+        overlayRef.current.classList.add('intro-split');
       }
+    }, 1100);
 
-      // 300–800ms: stretch vertically (scaleY ~4), drop to center, squash to 10px round dot
-      if (!p_dotStarted && t >= 300) {
-        p_dotStarted = true;
-        if (morph) {
-          morph.animate(
-            [
-              { transform: 'translateY(-28vh) scaleY(1)',   borderRadius: '3px',  opacity: 1 },
-              { transform: 'translateY(-8vh)  scaleY(4)',   borderRadius: '3px',  opacity: 1, offset: 0.4 },
-              { transform: 'translateY(0)     scaleY(4)',   borderRadius: '3px',  opacity: 1, offset: 0.7 },
-              { transform: 'translateY(0)     scaleY(0.8)', borderRadius: '50%',  opacity: 1, offset: 0.85 },
-              { transform: 'translateY(0)     scaleY(1)',   borderRadius: '50%',  opacity: 1 },
-            ],
-            { duration: 500, fill: 'forwards', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' }
-          );
-        }
-      }
+    // 1550ms: Banner reveals cleanly while curtains are opening
+    addTimeout(() => {
+      triggerBannerReveal();
+    }, 1550);
 
-      // 700–1400ms: Typewriter label under dot
-      if (!p_typeStarted && t >= 700) {
-        p_typeStarted = true;
-        startTypewriter();
-      }
+    // 2000ms: Split transition finished, release will-change GPU layer
+    addTimeout(() => {
+      if (curtainTopRef.current) curtainTopRef.current.style.willChange = 'auto';
+      if (curtainBottomRef.current) curtainBottomRef.current.style.willChange = 'auto';
+    }, 2000);
 
-      // 1400–1900ms: Dot becomes horizontal line (scaleX 0->1 across viewport)
-      if (!p_lineStarted && t >= 1400) {
-        p_lineStarted = true;
-        hideTypewriter();
-        if (morph) {
-          const vwScale = Math.ceil(window.innerWidth / 3);
-          morph.animate(
-            [
-              {
-                transform:   'scaleX(0) scaleY(2)',
-                borderRadius:'50%',
-                background:  '#AD89E8',
-                filter:      'blur(0px)',
-                boxShadow:   '0 0 14px 4px rgba(173, 137, 232, 0.7)',
-              },
-              {
-                transform:   `scaleX(${vwScale}) scaleY(2)`,
-                borderRadius:'1px',
-                background:  'linear-gradient(to right, transparent, #AD89E8, #F2EFFC, #AD89E8, transparent)',
-                filter:      'blur(1px)',
-                boxShadow:   '0 0 24px 6px rgba(173, 137, 232, 0.5)',
-              },
-            ],
-            { duration: 500, fill: 'forwards', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' }
-          );
-        }
-      }
+    // 2050ms: Scroll unlocks, hero intro state marked done, Section C enters
+    addTimeout(() => {
+      document.body.classList.remove('intro-scroll-lock');
+      if (heroWrapper) heroWrapper.dataset.intro = 'done';
+      triggerSectionC();
+    }, 2050);
 
-      // 1900–2300ms: Line thickens into light bar (~80px height), heats up
-      if (!p_barStarted && t >= 1900) {
-        p_barStarted = true;
-        if (morph) {
-          const vwScale = Math.ceil(window.innerWidth / 3);
-          morph.animate(
-            [
-              {
-                transform:  `scaleX(${vwScale}) scaleY(2)`,
-                filter:     'blur(0px)',
-                background: 'linear-gradient(to right, transparent, #AD89E8, #F2EFFC, #AD89E8, transparent)',
-              },
-              {
-                transform:  `scaleX(${vwScale}) scaleY(28)`,
-                filter:     'blur(10px)',
-                background: 'linear-gradient(to right, #E5DBF6, #FFFFFF, #E5DBF6)',
-              },
-            ],
-            { duration: 400, fill: 'forwards', easing: 'ease-in' }
-          );
-        }
-      }
+    // 2150ms: Completely unmount overlay from DOM (0 memory, 0 composite layers)
+    addTimeout(() => {
+      setMounted(false);
+    }, 2150);
 
-      // 2300–2700ms: Bar floods viewport (full flash #F2EFFC then #FFFFFF)
-      if (!p_floodStarted && t >= 2300) {
-        p_floodStarted = true;
-        if (morph) {
-          const vwScale   = Math.ceil(window.innerWidth / 3);
-          const fillScale = Math.ceil(window.innerHeight / 12) + 12;
-          morph.animate(
-            [
-              { transform: `scaleX(${vwScale}) scaleY(28)`,         filter: 'blur(10px)', background: '#F2EFFC' },
-              { transform: `scaleX(${vwScale}) scaleY(${fillScale})`, filter: 'blur(20px)', background: '#FFFFFF' },
-            ],
-            { duration: 400, fill: 'forwards', easing: 'ease-in' }
-          );
-        }
-      }
-
-      // 2500–3000ms: Overlay fades out (opacity 1->0, 500ms), unmounted after
-      if (!p_overlayFade && t >= 2500) {
-        p_overlayFade = true;
-        const overlay = overlayRef.current;
-        if (overlay) {
-          overlay.animate(
-            [{ opacity: 1 }, { opacity: 0 }],
-            { duration: 500, fill: 'forwards', easing: 'ease-out' }
-          );
-          addTimeout(() => setMounted(false), 510);
-        }
-        if (morph) morph.style.willChange = 'auto';
-      }
-
-      // 2500–3300ms: Banner reveals
-      if (!p_bannerReveal && t >= 2500) {
-        p_bannerReveal = true;
-        triggerBannerReveal(t0);
-      }
-
-      // 4000ms: Master clock completes, scroll unlocks, Section C begins
-      if (!p_introDone && t >= 4000) {
-        p_introDone = true;
-        document.body.classList.remove('intro-scroll-lock');
-        if (heroWrapper) heroWrapper.dataset.intro = 'done';
-        triggerSectionC();
-        return; // Stop animation loop
-      }
-
-      rafRef.current = requestAnimationFrame(tick);
-    }
-
-    rafRef.current = requestAnimationFrame(tick);
-
-    // Failsafe timeout at 6000ms reveals everything and unmounts overlay
+    // Failsafe timeout at 5000ms guarantees everything is revealed and overlay removed
     const failsafe = setTimeout(() => {
       revealAll();
       setMounted(false);
-    }, 6000);
+    }, 5000);
 
     const timeouts = timeoutsRef.current;
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
       clearTimeout(failsafe);
       timeouts.forEach(clearTimeout);
       document.body.classList.remove('intro-scroll-lock');
     };
-  }, [addTimeout, revealAll, startTypewriter, hideTypewriter, triggerBannerReveal, triggerSectionC]);
+  }, [addTimeout, revealAll, triggerBannerReveal, triggerSectionC]);
 
   if (!mounted) return null;
 
@@ -402,6 +223,7 @@ export default function HeroIntro() {
               .header.container[data-intro="playing"] .headerContainer2,
               .header.container[data-intro="playing"] .headerContainer1 .dotContainer,
               .header.container[data-intro="playing"] .heroHeadingInner,
+              .header.container[data-intro="playing"] .desktopHeroPortrait,
               body.intro-scroll-lock .navbar {
                 opacity: 1 !important;
                 transform: none !important;
@@ -413,16 +235,13 @@ export default function HeroIntro() {
       </noscript>
 
       <div id="hero-intro-overlay" ref={overlayRef} aria-hidden="true">
-        <div id="intro-morph" ref={morphRef} />
-        <div id="intro-label-row" ref={labelRowRef}>
-          <div id="intro-label-logo" aria-hidden="true" />
-          <span id="intro-label-text" ref={labelTextRef} />
-          <span id="intro-label-caret" aria-hidden="true" />
-        </div>
+        <div id="intro-curtain-top" ref={curtainTopRef} />
+        <div id="intro-curtain-bottom" ref={curtainBottomRef} />
+        <div id="intro-pixel-line" />
+        <div id="intro-pixel-spark" />
       </div>
     </>
   );
 }
 
 export { HeroIntro };
-

@@ -53,107 +53,145 @@
 }
 
 /* ============================================================
-   OVERLAY (0 - 3000ms)
+   OVERLAY: Flat 2D Two-Half Curtain Split
    ============================================================ */
 #hero-intro-overlay {
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: #1E1233;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: transparent;
   overflow: hidden;
   pointer-events: all;
 }
 
-/* ---- Dot grid (pure CSS gradients: 1px lines + dots at ~64px cells) ---- */
-#hero-intro-overlay::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle, #CDBCF5 1.2px, transparent 1.2px),
-    linear-gradient(to right, rgba(205, 188, 245, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(205, 188, 245, 0.08) 1px, transparent 1px);
-  background-size: 64px 64px, 64px 64px, 64px 64px;
-  background-position: 0 0, 0 0, 0 0;
-  mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, black 15%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, black 15%, transparent 100%);
-  opacity: 0;
-  animation: introGridFadeIn 0.3s ease 0s forwards;
+#hero-intro-overlay.intro-split {
   pointer-events: none;
 }
-@keyframes introGridFadeIn {
-  to { opacity: 1; }
+
+/* Curtain halves */
+#intro-curtain-top,
+#intro-curtain-bottom {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background-color: #B487F0;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.35) 1px, transparent 1px);
+  background-size: 16px 16px;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  pointer-events: all;
 }
 
-/* ---- Typewriter label under center dot ---- */
-#intro-label-row {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #CDBCF5;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
-  opacity: 0;
-  top: calc(50% + 26px);
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
-  user-select: none;
-  z-index: 2;
+#intro-curtain-top {
+  top: 0;
+  background-position: center bottom;
 }
 
-#intro-label-logo {
-  width: 16px;
-  height: 16px;
-  background-image: url("/img/icon/navInitialLogo.svg");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  flex-shrink: 0;
-}
-
-#intro-label-text {
-  display: inline-block;
-}
-
-/* Blinking block caret */
-#intro-label-caret {
-  display: inline-block;
-  width: 7px;
-  height: 13px;
-  background: #AD89E8;
-  margin-left: 2px;
-  vertical-align: middle;
-  animation: introCaret 0.55s step-end infinite;
-}
-@keyframes introCaret {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
-}
-
-/* ============================================================
-   MORPHING ELEMENT (sliver -> dot -> line -> bar -> flood)
-   ============================================================ */
-#intro-morph {
-  position: absolute;
+#intro-curtain-bottom {
   top: 50%;
-  left: 50%;
-  width: 3px;
-  height: 12px;
-  margin-left: -1.5px;
-  margin-top: -6px;
-  border-radius: 3px;
-  background: #AD89E8;
-  box-shadow: 0 0 14px 4px rgba(173, 137, 232, 0.7), 0 0 28px 8px rgba(173, 137, 232, 0.35);
-  transform-origin: center center;
+  background-position: center top;
+}
+
+/* Center pixel line (4px tall, repeating square pixel pattern) */
+#intro-pixel-line {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  margin-top: -2px;
+  background-image: repeating-linear-gradient(
+    to right,
+    #FFFFFF 0px,
+    #FFFFFF 4px,
+    rgba(180, 135, 240, 0.75) 4px,
+    rgba(180, 135, 240, 0.75) 5px
+  );
+  clip-path: inset(0 100% 0 0);
+  animation: drawPixelLine 0.6s steps(55) 0.3s forwards;
+  z-index: 10;
   pointer-events: none;
-  z-index: 3;
+  transform: translate3d(0, 0, 0);
+  will-change: clip-path, transform;
+}
+
+@keyframes drawPixelLine {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0% 0 0);
+  }
+}
+
+/* Leading-edge generator spark (flickers and travels ahead of the line front) */
+#intro-pixel-spark {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  width: 60px;
+  height: 12px;
+  margin-top: -6px;
+  z-index: 12;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    linear-gradient(#FFFFFF, #FFFFFF) 0px 4px / 4px 4px no-repeat,
+    linear-gradient(#FFFFFF, #FFFFFF) 8px 1px / 3px 3px no-repeat,
+    linear-gradient(#FFFFFF, #FFFFFF) 16px 8px / 3px 3px no-repeat,
+    linear-gradient(#FFFFFF, #FFFFFF) 24px 4px / 4px 4px no-repeat,
+    linear-gradient(#FFFFFF, #FFFFFF) 32px 0px / 3px 3px no-repeat,
+    linear-gradient(#FFFFFF, #FFFFFF) 40px 7px / 3px 3px no-repeat,
+    linear-gradient(#FFFFFF, #FFFFFF) 48px 3px / 4px 4px no-repeat,
+    linear-gradient(#FFFFFF, #FFFFFF) 54px 5px / 3px 3px no-repeat;
+  animation: sparkTravel 0.6s steps(55) 0.3s forwards,
+             sparkFlicker 0.12s steps(2) 0.3s infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes sparkTravel {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  98% {
+    transform: translate3d(calc(100vw - 30px), 0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(100vw, 0, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkFlicker {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* Split animation */
+#hero-intro-overlay.intro-split #intro-curtain-top {
+  transform: translate3d(0, -100%, 0);
+  transition: transform 900ms cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+#hero-intro-overlay.intro-split #intro-curtain-bottom {
+  transform: translate3d(0, 100%, 0);
+  transition: transform 900ms cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+#hero-intro-overlay.intro-split #intro-pixel-line {
+  transform: translate3d(0, -50vh, 0);
+  transition: transform 900ms cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+#hero-intro-overlay.intro-split #intro-pixel-spark {
+  display: none !important;
 }
 
 /* ============================================================
@@ -177,7 +215,6 @@
 
 [data-intro="playing"] .hi-letter {
   transform: translateY(110%) skewY(6deg);
-  filter: blur(10px);
   opacity: 0;
 }
 
@@ -231,7 +268,7 @@ body.intro-scroll-lock .navbar {
    ANIMATION REVEAL CLASSES (added by master clock)
    ============================================================ */
 
-/* (A)b: Labels at 2600ms */
+/* Labels */
 .banner-label-left.intro-reveal-label,
 .banner-label-right.intro-reveal-label {
   transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -240,17 +277,15 @@ body.intro-scroll-lock .navbar {
   transform: translateX(0) !important;
 }
 
-/* (A)c: Centered "Hi! I'm aashi" letters at 2650ms (stagger 55ms) */
+/* Centered "Hi! I'm aashi" letters */
 .hi-letter.intro-reveal-letter {
   transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1),
-              filter 800ms cubic-bezier(0.22, 1, 0.36, 1),
               opacity 400ms ease;
   transform: translateY(0) skewY(0deg) !important;
-  filter: blur(0) !important;
   opacity: 1 !important;
 }
 
-/* (A)d: Sparkles at 2900ms (stagger 120ms) */
+/* Sparkles */
 .banner-sparkle.intro-reveal-sparkle {
   transition: transform 550ms cubic-bezier(0.22, 1, 0.36, 1),
               opacity 450ms ease;
@@ -258,7 +293,7 @@ body.intro-scroll-lock .navbar {
   opacity: 1 !important;
 }
 
-/* (A)e: Lavender pill pops in at 3100ms */
+/* Lavender pill pops in */
 .headerContainer1 .dotContainer.intro-revealed {
   transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1),
               opacity 400ms ease;
@@ -267,7 +302,7 @@ body.intro-scroll-lock .navbar {
 }
 
 /* ============================================================
-   (C) SECTION C ENTRANCE CLASSES (at 4000ms)
+   (C) SECTION C ENTRANCE CLASSES
    ============================================================ */
 
 /* Navbar */
@@ -278,7 +313,7 @@ body.intro-scroll-lock .navbar {
   transform: translateY(0) !important;
 }
 
-/* Heading lines (stagger 90ms) */
+/* Heading lines */
 .heroHeadingInner.intro-revealed {
   transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1),
               opacity 800ms ease;
@@ -286,7 +321,7 @@ body.intro-scroll-lock .navbar {
   opacity: 1 !important;
 }
 
-/* Description (+250ms) */
+/* Description */
 .headerContainer2 p.intro-revealed {
   transition: opacity 800ms cubic-bezier(0.22, 1, 0.36, 1),
               transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -294,7 +329,7 @@ body.intro-scroll-lock .navbar {
   transform: translateY(0) !important;
 }
 
-/* Button (+400ms) */
+/* Button */
 .headerContainer2 .contact.intro-revealed {
   transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
               opacity 700ms ease;
@@ -379,34 +414,45 @@ body.intro-scroll-lock {
   .homeBanner {
     display: flex !important;
     flex-direction: row !important;
-    align-items: flex-end !important;
+    align-items: flex-start !important;
     justify-content: space-between !important;
     width: 100% !important;
     position: relative !important;
+    z-index: 20 !important;
+    min-height: clamp(380px, 28vw, 460px) !important;
     margin-top: 1.5rem !important;
   }
 
   .headerContainer1 {
-    flex: 1 1 0 !important;
-    max-width: 380px !important;
-    width: auto !important;
+    flex: 0 0 auto !important;
+    max-width: clamp(350px, 25vw, 420px) !important;
+    width: 100% !important;
     height: auto !important;
-    margin: 0 !important;
-    padding: 0 1rem 0 0 !important;
-    align-self: flex-end !important;
+    margin: clamp(1.2rem, 2vw, 2.2rem) 0 0 0 !important;
+    padding: 0 !important;
+    align-self: flex-start !important;
+    z-index: 20 !important;
+  }
+
+  .headerContainer1 .heroHeading {
+    max-width: clamp(350px, 25vw, 420px) !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
   }
 
   .desktopHeroPortrait {
     display: flex !important;
     justify-content: center !important;
     align-items: flex-end !important;
-    align-self: flex-end !important;
-    flex: 0 0 auto !important;
-    width: clamp(320px, 24vw, 420px) !important;
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
     margin: 0 auto !important;
+    width: clamp(370px, 31vw, 540px) !important;
     pointer-events: none !important;
     user-select: none !important;
-    z-index: 10;
+    z-index: 25 !important;
   }
 
   .desktopHeroPortraitImg {
@@ -418,16 +464,19 @@ body.intro-scroll-lock {
     object-position: top center !important;
     mask-image: linear-gradient(to bottom, black 72%, transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, black 72%, transparent 100%);
+    pointer-events: none !important;
+    user-select: none !important;
   }
 
   .headerContainer2 {
-    flex: 1 1 0 !important;
-    max-width: 380px !important;
-    width: auto !important;
+    flex: 0 0 auto !important;
+    max-width: clamp(280px, 22vw, 360px) !important;
+    width: 100% !important;
     height: auto !important;
     margin: 0 0 0 auto !important;
-    padding: 0 0 0 1rem !important;
-    align-self: flex-end !important;
+    margin-top: clamp(3.5rem, 6.5vw, 7.5rem) !important;
+    padding: 0 !important;
+    align-self: flex-start !important;
+    z-index: 20 !important;
   }
 }
-
