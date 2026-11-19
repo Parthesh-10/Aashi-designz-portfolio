@@ -175,10 +175,67 @@ export default function Category({ categoryDesc = [] }) {
     router.push(card2.pageLink || '/service/branddesign');
   };
 
+  const getService = (keyword, fallbackHeading, fallbackLink, fallbackImg) => {
+    const found = categoryDesc.find((c) => c.pageLink?.toLowerCase().includes(keyword.toLowerCase()));
+    return {
+      heading: found?.heading || fallbackHeading,
+      pageLink: found?.pageLink || fallbackLink,
+      imgSrc: found?.imgSrc || fallbackImg,
+    };
+  };
+
+  const uiux = getService('uiux', 'UI/UX', '/service/uiuxdesign', 'dsfasdf.png');
+  const branding = getService('branddesign', 'BRANDING', '/service/branddesign', 'hfsdfas.png');
+  const video = getService('video', 'VIDEO EDITING', '/service/videoediting', 'dfsdafsdlkfjs.png');
+  const graphic = getService('graphic', 'GRAPHIC DESIGNING', '/service/graphicdesign', 'kgjdflg.jpg');
+  const strategy = getService('strategy', 'DESIGN STRATEGY', '/service/designstrategy', 'dfhasdlfasd.png');
+
+  const MOBILE_CATEGORIES = [
+    {
+      title: 'Branding & Strategy',
+      destination: branding.pageLink,
+      cardLeft: { src: `/img/${uiux.imgSrc}`, alt: uiux.heading, link: uiux.pageLink },
+      cardMiddle: { src: `/img/${branding.imgSrc}`, alt: branding.heading, link: branding.pageLink },
+      cardRight: { src: `/img/${video.imgSrc}`, alt: video.heading, link: video.pageLink, hasBadge: true },
+    },
+    {
+      title: 'Design & Edit',
+      destination: graphic.pageLink,
+      cardLeft: { src: `/img/${graphic.imgSrc}`, alt: graphic.heading, link: graphic.pageLink },
+      cardMiddle: { src: `/img/${video.imgSrc}`, alt: video.heading, link: video.pageLink },
+      cardRight: { src: `/img/${branding.imgSrc}`, alt: branding.heading, link: branding.pageLink, hasBadge: true },
+    },
+    {
+      title: 'Digital Marketing',
+      destination: strategy.pageLink,
+      cardLeft: { src: `/img/${strategy.imgSrc}`, alt: strategy.heading, link: strategy.pageLink },
+      cardMiddle: { src: `/img/${branding.imgSrc}`, alt: branding.heading, link: branding.pageLink },
+      cardRight: { src: `/img/${uiux.imgSrc}`, alt: uiux.heading, link: uiux.pageLink, hasBadge: true },
+    },
+    {
+      title: 'UI / UX',
+      destination: uiux.pageLink,
+      cardLeft: { src: `/img/${uiux.imgSrc}`, alt: uiux.heading, link: uiux.pageLink },
+      cardMiddle: { src: `/img/${branding.imgSrc}`, alt: branding.heading, link: branding.pageLink },
+      cardRight: { src: `/img/${video.imgSrc}`, alt: video.heading, link: video.pageLink, hasBadge: true },
+    },
+    {
+      title: 'Offline Marketing',
+      destination: graphic.pageLink,
+      cardLeft: { src: `/img/${graphic.imgSrc}`, alt: graphic.heading, link: graphic.pageLink },
+      cardMiddle: { src: `/img/${branding.imgSrc}`, alt: branding.heading, link: branding.pageLink },
+      cardRight: { src: `/img/${strategy.imgSrc}`, alt: strategy.heading, link: strategy.pageLink, hasBadge: true },
+    },
+  ];
+
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+  const activeCategory = MOBILE_CATEGORIES[activeCategoryIndex] || MOBILE_CATEGORIES[0];
+
   return (
     <div className="category">
       <h2 className="heading">WHAT I DO</h2>
 
+      {/* Desktop & Tablet Folder Grid (>= 768px) */}
       <div className="singleFolderContainer" ref={containerRef}>
         {FOLDER_TITLES.map((title, idx) => (
           <FolderItem
@@ -190,6 +247,112 @@ export default function Category({ categoryDesc = [] }) {
             onArrowClick={handleArrowClick}
           />
         ))}
+      </div>
+
+      {/* Mobile Featured Showcase (< 768px) */}
+      <div className="categoryMobileShowcase">
+        <div className="categoryMobileCardWrapper">
+          <div className="categoryMobileCardBack" />
+
+          <div className="categoryMobileMockups">
+            <Link
+              href={activeCategory.cardLeft.link}
+              className="categoryMobileMockupCard mockupLeft"
+              title={activeCategory.cardLeft.alt}
+            >
+              <div className="categoryMobileMockupInner">
+                <img
+                  src={activeCategory.cardLeft.src}
+                  alt={activeCategory.cardLeft.alt}
+                />
+              </div>
+            </Link>
+
+            <Link
+              href={activeCategory.cardMiddle.link}
+              className="categoryMobileMockupCard mockupMiddle"
+              title={activeCategory.cardMiddle.alt}
+            >
+              <div className="categoryMobileMockupInner">
+                <img
+                  src={activeCategory.cardMiddle.src}
+                  alt={activeCategory.cardMiddle.alt}
+                />
+              </div>
+            </Link>
+
+            <Link
+              href={activeCategory.cardRight.link}
+              className="categoryMobileMockupCard mockupRight"
+              title={activeCategory.cardRight.alt}
+            >
+              {activeCategory.cardRight.hasBadge && (
+                <div className="avatarBadge">A</div>
+              )}
+              <div className="categoryMobileMockupInner">
+                <img
+                  src={activeCategory.cardRight.src}
+                  alt={activeCategory.cardRight.alt}
+                />
+              </div>
+            </Link>
+          </div>
+
+          <div className="categoryMobileCardFront" />
+
+          <svg
+            className="categoryMobileFrontRim"
+            viewBox="0 0 300 142"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M 0 0 L 114 0 C 131 0, 147 21, 165 21 L 300 21"
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.55)"
+              strokeWidth="2"
+            />
+          </svg>
+
+          <h3 className="categoryMobileTitle">{activeCategory.title}</h3>
+
+          <Link
+            href={activeCategory.destination}
+            className="categoryMobileArrowBtn"
+            aria-label={`Explore ${activeCategory.title}`}
+          >
+            <svg
+              className="folderArrowIcon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="7" y1="17" x2="17" y2="7" />
+              <polyline points="7 7 17 7 17 17" />
+            </svg>
+          </Link>
+        </div>
+
+        {/* Category Navigation Buttons */}
+        <div className="categoryMobileNav" role="tablist" aria-label="Service categories">
+          {MOBILE_CATEGORIES.map((cat, idx) => {
+            const isSelected = idx === activeCategoryIndex;
+            return (
+              <button
+                key={idx}
+                type="button"
+                role="tab"
+                aria-selected={isSelected}
+                className={`categoryMobilePill ${isSelected ? 'active' : ''}`}
+                onClick={() => setActiveCategoryIndex(idx)}
+              >
+                {cat.title}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="categoryDesc">

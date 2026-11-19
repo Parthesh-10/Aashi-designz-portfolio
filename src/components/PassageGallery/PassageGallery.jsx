@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import * as THREE from 'three';
 import './PassageGallery.css';
 
@@ -722,7 +723,9 @@ export default function PassageGallery({
           <button
             className="passage-hint-skip"
             onClick={() => {
-              const el = containerRef.current?.closest('.passage-section-wrapper')?.nextElementSibling;
+              const el =
+                containerRef.current?.closest('.passage-outer-container')?.nextElementSibling ||
+                containerRef.current?.closest('.passage-section-wrapper')?.nextElementSibling;
               if (el) {
                 el.scrollIntoView({ behavior: 'smooth' });
               } else {
@@ -736,8 +739,8 @@ export default function PassageGallery({
         </div>
       )}
 
-      {/* Focused Photo Inspection Modal Overlay */}
-      {focusedItem && captions && (
+      {/* Focused Photo Inspection Modal Overlay (Portaled to document.body so it stays full-viewport) */}
+      {focusedItem && captions && typeof document !== 'undefined' && createPortal(
         <div
           className="passage-focus-overlay"
           onClick={closeFocus}
@@ -766,7 +769,8 @@ export default function PassageGallery({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

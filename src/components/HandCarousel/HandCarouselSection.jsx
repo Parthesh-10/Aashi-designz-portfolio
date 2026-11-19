@@ -11,19 +11,12 @@ const SLIDES = [
   { src: '/About%20me/5.png', alt: 'Project 5 that got out of hand' }
 ];
 
-const TRACK_ITEMS = [
-  { ...SLIDES[4], key: 'clone-prev', isClone: true, realIndex: 4 },
-  { ...SLIDES[0], key: 'slide-0', isClone: false, realIndex: 0 },
-  { ...SLIDES[1], key: 'slide-1', isClone: false, realIndex: 1 },
-  { ...SLIDES[2], key: 'slide-2', isClone: false, realIndex: 2 },
-  { ...SLIDES[3], key: 'slide-3', isClone: false, realIndex: 3 },
-  { ...SLIDES[4], key: 'slide-4', isClone: false, realIndex: 4 },
-  { ...SLIDES[0], key: 'clone-next', isClone: true, realIndex: 0 }
-];
+const AUTOPLAY_INTERVAL_MS = 2500;
+const TRANSITION_DURATION_MS = 750;
 
 export default function HandCarouselSection() {
-  const [currentIndex, setCurrentIndex] = useState(1);
-  const [isTransitioning, setIsTransitioning] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [animatingState, setAnimatingState] = useState(null); // { from, to, direction }
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isDocumentHidden, setIsDocumentHidden] = useState(false);
@@ -80,31 +73,51 @@ export default function HandCarouselSection() {
     if (isManual) resetTimer();
 
     if (prefersReducedMotion) {
-      setCurrentIndex((prev) => (prev >= 5 ? 1 : prev + 1));
+      setCurrentIndex((prev) => (prev + 1) % SLIDES.length);
       return;
     }
 
     if (isTransitioningRef.current) return;
     isTransitioningRef.current = true;
-    setIsTransitioning(true);
-    setCurrentIndex((prev) => prev + 1);
-  }, [prefersReducedMotion, resetTimer]);
+
+    const from = currentIndex;
+    const to = (currentIndex + 1) % SLIDES.length;
+
+    setAnimatingState({ from, to, direction: 'next' });
+    setCurrentIndex(to);
+  }, [currentIndex, prefersReducedMotion, resetTimer]);
 
   const goToPrev = useCallback((isManual = false) => {
     if (isManual) resetTimer();
 
     if (prefersReducedMotion) {
-      setCurrentIndex((prev) => (prev <= 1 ? 5 : prev - 1));
+      setCurrentIndex((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
       return;
     }
 
     if (isTransitioningRef.current) return;
     isTransitioningRef.current = true;
-    setIsTransitioning(true);
-    setCurrentIndex((prev) => prev - 1);
-  }, [prefersReducedMotion, resetTimer]);
 
-  // Autoplay loop (every 4s)
+    const from = currentIndex;
+    const to = (currentIndex - 1 + SLIDES.length) % SLIDES.length;
+
+    setAnimatingState({ from, to, direction: 'prev' });
+    setCurrentIndex(to);
+  }, [currentIndex, prefersReducedMotion, resetTimer]);
+
+  // Handle animation completion
+  useEffect(() => {
+    if (!animatingState) return;
+
+    const timer = setTimeout(() => {
+      setAnimatingState(null);
+      isTransitioningRef.current = false;
+    }, TRANSITION_DURATION_MS);
+
+    return () => clearTimeout(timer);
+  }, [animatingState]);
+
+  // Autoplay loop
   useEffect(() => {
     if (prefersReducedMotion || isHovered || isFocused || isDocumentHidden || !isInView) {
       return;
@@ -112,52 +125,23 @@ export default function HandCarouselSection() {
 
     const intervalId = setInterval(() => {
       goToNext(false);
-    }, 4000);
+    }, AUTOPLAY_INTERVAL_MS);
 
     return () => clearInterval(intervalId);
   }, [prefersReducedMotion, isHovered, isFocused, isDocumentHidden, isInView, timerToken, goToNext]);
 
-  // Handle seamless infinite looping at transition end
-  const handleTransitionEnd = () => {
-    if (currentIndex === 6) {
-      setIsTransitioning(false);
-      setCurrentIndex(1);
-    } else if (currentIndex === 0) {
-      setIsTransitioning(false);
-      setCurrentIndex(5);
-    }
-    isTransitioningRef.current = false;
-  };
-
-  // Safety fallback for transitionend unlock
-  useEffect(() => {
-    if (!isTransitioning || prefersReducedMotion) return;
-    const timer = setTimeout(() => {
-      if (currentIndex === 6) {
-        setIsTransitioning(false);
-        setCurrentIndex(1);
-      } else if (currentIndex === 0) {
-        setIsTransitioning(false);
-        setCurrentIndex(5);
-      }
-      isTransitioningRef.current = false;
-    }, 650);
-
-    return () => clearTimeout(timer);
-  }, [currentIndex, isTransitioning, prefersReducedMotion]);
-
-  // Keyboard navigation (ArrowLeft / ArrowRight)
+  // Keyboard navigation (ArrowLeft/ArrowUp for Prev, ArrowRight/ArrowDown for Next)
   const handleKeyDown = (e) => {
-    if (e.key === 'ArrowLeft') {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
       e.preventDefault();
       goToPrev(true);
-    } else if (e.key === 'ArrowRight') {
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault();
       goToNext(true);
     }
   };
 
-  // Touch / Pointer Swipe
+  // Touch / Pointer Swipe (supports vertical and horizontal drag)
   const handlePointerDown = (e) => {
     if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
     pointerStartXRef.current = e.clientX;
@@ -165,17 +149,17 @@ export default function HandCarouselSection() {
   };
 
   const handlePointerUp = (e) => {
-    if (pointerStartXRef.current === null) return;
-    const diffX = e.clientX - pointerStartXRef.current;
+    if (pointerStartXRef.current === null && pointerStartYRef.current === null) return;
+    const diffX = e.clientX - (pointerStartXRef.current ?? e.clientX);
     const diffY = e.clientY - (pointerStartYRef.current ?? e.clientY);
     pointerStartXRef.current = null;
     pointerStartYRef.current = null;
 
-    if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
-      if (diffX > 0) {
-        goToPrev(true);
-      } else {
+    if (Math.abs(diffY) > 35 || Math.abs(diffX) > 40) {
+      if (diffY < -30 || diffX < -40) {
         goToNext(true);
+      } else if (diffY > 30 || diffX > 40) {
+        goToPrev(true);
       }
     }
   };
@@ -185,8 +169,32 @@ export default function HandCarouselSection() {
     pointerStartYRef.current = null;
   };
 
-  // Map track index to active slide for accessibility
-  const activeRealIndex = (currentIndex - 1 + 5) % 5;
+  // Determine the dynamic stack state class for each slide
+  const getSlideClass = (idx) => {
+    if (!animatingState) {
+      if (idx === currentIndex) return 'handcarousel-slide-active';
+      if (idx === (currentIndex + 1) % SLIDES.length) return 'handcarousel-slide-peek';
+      return 'handcarousel-slide-hidden';
+    }
+
+    const { from, to, direction } = animatingState;
+
+    if (direction === 'next') {
+      if (idx === from) return 'handcarousel-slide-exit-up';
+      if (idx === to) return 'handcarousel-slide-promote';
+      if (idx === (to + 1) % SLIDES.length) return 'handcarousel-slide-emerge';
+      return 'handcarousel-slide-hidden';
+    }
+
+    if (direction === 'prev') {
+      if (idx === to) return 'handcarousel-slide-enter-down';
+      if (idx === from) return 'handcarousel-slide-demote';
+      if (idx === (from + 1) % SLIDES.length) return 'handcarousel-slide-drop-out';
+      return 'handcarousel-slide-hidden';
+    }
+
+    return 'handcarousel-slide-hidden';
+  };
 
   return (
     <section className="handcarousel-section container">
@@ -217,73 +225,26 @@ export default function HandCarouselSection() {
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
       >
-        <div
-          className="handcarousel-track"
-          style={{
-            transform: `translateX(-${currentIndex * 100}%)`,
-            transition: isTransitioning && !prefersReducedMotion ? 'transform 0.6s ease-in-out' : 'none'
-          }}
-          onTransitionEnd={handleTransitionEnd}
-        >
-          {TRACK_ITEMS.map((item, index) => {
-            const isVisible = index === currentIndex;
+        <div className="handcarousel-track">
+          {SLIDES.map((item, index) => {
+            const slideClass = getSlideClass(index);
             return (
               <div
-                key={item.key}
-                className="handcarousel-slide"
-                aria-hidden={!isVisible}
+                key={index}
+                className={`handcarousel-slide ${slideClass}`}
+                aria-hidden={index !== currentIndex}
               >
                 <img
                   src={item.src}
                   alt={item.alt}
                   className="handcarousel-image"
-                  loading={index === 1 ? 'eager' : 'lazy'}
+                  loading={index === 0 ? 'eager' : 'lazy'}
                   draggable={false}
                 />
               </div>
             );
           })}
         </div>
-
-        <button
-          type="button"
-          className="handcarousel-button handcarousel-button-prev"
-          onClick={() => goToPrev(true)}
-          aria-label="Previous slide"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="handcarousel-arrow-icon"
-            aria-hidden="true"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-
-        <button
-          type="button"
-          className="handcarousel-button handcarousel-button-next"
-          onClick={() => goToNext(true)}
-          aria-label="Next slide"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="handcarousel-arrow-icon"
-            aria-hidden="true"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
       </div>
     </section>
   );

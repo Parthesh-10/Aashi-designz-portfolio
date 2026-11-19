@@ -267,9 +267,17 @@
     display: none !important;
   }
 
-  /* Change B: Bigger, wider "Hi! I'm Aashi" spanning ~90-95% of viewport width */
+  /* Flush top labels to container content edges */
+  .banner-label-left {
+    left: 0 !important;
+  }
+  .banner-label-right {
+    right: 0 !important;
+  }
+
+  /* Sized to fit container width on one line */
   .hi-aashi-text {
-    font-size: clamp(6.5rem, 14.7vw, 18.5rem);
+    font-size: clamp(5.2rem, 11.6vw, 14.6rem);
     font-weight: 700;
   }
 }

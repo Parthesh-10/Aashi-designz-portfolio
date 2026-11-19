@@ -27,7 +27,13 @@
 /* ---- prefers-reduced-motion: skip intro entirely with 300ms fade ---- */
 @media (prefers-reduced-motion: reduce) {
   #hero-intro-overlay {
-    animation: introReducedFade 0.3s ease forwards !important;
+    animation: introReducedFade 0.2s ease forwards !important;
+  }
+  #intro-dot,
+  #intro-line,
+  #intro-string-svg,
+  #intro-expand-burst {
+    display: none !important;
   }
   .header.container[data-intro="playing"] .banner-bg-img,
   .header.container[data-intro="playing"] .banner-label-left,
@@ -53,145 +59,99 @@
 }
 
 /* ============================================================
-   OVERLAY: Flat 2D Two-Half Curtain Split
+   OVERLAY: Vibrating String + Expand-to-Reveal Intro
    ============================================================ */
 #hero-intro-overlay {
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: transparent;
+  background-color: #B487F0;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.35) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position: center center;
   overflow: hidden;
   pointer-events: all;
 }
 
-#hero-intro-overlay.intro-split {
-  pointer-events: none;
-}
-
-/* Curtain halves */
-#intro-curtain-top,
-#intro-curtain-bottom {
-  position: fixed;
-  left: 0;
-  width: 100%;
-  height: 50%;
-  background-color: #B487F0;
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.35) 1px, transparent 1px);
-  background-size: 16px 16px;
-  transform: translate3d(0, 0, 0);
-  will-change: transform;
-  pointer-events: all;
-}
-
-#intro-curtain-top {
-  top: 0;
-  background-position: center bottom;
-}
-
-#intro-curtain-bottom {
-  top: 50%;
-  background-position: center top;
-}
-
-/* Center pixel line (4px tall, repeating square pixel pattern) */
-#intro-pixel-line {
+/* Beat 1: Center dot (18px = base 8px + 10px) */
+#intro-dot {
   position: fixed;
   top: 50%;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  margin-top: -2px;
-  background-image: repeating-linear-gradient(
-    to right,
-    #FFFFFF 0px,
-    #FFFFFF 4px,
-    rgba(180, 135, 240, 0.75) 4px,
-    rgba(180, 135, 240, 0.75) 5px
-  );
-  clip-path: inset(0 100% 0 0);
-  animation: drawPixelLine 0.6s steps(55) 0.3s forwards;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  margin-left: -9px;
+  background-color: #FFFFFF;
+  border-radius: 50%;
   z-index: 10;
   pointer-events: none;
-  transform: translate3d(0, 0, 0);
-  will-change: clip-path, transform;
+  opacity: 0;
+  transform: scale(0.6);
+  will-change: opacity, transform;
 }
 
-@keyframes drawPixelLine {
-  0% {
-    clip-path: inset(0 100% 0 0);
-  }
-  100% {
-    clip-path: inset(0 0% 0 0);
-  }
-}
-
-/* Leading-edge generator spark (flickers and travels ahead of the line front) */
-#intro-pixel-spark {
+/* Beat 1: Solid white line (12.5px = base 2.5px + 10px tall) stretching edge-to-edge */
+#intro-line {
   position: fixed;
   top: 50%;
-  left: 0;
-  width: 60px;
-  height: 12px;
-  margin-top: -6px;
-  z-index: 12;
+  left: -2px;
+  width: calc(100vw + 4px);
+  height: 12.5px;
+  margin-top: -6.25px;
+  background-color: #FFFFFF;
+  z-index: 10;
   pointer-events: none;
   opacity: 0;
-  background:
-    linear-gradient(#FFFFFF, #FFFFFF) 0px 4px / 4px 4px no-repeat,
-    linear-gradient(#FFFFFF, #FFFFFF) 8px 1px / 3px 3px no-repeat,
-    linear-gradient(#FFFFFF, #FFFFFF) 16px 8px / 3px 3px no-repeat,
-    linear-gradient(#FFFFFF, #FFFFFF) 24px 4px / 4px 4px no-repeat,
-    linear-gradient(#FFFFFF, #FFFFFF) 32px 0px / 3px 3px no-repeat,
-    linear-gradient(#FFFFFF, #FFFFFF) 40px 7px / 3px 3px no-repeat,
-    linear-gradient(#FFFFFF, #FFFFFF) 48px 3px / 4px 4px no-repeat,
-    linear-gradient(#FFFFFF, #FFFFFF) 54px 5px / 3px 3px no-repeat;
-  animation: sparkTravel 0.6s steps(55) 0.3s forwards,
-             sparkFlicker 0.12s steps(2) 0.3s infinite;
+  transform: scaleX(0);
+  transform-origin: center center;
   will-change: transform, opacity;
 }
 
-@keyframes sparkTravel {
-  0% {
-    transform: translate3d(0, 0, 0);
-    opacity: 1;
-  }
-  98% {
-    transform: translate3d(calc(100vw - 30px), 0, 0);
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(100vw, 0, 0);
-    opacity: 0;
-  }
+/* Beat 2: Full-viewport SVG for vibrating string (z-index: 20 so it sits on top of early burst) */
+#intro-string-svg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 20;
+  pointer-events: none;
+  overflow: visible;
 }
 
-@keyframes sparkFlicker {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.35;
-  }
+.intro-main-path {
+  stroke: #FFFFFF;
+  stroke-width: 12.5px;
+  fill: none;
+  stroke-linecap: butt;
 }
 
-/* Split animation */
-#hero-intro-overlay.intro-split #intro-curtain-top {
-  transform: translate3d(0, -100%, 0);
-  transition: transform 900ms cubic-bezier(0.76, 0, 0.24, 1);
+.intro-ghost-path {
+  stroke: #FFFFFF;
+  stroke-width: 12.5px;
+  fill: none;
+  stroke-linecap: butt;
+  pointer-events: none;
 }
 
-#hero-intro-overlay.intro-split #intro-curtain-bottom {
-  transform: translate3d(0, 100%, 0);
-  transition: transform 900ms cubic-bezier(0.76, 0, 0.24, 1);
+.intro-ghost-1 {
+  opacity: 0.35;
 }
 
-#hero-intro-overlay.intro-split #intro-pixel-line {
-  transform: translate3d(0, -50vh, 0);
-  transition: transform 900ms cubic-bezier(0.76, 0, 0.24, 1);
+.intro-ghost-2 {
+  opacity: 0.20;
 }
 
-#hero-intro-overlay.intro-split #intro-pixel-spark {
-  display: none !important;
+/* Beat 3: Full-screen white expanding burst layer (GPU compositor scaleY) */
+#intro-expand-burst {
+  position: fixed;
+  inset: -2px;
+  background-color: #FFFFFF;
+  z-index: 15;
+  pointer-events: none;
+  transform: scaleY(0);
+  transform-origin: center center;
+  will-change: transform;
 }
 
 /* ============================================================
@@ -407,10 +367,18 @@ body.intro-scroll-lock {
 /* Desktop layout (>= 768px) */
 @media (min-width: 768px) {
   .header.container {
-    padding-left: clamp(1.5rem, 3.8vw, 3.8vw) !important;
-    padding-right: clamp(1.5rem, 3.8vw, 3.8vw) !important;
+    padding-left: 12rem !important;
+    padding-right: 12rem !important;
   }
+}
+@media (max-width: 900px) and (min-width: 768px) {
+  .header.container {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+}
 
+@media (min-width: 768px) {
   .homeBanner {
     display: flex !important;
     flex-direction: row !important;

@@ -2676,4 +2676,13 @@ textarea:focus {
     mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
   }
+
+  /* About Me Section — Mobile Line Height */
+  .aboutDiv div h3 {
+    line-height: 1.2;
+  }
+
+  .aboutDiv div h6 {
+    line-height: 1.38;
+  }
 }

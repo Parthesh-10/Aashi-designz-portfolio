@@ -1,0 +1,199 @@
+/* ============================================================
+   ServicesHero.css — Hero Section for Services Page (/service/branddesign)
+   ============================================================ */
+
+.svchero-section.container {
+  --svchero-nav-height: 66px;
+  width: 100%;
+  padding-top: calc(var(--svchero-nav-height) + clamp(68px, 5vw, 76px));
+  padding-bottom: clamp(40px, 4vw, 60px);
+}
+
+.svchero-grid {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(32px, 3.2vw, 48px);
+  width: 100%;
+}
+
+/* Left Column (~42-45%) */
+.svchero-left {
+  flex: 0 0 45%;
+  max-width: 500px;
+  margin-top: clamp(18px, 1.8vw, 28px);
+}
+
+.svchero-label-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: clamp(10px, 1.2vw, 14px);
+}
+
+.svchero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #A98BE6;
+  flex-shrink: 0;
+}
+
+.svchero-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #A98BE6;
+}
+
+.svchero-heading {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(40px, 3.6vw, 52px);
+  font-weight: 500;
+  color: #313944;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  margin: 0 0 clamp(14px, 1.3vw, 18px) 0;
+  text-align: left;
+}
+
+.svchero-subtext {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(16px, 1.25vw, 18px);
+  font-weight: 400;
+  color: #6B6B75;
+  line-height: 1.3;
+  margin: 0;
+  text-align: left;
+}
+
+.svchero-desktop-br {
+  display: inline;
+}
+
+/* Right Column (~48-50%) */
+.svchero-right {
+  flex: 0 0 50%;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.svchero-image-wrapper {
+  width: 100%;
+  aspect-ratio: 1024 / 503;
+  border-radius: 40px;
+  overflow: hidden;
+  background-color: #f7f2fb;
+}
+
+.svchero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Pill Button Centered Below Image */
+.svchero-button-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: clamp(16px, 1.8vw, 20px);
+}
+
+.svchero-button {
+  margin-top: 0 !important;
+  height: auto !important;
+  padding: 6px 8px 6px 14px !important;
+  border-radius: 9999px !important;
+  background-color: #b487ef !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+.svchero-button h5 {
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #ffffff !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  letter-spacing: 0.01em !important;
+}
+
+/* Tablet (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .svchero-section.container {
+    padding-top: calc(var(--svchero-nav-height) + 54px);
+  }
+  .svchero-grid {
+    gap: 28px;
+  }
+  .svchero-left {
+    flex: 0 0 47%;
+    margin-top: 16px;
+  }
+  .svchero-right {
+    flex: 0 0 49%;
+  }
+  .svchero-heading {
+    font-size: 38px;
+  }
+  .svchero-subtext {
+    font-size: 16px;
+  }
+  .svchero-image-wrapper {
+    border-radius: 30px;
+  }
+}
+
+/* Mobile (<= 767px) */
+@media (max-width: 767px) {
+  .svchero-section.container {
+    --svchero-nav-height: 60px;
+    padding-top: calc(var(--svchero-nav-height) + 36px);
+    padding-bottom: 36px;
+  }
+  .svchero-grid {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .svchero-left {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 0;
+  }
+  .svchero-right {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+  }
+  .svchero-heading {
+    font-size: clamp(28px, 8vw, 36px);
+    margin-bottom: 10px;
+  }
+  .svchero-subtext {
+    font-size: clamp(15px, 4vw, 16px);
+    line-height: 1.35;
+  }
+  .svchero-desktop-br {
+    display: none;
+  }
+  .svchero-image-wrapper {
+    aspect-ratio: 16 / 10;
+    border-radius: 24px;
+  }
+  .svchero-button-wrapper {
+    margin-top: 16px;
+  }
+}

@@ -2,16 +2,69 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import './HeroIntro.css';
 
+// ============================================================
+// CONFIGURABLE TUNING CONSTANTS
+// ============================================================
+
+// Thickness constants
+const STRING_THICKNESS_BASE = 2.5;
+const STRING_THICKNESS_ADD = 10;
+const STRING_THICKNESS = STRING_THICKNESS_BASE + STRING_THICKNESS_ADD; // 12.5px
+
+const DOT_SIZE_BASE = 8;
+const DOT_SIZE_ADD = 10;
+const DOT_SIZE = DOT_SIZE_BASE + DOT_SIZE_ADD; // 18px
+
+// Vibration amplitude constants (reference values at 1440x900 desktop)
+const STRING_AMP_1_REF = 70; // First mode amplitude (sag/crest)
+const STRING_AMP_2_REF = 28; // Second mode amplitude (figure-eight crossing, ratio = 0.40)
+const AMP_REF_DIM = 900;     // Reference min viewport dimension
+const F1_HZ = 6.5;
+const F2_HZ = 13.0;
+const TAU_SEC = 0.28;
+
+// Fast lead-in timing constants (ms from first paint)
+const DOT_FADE_MS = 120;
+const LINE_STRETCH_MS = 220;
+const HOLD_BEFORE_PLUCK_MS = 30;
+const PLUCK_START_MS = DOT_FADE_MS + LINE_STRETCH_MS + HOLD_BEFORE_PLUCK_MS; // 370ms
+
+// Mid-vibration expansion & reveal timing constants (ms relative to pluck)
+// Mode 1 zero-crossing: t = 9 / (4 * f1) = 9 / 26 ≈ 346.15ms
+const REVEAL_AT_MS = Math.round((9 / (4 * F1_HZ)) * 1000); // 346ms
+const EXPAND_MS = 200;      // Fast burst expansion duration
+const FADE_TRIGGER_MS = 140; // 70% into expansion (REVEAL_AT_MS + 140ms)
+const FADE_MS = 240;        // Overlay opacity fade duration
+
+// Evaluates cubic-bezier(x1, y1, x2, y2) at progression p
+function evaluateCubicBezier(p, x1, y1, x2, y2) {
+  let t = p;
+  for (let i = 0; i < 5; i++) {
+    const currentSlope = 3 * (1 - t) * (1 - t) * x1 + 6 * (1 - t) * t * (x2 - x1) + 3 * t * t * (1 - x2);
+    if (Math.abs(currentSlope) < 1e-6) break;
+    const currentX = 3 * (1 - t) * (1 - t) * t * x1 + 3 * (1 - t) * t * t * x2 + t * t * t - p;
+    t -= currentX / currentSlope;
+  }
+  t = Math.max(0, Math.min(1, t));
+  return 3 * (1 - t) * (1 - t) * t * y1 + 3 * (1 - t) * t * t * y2 + t * t * t;
+}
+
 // Module-level flag: persists across React StrictMode double-mounts in dev
 // and across client-side router navigation back to home page
 let introHasPlayed = false;
 
 export default function HeroIntro() {
   const [mounted, setMounted] = useState(true);
-  const overlayRef       = useRef(null);
-  const curtainTopRef    = useRef(null);
-  const curtainBottomRef = useRef(null);
-  const timeoutsRef      = useRef([]);
+  const overlayRef   = useRef(null);
+  const dotRef       = useRef(null);
+  const lineRef      = useRef(null);
+  const burstRef     = useRef(null);
+  const svgRef       = useRef(null);
+  const mainPathRef  = useRef(null);
+  const ghost1Ref    = useRef(null);
+  const ghost2Ref    = useRef(null);
+  const timeoutsRef  = useRef([]);
+  const rafRef       = useRef(null);
 
   const addTimeout = useCallback((fn, delay) => {
     const tid = setTimeout(fn, delay);
@@ -62,9 +115,9 @@ export default function HeroIntro() {
     if (portrait) portrait.classList.add('intro-revealed');
   }, []);
 
-  // Banner elements entrance during split
+  // Banner elements entrance during reveal
   const triggerBannerReveal = useCallback(() => {
-    // (a) Background image fade in (700ms) with pure opacity (no heavy blur)
+    // (a) Background image fade in (700ms) with pure opacity
     const bannerImg = document.querySelector('.banner-bg-img');
     if (bannerImg) {
       bannerImg.animate(
@@ -144,61 +197,231 @@ export default function HeroIntro() {
 
   // Master Clock & Lifecycle
   useEffect(() => {
+    // Preload hero portrait image and fonts during lead-in so hero reveal is instant with 0 dropped frames
+    if (typeof Image !== 'undefined') {
+      const img = new Image();
+      img.src = '/img/hero-portrait.png';
+      if (img.decode) {
+        img.decode().catch(() => {});
+      }
+    }
+    if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+      document.fonts.ready.catch(() => {});
+    }
+
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Check if intro has already run on this full page load or user prefers reduced motion
     if (reducedMotion || introHasPlayed) {
       introHasPlayed = true;
+      if (reducedMotion) {
+        // Reduced motion: show purple screen for 200ms, fade out over 200ms, then reveal
+        const t1 = setTimeout(() => {
+          revealAll();
+          if (overlayRef.current) {
+            overlayRef.current.style.transition = 'opacity 200ms ease-out';
+            overlayRef.current.style.opacity = '0';
+          }
+          const t2 = setTimeout(() => setMounted(false), 200);
+          timeoutsRef.current.push(t2);
+        }, 200);
+        timeoutsRef.current.push(t1);
+        return () => {
+          timeoutsRef.current.forEach(clearTimeout);
+        };
+      }
       revealAll();
-      const tid = setTimeout(() => setMounted(false), 300);
+      const tid = setTimeout(() => setMounted(false), 200);
       return () => clearTimeout(tid);
     }
 
     introHasPlayed = true;
     document.body.classList.add('intro-scroll-lock');
 
-    const heroWrapper = document.querySelector('.header.container');
+    let W = window.innerWidth;
+    let H = window.innerHeight;
 
-    // 1100ms: Split curtains start sliding apart (after 0.3s hold + 0.6s line draw + 0.2s pause)
-    addTimeout(() => {
-      if (overlayRef.current) {
-        overlayRef.current.classList.add('intro-split');
+    if (svgRef.current) {
+      svgRef.current.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    }
+
+    const onResize = () => {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      if (svgRef.current) {
+        svgRef.current.setAttribute('viewBox', `0 0 ${W} ${H}`);
       }
-    }, 1100);
+    };
+    window.addEventListener('resize', onResize);
 
-    // 1550ms: Banner reveals cleanly while curtains are opening
+    // Vibrating String parameters
+    const f1 = F1_HZ;
+    const f2 = F2_HZ;
+    const tau = TAU_SEC;
+    // Scale amplitudes with viewport min dimension
+    const scale = Math.max(0.32, Math.min(1.2, Math.pow(Math.min(W, H) / AMP_REF_DIM, 1.25)));
+    const A1 = STRING_AMP_1_REF * scale;
+    const A2 = STRING_AMP_2_REF * scale;
+
+    const computePathD = (tVal) => {
+      const yMid = H / 2;
+      const xStart = -2;
+      const xEnd = W + 2;
+      const span = xEnd - xStart;
+
+      if (tVal < 0) {
+        return `M ${xStart.toFixed(1)} ${yMid.toFixed(1)} L ${xEnd.toFixed(1)} ${yMid.toFixed(1)}`;
+      }
+      const decay = Math.exp(-tVal / tau);
+      // Smooth onset over initial 30ms to pull into downward sag from horizontal axis
+      const onset = Math.min(1, tVal / 0.03);
+      const cos1 = Math.cos(2 * Math.PI * f1 * tVal);
+      const cos2 = Math.cos(2 * Math.PI * f2 * tVal);
+      const amp1 = A1 * decay * cos1 * onset;
+      const amp2 = A2 * decay * cos2 * onset;
+
+      // Clamp max displacement so stroke (including thickness) never leaves visible screen
+      const maxDisp = Math.max(10, H / 2 - (STRING_THICKNESS / 2 + 4));
+
+      const pointsCount = 64;
+      let d = `M ${xStart.toFixed(1)} ${yMid.toFixed(1)}`;
+      for (let i = 1; i <= pointsCount; i++) {
+        const frac = i / pointsCount;
+        const x = xStart + frac * span;
+        const sin1 = Math.sin(Math.PI * frac);
+        const sin2 = Math.sin(2 * Math.PI * frac);
+        const rawDisp = amp1 * sin1 + amp2 * sin2;
+        const clampedDisp = Math.max(-maxDisp, Math.min(maxDisp, rawDisp));
+        const y = yMid + clampedDisp;
+        d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+      }
+      return d;
+    };
+
+    // --- BEAT 1: FAST LEAD-IN (DOT -> LINE) ---
+    // 0 to DOT_FADE_MS (120ms): Dot fades in at exact center
+    if (dotRef.current) {
+      dotRef.current.style.transition = `opacity ${DOT_FADE_MS}ms ease-out, transform ${DOT_FADE_MS}ms ease-out`;
+      dotRef.current.style.opacity = '1';
+      dotRef.current.style.transform = 'scale(1)';
+    }
+
+    // At DOT_FADE_MS (120ms): Dot stretches horizontally into full-width line (scaleX 0 -> 1 over LINE_STRETCH_MS 220ms)
     addTimeout(() => {
-      triggerBannerReveal();
-    }, 1550);
+      if (dotRef.current) {
+        dotRef.current.style.transition = 'opacity 60ms ease-out';
+        dotRef.current.style.opacity = '0';
+      }
+      if (lineRef.current) {
+        lineRef.current.style.opacity = '1';
+        lineRef.current.style.transition = `transform ${LINE_STRETCH_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+        lineRef.current.style.transform = 'scaleX(1)';
+      }
+    }, DOT_FADE_MS);
 
-    // 2000ms: Split transition finished, release will-change GPU layer
+    // At PLUCK_START_MS (370ms): Line & dot hidden, string plucked, rAF begins immediately
     addTimeout(() => {
-      if (curtainTopRef.current) curtainTopRef.current.style.willChange = 'auto';
-      if (curtainBottomRef.current) curtainBottomRef.current.style.willChange = 'auto';
-    }, 2000);
+      if (lineRef.current) lineRef.current.style.display = 'none';
+      if (dotRef.current) dotRef.current.style.display = 'none';
+      if (svgRef.current) svgRef.current.style.display = 'block';
 
-    // 2050ms: Scroll unlocks, hero intro state marked done, Section C enters
-    addTimeout(() => {
-      document.body.classList.remove('intro-scroll-lock');
-      if (heroWrapper) heroWrapper.dataset.intro = 'done';
-      triggerSectionC();
-    }, 2050);
+      let lastTime = performance.now();
+      let elapsed = 0;
+      let fadeTriggered = false;
+      let svgHidden = false;
 
-    // 2150ms: Completely unmount overlay from DOM (0 memory, 0 composite layers)
-    addTimeout(() => {
-      setMounted(false);
-    }, 2150);
+      const stepString = (now) => {
+        if (document.hidden) {
+          lastTime = now;
+          rafRef.current = requestAnimationFrame(stepString);
+          return;
+        }
+        const delta = (now - lastTime) / 1000;
+        lastTime = now;
+        elapsed += Math.min(delta, 0.05);
 
-    // Failsafe timeout at 5000ms guarantees everything is revealed and overlay removed
+        // Continuous standing wave vibration on SVG while visible
+        if (!svgHidden) {
+          const dMain = computePathD(elapsed);
+          if (mainPathRef.current) mainPathRef.current.setAttribute('d', dMain);
+
+          const dG1 = computePathD(elapsed - 0.012);
+          if (ghost1Ref.current) ghost1Ref.current.setAttribute('d', dG1);
+
+          const dG2 = computePathD(elapsed - 0.024);
+          if (ghost2Ref.current) ghost2Ref.current.setAttribute('d', dG2);
+        }
+
+        // Mid-vibration GPU burst expansion starting at REVEAL_AT_MS (346ms)
+        const revealAtSec = REVEAL_AT_MS / 1000;
+        const expandSec = EXPAND_MS / 1000;
+
+        if (elapsed >= revealAtSec && burstRef.current) {
+          const progress = Math.min(1, (elapsed - revealAtSec) / expandSec);
+          // Easing: cubic-bezier(0.83, 0, 0.17, 1) - high-speed explosive burst
+          const eased = evaluateCubicBezier(progress, 0.83, 0, 0.17, 1);
+          const startScale = Math.max(0.005, STRING_THICKNESS / H);
+          const currentScaleY = startScale + (1.02 - startScale) * eased;
+
+          burstRef.current.style.transform = `scaleY(${currentScaleY.toFixed(5)})`;
+
+          // Once the expanding burst covers the vibration envelope (> 120px half-height),
+          // hide the SVG to eliminate SVG path updates and release GPU/CPU rasterization
+          if (!svgHidden && currentScaleY * (H / 2) > 120) {
+            svgHidden = true;
+            if (svgRef.current) svgRef.current.style.display = 'none';
+          }
+        }
+
+        // Page Reveal & Fade Trigger at (REVEAL_AT_MS + FADE_TRIGGER_MS = 486ms after pluck)
+        const fadeStartSec = (REVEAL_AT_MS + FADE_TRIGGER_MS) / 1000;
+        if (elapsed >= fadeStartSec && !fadeTriggered) {
+          fadeTriggered = true;
+
+          // Unlock scroll and trigger page entrance animations
+          document.body.classList.remove('intro-scroll-lock');
+          const heroWrapper = document.querySelector('.header.container');
+          if (heroWrapper) heroWrapper.dataset.intro = 'done';
+          triggerBannerReveal();
+          triggerSectionC();
+
+          // Fade whole intro container from opacity 1 to 0 over FADE_MS
+          if (overlayRef.current) {
+            overlayRef.current.style.transition = `opacity ${FADE_MS}ms ease-out`;
+            overlayRef.current.style.opacity = '0';
+            overlayRef.current.style.pointerEvents = 'none';
+          }
+
+          // Schedule complete unmount after fade ends
+          addTimeout(() => {
+            setMounted(false);
+          }, FADE_MS);
+        }
+
+        // End rAF loop once fade duration has finished
+        const totalDurationSec = (REVEAL_AT_MS + FADE_TRIGGER_MS + FADE_MS) / 1000;
+        if (elapsed >= totalDurationSec + 0.05) {
+          return;
+        }
+
+        rafRef.current = requestAnimationFrame(stepString);
+      };
+
+      rafRef.current = requestAnimationFrame(stepString);
+    }, PLUCK_START_MS);
+
+    // Failsafe timeout at 3500ms guarantees everything is revealed and overlay removed
     const failsafe = setTimeout(() => {
       revealAll();
       setMounted(false);
-    }, 5000);
+    }, 3500);
 
     const timeouts = timeoutsRef.current;
     return () => {
       clearTimeout(failsafe);
       timeouts.forEach(clearTimeout);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('resize', onResize);
       document.body.classList.remove('intro-scroll-lock');
     };
   }, [addTimeout, revealAll, triggerBannerReveal, triggerSectionC]);
@@ -235,10 +458,50 @@ export default function HeroIntro() {
       </noscript>
 
       <div id="hero-intro-overlay" ref={overlayRef} aria-hidden="true">
-        <div id="intro-curtain-top" ref={curtainTopRef} />
-        <div id="intro-curtain-bottom" ref={curtainBottomRef} />
-        <div id="intro-pixel-line" />
-        <div id="intro-pixel-spark" />
+        <div
+          id="intro-dot"
+          ref={dotRef}
+          style={{
+            width: `${DOT_SIZE}px`,
+            height: `${DOT_SIZE}px`,
+            marginTop: `-${DOT_SIZE / 2}px`,
+            marginLeft: `-${DOT_SIZE / 2}px`,
+          }}
+        />
+        <div
+          id="intro-line"
+          ref={lineRef}
+          style={{
+            height: `${STRING_THICKNESS}px`,
+            marginTop: `-${STRING_THICKNESS / 2}px`,
+          }}
+        />
+        <div
+          id="intro-expand-burst"
+          ref={burstRef}
+        />
+        <svg
+          id="intro-string-svg"
+          ref={svgRef}
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ display: 'none' }}
+        >
+          <path
+            ref={ghost2Ref}
+            className="intro-ghost-path intro-ghost-2"
+            style={{ strokeWidth: `${STRING_THICKNESS}px` }}
+          />
+          <path
+            ref={ghost1Ref}
+            className="intro-ghost-path intro-ghost-1"
+            style={{ strokeWidth: `${STRING_THICKNESS}px` }}
+          />
+          <path
+            ref={mainPathRef}
+            className="intro-main-path"
+            style={{ strokeWidth: `${STRING_THICKNESS}px` }}
+          />
+        </svg>
       </div>
     </>
   );

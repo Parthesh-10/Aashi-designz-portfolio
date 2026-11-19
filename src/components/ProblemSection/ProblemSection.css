@@ -115,11 +115,16 @@
     margin-bottom: 24px;
   }
   .problem-grid {
-    grid-template-columns: 1fr;
-    gap: 28px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(8px, 2.5vw, 12px);
   }
   .problem-image-wrapper {
-    aspect-ratio: 4 / 3;
-    max-height: 300px;
+    aspect-ratio: 302 / 340;
+    max-height: none;
+    margin-bottom: 0;
+  }
+  .problem-card-title,
+  .problem-card-caption {
+    display: none !important;
   }
 }

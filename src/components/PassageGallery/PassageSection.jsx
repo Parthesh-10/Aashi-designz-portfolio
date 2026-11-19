@@ -138,28 +138,30 @@ export default function PassageSection() {
   const hasWebGL = isClient && checkWebGLSupport();
 
   return (
-    <section className="passage-section-wrapper" aria-label="Passage Gallery Section">
-      {isClient && hasWebGL ? (
-        <PassageGallery
-          items={PORTFOLIO_ITEMS}
-          colors={['#5227FF', '#FF9FFC']}
-          backgroundColor="#06020c"
-          speed={0.35}
-          look={0.65}
-          fov={68}
-          lanes={5}
-          photoFill={0.36}
-          accentFill={0.08}
-          interactive={true}
-          focusOnClick={true}
-          captions={true}
-          wheel={true}
-          ariaLabel="Interactive 3D Passage Gallery of creative portfolio works"
-        />
-      ) : (
-        <PassageFallback />
-      )}
-    </section>
+    <div className="passage-outer-container container">
+      <section className="passage-section-wrapper" aria-label="Passage Gallery Section">
+        {isClient && hasWebGL ? (
+          <PassageGallery
+            items={PORTFOLIO_ITEMS}
+            colors={['#5227FF', '#FF9FFC']}
+            backgroundColor="#06020c"
+            speed={0.35}
+            look={0.65}
+            fov={68}
+            lanes={5}
+            photoFill={0.36}
+            accentFill={0.08}
+            interactive={true}
+            focusOnClick={true}
+            captions={true}
+            wheel={true}
+            ariaLabel="Interactive 3D Passage Gallery of creative portfolio works"
+          />
+        ) : (
+          <PassageFallback />
+        )}
+      </section>
+    </div>
   );
 }
 

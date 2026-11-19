@@ -21,7 +21,7 @@ export default function Header() {
             <div className="navLinks">
               <a href="/" className="navLink clickable">HOME</a>
               <a href="/about" className="navLink clickable">ABOUT US</a>
-              <h3 className="navLink">SERVICES</h3>
+              <a href="/service/branddesign" className="navLink clickable">SERVICES</a>
               <div className="dropDown">
                 <a className="subLinks navLink clickable" href="/service/branddesign">Brand Design</a>
                 <a className="subLinks navLink clickable" href="/service/graphicdesign">Graphic Design</a>
