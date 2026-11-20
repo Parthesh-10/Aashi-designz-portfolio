@@ -34,7 +34,10 @@ export default function Home() {
 
             <h1 className="heroHeading">
               <span className="heroHeadingLine">
-                <span className="heroHeadingInner">Brand &amp; Digital Experience</span>
+                <span className="heroHeadingInner">Brand &amp; Digital</span>
+              </span>
+              <span className="heroHeadingLine">
+                <span className="heroHeadingInner">Experience</span>
               </span>
               <span className="heroHeadingLine">
                 <span className="heroHeadingInner">Designer</span>

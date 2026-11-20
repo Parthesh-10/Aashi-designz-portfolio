@@ -754,6 +754,11 @@
    Responsive Breakpoints
    -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
+  .findyourfit-wrapper {
+    padding-left: calc(16px + var(--mobile-extra-gutter));
+    padding-right: calc(16px + var(--mobile-extra-gutter));
+  }
+
   .findyourfit-finish-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -786,7 +791,10 @@
 
 @media (max-width: 480px) {
   .findyourfit-wrapper {
-    padding: 36px 12px;
+    padding-top: 36px;
+    padding-bottom: 36px;
+    padding-left: calc(12px + var(--mobile-extra-gutter));
+    padding-right: calc(12px + var(--mobile-extra-gutter));
   }
 
   .findyourfit-card {

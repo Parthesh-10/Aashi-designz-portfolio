@@ -1,5 +1,6 @@
 :root {
   --font-color: #313944;
+  --mobile-extra-gutter: 0px;
 }
 
 body {
@@ -363,6 +364,9 @@ button:hover .arrow2 {
 }
 .headerContainer1 h1 {
   font-weight: bold;
+}
+.headerContainer1 .heroHeadingInner {
+  font-weight: 700;
 }
 .headerContainer1 .dotContainer {
   background-color: #b388eb4e;
@@ -2125,7 +2129,7 @@ textarea:focus {
     padding: 2rem 1rem 1rem;
   }
   .container {
-    padding: 0.5rem 1rem;
+    padding: 0.5rem calc(1rem + var(--mobile-extra-gutter));
   }
 
   .headerContainer1,
@@ -2357,7 +2361,7 @@ textarea:focus {
     padding: 2rem 1.5rem;
   }
   .contactContainer {
-    padding: 5rem 1rem;
+    padding: 5rem calc(1rem + var(--mobile-extra-gutter));
   }
   .syncTripDesc {
     width: 100%;
@@ -2415,6 +2419,17 @@ textarea:focus {
    Section 1: Header & Section 2: Hero
    ========================================================= */
 @media (max-width: 767px) {
+  :root,
+  html,
+  body {
+    --mobile-extra-gutter: 20px;
+  }
+
+  .container {
+    padding-left: calc(1rem + var(--mobile-extra-gutter));
+    padding-right: calc(1rem + var(--mobile-extra-gutter));
+  }
+
   /* Hide custom cursor on mobile touch */
   .cursor {
     display: none !important;
@@ -2544,7 +2559,7 @@ textarea:focus {
     flex-direction: column !important;
     align-items: flex-start !important;
     width: 100% !important;
-    padding: 0 28px;
+    padding: 0 calc(28px + var(--mobile-extra-gutter));
     box-sizing: border-box;
     margin-top: 14px;
   }
@@ -2628,7 +2643,22 @@ textarea:focus {
     margin-top: 16px;
     margin-bottom: 0;
     max-width: 100% !important;
-    text-align: left;
+    text-align: center;
+  }
+
+  /* Global mobile center-alignment for paragraphs and descriptive text */
+  .text p,
+  .aboutDiv div h3,
+  .aboutDiv div h6,
+  .serviceParagraph p,
+  .serviceParagraph div p,
+  .skillPara p,
+  .bannerText p,
+  .footerDiv1 p,
+  .casestudyHeader p,
+  .sectionPara p,
+  .sectionPara h3 {
+    text-align: center !important;
   }
 
   /* "Work With Me" button */
@@ -2684,5 +2714,54 @@ textarea:focus {
 
   .aboutDiv div h6 {
     line-height: 1.38;
+  }
+
+  /* About Page Hero — Move Photo Card above Text and adjust Heading Line Height */
+  .aboutContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .aboutImg {
+    order: -1 !important;
+    margin: 0 auto 1.5rem !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    height: auto !important;
+  }
+
+  .aboutText {
+    order: 1 !important;
+    width: 100% !important;
+  }
+
+  .aboutText h3 {
+    line-height: 1.25 !important;
+  }
+
+  /* Content sections with independent mobile gutters */
+  .aboutHeader {
+    padding-left: calc(1rem + var(--mobile-extra-gutter));
+    padding-right: calc(1rem + var(--mobile-extra-gutter));
+  }
+
+  .contactContainer {
+    padding-left: calc(1rem + var(--mobile-extra-gutter));
+    padding-right: calc(1rem + var(--mobile-extra-gutter));
+  }
+
+  .footer {
+    padding-left: calc(1.5rem + var(--mobile-extra-gutter));
+    padding-right: calc(1.5rem + var(--mobile-extra-gutter));
+  }
+
+  .footerMain {
+    padding: 0;
+    height: auto;
+    min-height: 120px;
+    flex-wrap: wrap;
+    gap: 16px;
   }
 }

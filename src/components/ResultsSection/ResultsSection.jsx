@@ -238,6 +238,17 @@ export default function ResultsSection({ resultsData = [] }) {
                           <span className="results-front-number">{card.front.number}</span>
                           <span className="results-front-label">{card.front.label}</span>
                         </div>
+                        <button
+                          type="button"
+                          className="results-flip-btn results-flip-btn-dark results-mobile-flip-btn"
+                          aria-label={`Flip ${card.front.number} card`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCardClick(card.id);
+                          }}
+                        >
+                          <RefreshIcon />
+                        </button>
                       </div>
 
                       {/* BACK FACE */}
@@ -255,6 +266,17 @@ export default function ResultsSection({ resultsData = [] }) {
                             </div>
                           ))}
                         </div>
+                        <button
+                          type="button"
+                          className="results-flip-btn results-flip-btn-light results-mobile-flip-btn"
+                          aria-label={`Flip ${card.front.number} card back`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCardClick(card.id);
+                          }}
+                        >
+                          <RefreshIcon />
+                        </button>
                       </div>
                     </div>
                   </div>

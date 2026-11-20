@@ -30,10 +30,15 @@
     animation: introReducedFade 0.2s ease forwards !important;
   }
   #intro-dot,
+  #intro-dot-trail,
   #intro-line,
   #intro-string-svg,
   #intro-expand-burst {
     display: none !important;
+  }
+  #intro-dot {
+    transform: translateY(0) !important;
+    box-shadow: none !important;
   }
   .header.container[data-intro="playing"] .banner-bg-img,
   .header.container[data-intro="playing"] .banner-label-left,
@@ -65,10 +70,13 @@
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background-color: #B487F0;
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.35) 1px, transparent 1px);
-  background-size: 16px 16px;
-  background-position: center center;
+  background-color: #E2CBFF;
+  background-image:
+    radial-gradient(circle, #B388EB 2.5px, transparent 2.5px),
+    radial-gradient(circle, #B388EB 2.5px, transparent 2.5px);
+  background-size: 29px 58px;
+  background-position: 0 0, 14.5px 29px;
+  background-repeat: repeat;
   overflow: hidden;
   pointer-events: all;
 }
@@ -82,13 +90,71 @@
   height: 18px;
   margin-top: -9px;
   margin-left: -9px;
-  background-color: #FFFFFF;
+  background-color: transparent;
   border-radius: 50%;
   z-index: 10;
   pointer-events: none;
+  opacity: 1;
+  transform: translateY(calc(-50vh - 40px));
+  box-shadow: 0 0 24px rgba(147, 117, 215, 0.45);
+  will-change: opacity, transform, box-shadow;
+}
+
+#intro-dot-circle {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  z-index: 2;
+  pointer-events: none;
+}
+
+#intro-dot-trail {
+  position: absolute;
+  bottom: 9px;
+  left: 0;
+  width: 18px;
+  height: 140px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, rgba(147, 117, 215, 0) 0%, rgba(147, 117, 215, 0.45) 100%);
+  filter: blur(5px);
+  transform-origin: bottom center;
+  pointer-events: none;
+  z-index: 1;
   opacity: 0;
-  transform: scale(0.6);
+  transform: scaleY(0);
   will-change: opacity, transform;
+}
+
+@keyframes introTrailDrop {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  15% {
+    transform: scaleY(0.4);
+    opacity: 0.7;
+  }
+  35% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  55% {
+    transform: scaleY(0.7);
+    opacity: 0.8;
+  }
+  75% {
+    transform: scaleY(0.3);
+    opacity: 0.35;
+  }
+  92% {
+    transform: scaleY(0.05);
+    opacity: 0.08;
+  }
+  100% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
 }
 
 /* Beat 1: Solid white line (12.5px = base 2.5px + 10px tall) stretching edge-to-edge */
@@ -196,9 +262,14 @@
 .heroHeadingLine {
   display: block;
   overflow: hidden;
+  white-space: nowrap;
+}
+.heroHeading {
+  font-weight: 700 !important;
 }
 .heroHeadingInner {
   display: block;
+  font-weight: 700 !important;
   will-change: transform, opacity;
 }
 [data-intro="playing"] .heroHeadingInner {
@@ -364,6 +435,69 @@ body.intro-scroll-lock {
   transform: translateY(0) !important;
 }
 
+/* ============================================================
+   Mobile Hero Portrait & Layout (max-width: 767px)
+   ============================================================ */
+@media (max-width: 767px) {
+  .homeBanner {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .homeBanner::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .desktopHeroPortrait {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    order: 1 !important;
+    position: relative !important;
+    width: clamp(260px, 75vw, 320px) !important;
+    max-width: 80vw !important;
+    margin: clamp(-20px, -5.2vw, -26px) auto clamp(-110px, -28vw, -130px) !important;
+    pointer-events: none !important;
+    user-select: none !important;
+    z-index: 10 !important;
+  }
+
+  .desktopHeroPortraitImg {
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    aspect-ratio: 1356 / 1494;
+    object-fit: cover !important;
+    object-position: top center !important;
+    mask-image: linear-gradient(to bottom, black 65%, transparent 100%) !important;
+    -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%) !important;
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+
+  .headerContainer1 {
+    order: 2 !important;
+    padding-left: calc(28px + var(--mobile-extra-gutter)) !important;
+    padding-right: calc(28px + var(--mobile-extra-gutter)) !important;
+    position: relative !important;
+    z-index: 20 !important;
+  }
+
+  .headerContainer2 {
+    order: 3 !important;
+    padding-left: calc(28px + var(--mobile-extra-gutter)) !important;
+    padding-right: calc(28px + var(--mobile-extra-gutter)) !important;
+    position: relative !important;
+    z-index: 20 !important;
+  }
+
+  .headerContainer2 p {
+    text-align: center !important;
+  }
+}
+
 /* Desktop layout (>= 768px) */
 @media (min-width: 768px) {
   .header.container {
@@ -396,13 +530,20 @@ body.intro-scroll-lock {
     max-width: clamp(350px, 25vw, 420px) !important;
     width: 100% !important;
     height: auto !important;
-    margin: clamp(1.2rem, 2vw, 2.2rem) 0 0 0 !important;
+    margin: clamp(6.2rem, 7.5vw, 8.5rem) 0 0 var(--hero-left-align, 0) !important;
     padding: 0 !important;
     align-self: flex-start !important;
     z-index: 20 !important;
   }
 
+  .headerContainer1 .dotContainer {
+    margin-bottom: 14px !important;
+  }
+
   .headerContainer1 .heroHeading {
+    font-size: 2.64rem !important;
+    line-height: 1.2 !important;
+    font-weight: 700 !important;
     max-width: clamp(350px, 25vw, 420px) !important;
     word-break: normal !important;
     overflow-wrap: normal !important;
@@ -439,12 +580,14 @@ body.intro-scroll-lock {
   .headerContainer2 {
     flex: 0 0 auto !important;
     max-width: clamp(280px, 22vw, 360px) !important;
-    width: 100% !important;
+    width: fit-content !important;
     height: auto !important;
-    margin: 0 0 0 auto !important;
-    margin-top: clamp(3.5rem, 6.5vw, 7.5rem) !important;
+    margin: clamp(3.5rem, 6.5vw, 7.5rem) var(--hero-right-align, 0) 0 auto !important;
     padding: 0 !important;
     align-self: flex-start !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
     z-index: 20 !important;
   }
 }

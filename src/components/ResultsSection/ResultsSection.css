@@ -372,8 +372,32 @@
     line-height: 1.25;
   }
 
-  /* Hide flip refresh buttons on mobile carousel */
-  .results-flip-btn {
+  /* Mobile Flip Button - Bottom Right Corner */
+  .results-mobile-flip-btn {
+    display: flex !important;
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    left: auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    z-index: 6;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    touch-action: manipulation;
+    padding: 0;
+  }
+
+  .results-mobile-flip-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .results-card-wrapper .results-flip-btn {
     display: none !important;
   }
 

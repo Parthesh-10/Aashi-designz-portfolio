@@ -276,7 +276,27 @@
 
 @media (max-width: 767px) {
   .passage-hint-bar {
-    display: none !important;
+    display: flex !important;
+    max-width: calc(100% - 24px);
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .passage-hint-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .passage-caption-desc {
+    text-align: center;
+  }
+}
+
+/* Touch device scoping: enable custom touch glide, prevent browser page scroll & pull-to-refresh */
+@media (hover: none) and (pointer: coarse) {
+  .passage-gallery-container,
+  .passage-gallery-canvas {
+    touch-action: none;
+    overscroll-behavior: contain;
   }
 }
 

@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Script from "next/script";
+import SiteGradualBlur from "@/components/GradualBlur/SiteGradualBlur";
 
 export const metadata = {
   title: "Aashidesignz",
@@ -33,6 +34,7 @@ export default function RootLayout({ children }) {
         <Header />
         {children}
         <Footer />
+        <SiteGradualBlur />
         <Script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js" strategy="lazyOnload" />
         <Script src="/js/index.js" strategy="lazyOnload" />
       </body>

@@ -8,6 +8,16 @@ import './PassageGallery.css';
 const DEFAULT_COLORS = ['#5227FF', '#FF9FFC'];
 const DEFAULT_BG = '#06020c';
 
+// Touch Glide Configuration Constants (mobile / touch input only)
+const TOUCH_GLIDE_FACTOR = 0.0035;        // Finger delta to 3D Z scale (~1.4 units per 400px swipe)
+const TOUCH_STEER_FACTOR = 0.45;          // Subtle steering ratio during touch swipe
+const TOUCH_MOMENTUM_DECAY = 0.92;        // Decay multiplier per frame on release (matches desktop wheel momentum)
+const TOUCH_MOMENTUM_MAX_VELOCITY = 0.06; // Clamps release velocity to prevent over-speed jump
+const TUNNEL_START_Z = 0;                 // Corridor entrance boundary
+const TUNNEL_END_Z = -35.0;               // Corridor exit boundary (~24 row steps of modular travel)
+const TAP_MAX_DISTANCE = 8;               // Maximum movement (px) for a gesture to be classified as a tap
+const TAP_MAX_DURATION = 300;             // Maximum duration (ms) for a tap vs glide
+
 // Helper: Rounded rectangle ShapeGeometry for smooth, non-warping tiles
 function createRoundedPlaneGeometry(width, height, radius) {
   const shape = new THREE.Shape();
@@ -129,7 +139,6 @@ export default function PassageGallery({
     scrollVelocity: 0,
     mouse: { x: 0, y: 0, targetX: 0, targetY: 0 },
     pointerDownPos: { x: 0, y: 0 },
-    touchStart: { y: 0, targetZ: 0 },
     hoveredMesh: null,
     focusedMesh: null,
     focusedOrigin: null,
@@ -433,8 +442,127 @@ export default function PassageGallery({
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
 
+    // Touch gesture tracking (scoped strictly to pointerType === 'touch' || 'pen')
+    let activeTouchId = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStartTime = 0;
+    let touchLastX = 0;
+    let touchLastY = 0;
+    let touchLastTime = 0;
+    let touchVelocityY = 0;
+    let touchMomentumVelocity = 0;
+    let cachedCanvasRect = null;
+    let lastTouchTapTime = 0;
+
+    const inspectPhotoAt = (clientX, clientY) => {
+      if (!interactive || !focusOnClick) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const clickPointer = new THREE.Vector2(
+        ((clientX - rect.left) / rect.width) * 2 - 1,
+        -((clientY - rect.top) / rect.height) * 2 + 1
+      );
+
+      camera.updateMatrixWorld();
+      raycaster.setFromCamera(clickPointer, camera);
+      const hits = raycaster.intersectObjects(photoMeshes, true);
+
+      if (hits.length > 0) {
+        let hitMesh = hits[0].object;
+        while (hitMesh && !photoMeshes.includes(hitMesh) && hitMesh.parent) {
+          hitMesh = hitMesh.parent;
+        }
+
+        if (hitMesh && photoMeshes.includes(hitMesh) && hitMesh.userData?.item) {
+          if (s.focusedMesh === hitMesh) {
+            closeFocus();
+          } else {
+            if (s.focusedMesh && s.focusedOrigin) {
+              s.focusedMesh.position.copy(s.focusedOrigin.pos);
+              s.focusedMesh.rotation.copy(s.focusedOrigin.rot);
+              s.focusedMesh.scale.copy(s.focusedOrigin.scale);
+            }
+            s.focusedMesh = hitMesh;
+            s.focusedOrigin = {
+              pos: hitMesh.position.clone(),
+              rot: hitMesh.rotation.clone(),
+              scale: hitMesh.scale.clone()
+            };
+            setFocusedItem(hitMesh.userData.item);
+          }
+        }
+      } else if (s.focusedMesh) {
+        closeFocus();
+      }
+    };
+
     const onPointerMove = (e) => {
       if (!interactive) return;
+
+      const isTouch = e.pointerType === 'touch' || e.pointerType === 'pen';
+
+      if (isTouch) {
+        if (activeTouchId !== e.pointerId || s.focusedMesh) return;
+
+        const now = performance.now();
+        const dt = Math.max((now - touchLastTime) / 1000, 0.001);
+        const deltaY = e.clientY - touchLastY;
+        const totalDist = Math.hypot(e.clientX - touchStartX, e.clientY - touchStartY);
+
+        const instantVelocityY = deltaY / dt;
+        touchVelocityY = touchVelocityY * 0.4 + instantVelocityY * 0.6;
+
+        touchLastX = e.clientX;
+        touchLastY = e.clientY;
+        touchLastTime = now;
+
+        if (totalDist >= TAP_MAX_DISTANCE) {
+          // Steering via horizontal finger drag
+          if (cachedCanvasRect && cachedCanvasRect.width > 0) {
+            const normX = ((e.clientX - cachedCanvasRect.left) / cachedCanvasRect.width) * 2 - 1;
+            const normY = -((e.clientY - cachedCanvasRect.top) / cachedCanvasRect.height) * 2 + 1;
+            s.mouse.targetX = normX * look * 0.75 * TOUCH_STEER_FACTOR;
+            s.mouse.targetY = normY * look * 0.55 * TOUCH_STEER_FACTOR;
+          }
+
+          // Tunnel Glide & Boundary Handoff:
+          // finger dragging UP (deltaY < 0) glides forward into tunnel (decreases targetZ)
+          // finger dragging DOWN (deltaY > 0) glides backward toward entrance (increases targetZ)
+          const deltaZ = deltaY * TOUCH_GLIDE_FACTOR;
+          const proposedTargetZ = s.targetZ + deltaZ;
+
+          if (deltaY > 0 && s.targetZ >= TUNNEL_START_Z) {
+            // At start boundary pulling down -> hand off to page scroll up
+            s.targetZ = TUNNEL_START_Z;
+            window.scrollBy(0, -deltaY);
+          } else if (deltaY < 0 && s.targetZ <= TUNNEL_END_Z) {
+            // At end boundary pulling up -> hand off to page scroll down
+            s.targetZ = TUNNEL_END_Z;
+            window.scrollBy(0, -deltaY);
+          } else if (proposedTargetZ > TUNNEL_START_Z) {
+            // Crossed entrance boundary in this move
+            const usedDeltaZ = TUNNEL_START_Z - s.targetZ;
+            const usedDeltaY = usedDeltaZ / TOUCH_GLIDE_FACTOR;
+            const remainingDeltaY = deltaY - usedDeltaY;
+            s.targetZ = TUNNEL_START_Z;
+            window.scrollBy(0, -remainingDeltaY);
+          } else if (proposedTargetZ < TUNNEL_END_Z) {
+            // Crossed exit boundary in this move
+            const usedDeltaZ = TUNNEL_END_Z - s.targetZ;
+            const usedDeltaY = usedDeltaZ / TOUCH_GLIDE_FACTOR;
+            const remainingDeltaY = deltaY - usedDeltaY;
+            s.targetZ = TUNNEL_END_Z;
+            window.scrollBy(0, -remainingDeltaY);
+          } else {
+            // Inside corridor
+            s.targetZ = proposedTargetZ;
+          }
+        }
+        return;
+      }
+
+      // Desktop mouse pointer move (100% unchanged)
       const rect = canvas.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -475,78 +603,110 @@ export default function PassageGallery({
       s.targetZ -= clamped * 0.0022;
     };
 
-    // Touch swipe on mobile
-    const onTouchStart = (e) => {
-      if (!interactive || e.touches.length !== 1) return;
-      s.touchStart.y = e.touches[0].clientY;
-      s.touchStart.targetZ = s.targetZ;
-    };
-
-    const onTouchMove = (e) => {
-      if (!interactive || e.touches.length !== 1) return;
-      const deltaY = e.touches[0].clientY - s.touchStart.y;
-      s.targetZ = s.touchStart.targetZ + deltaY * 0.012;
-    };
-
     // Pointer down: record position to differentiate click from drag
     const onPointerDown = (e) => {
+      const isTouch = e.pointerType === 'touch' || e.pointerType === 'pen';
+
+      if (isTouch) {
+        if (!interactive || s.focusedMesh) return;
+
+        // Cancel existing momentum on new touch
+        touchMomentumVelocity = 0;
+        touchVelocityY = 0;
+
+        activeTouchId = e.pointerId;
+        touchStartX = e.clientX;
+        touchStartY = e.clientY;
+        touchLastX = e.clientX;
+        touchLastY = e.clientY;
+        touchStartTime = performance.now();
+        touchLastTime = touchStartTime;
+        cachedCanvasRect = canvas.getBoundingClientRect();
+
+        try {
+          canvas.setPointerCapture(e.pointerId);
+        } catch {}
+        return;
+      }
+
+      // Desktop mouse pointer down
       if (!interactive || e.button > 0) return;
       s.pointerDownPos.x = e.clientX;
       s.pointerDownPos.y = e.clientY;
+    };
+
+    const onPointerUp = (e) => {
+      const isTouch = e.pointerType === 'touch' || e.pointerType === 'pen';
+      if (!isTouch) return;
+
+      if (activeTouchId !== e.pointerId) return;
+
+      try {
+        canvas.releasePointerCapture(e.pointerId);
+      } catch {}
+      activeTouchId = null;
+
+      const duration = performance.now() - touchStartTime;
+      const totalDist = Math.hypot(e.clientX - touchStartX, e.clientY - touchStartY);
+
+      // Tap detection (under 8px, under 300ms)
+      if (totalDist < TAP_MAX_DISTANCE && duration < TAP_MAX_DURATION) {
+        lastTouchTapTime = performance.now();
+        inspectPhotoAt(e.clientX, e.clientY);
+        s.mouse.targetX = 0;
+        s.mouse.targetY = 0;
+        return;
+      }
+
+      // Momentum on drag release
+      if (!s.reducedMotion) {
+        let initialMomentum = touchVelocityY * TOUCH_GLIDE_FACTOR * 0.22;
+        initialMomentum = Math.sign(initialMomentum) * Math.min(Math.abs(initialMomentum), TOUCH_MOMENTUM_MAX_VELOCITY);
+        touchMomentumVelocity = initialMomentum;
+      } else {
+        touchMomentumVelocity = 0;
+      }
+
+      // Return steering smoothly to center
+      s.mouse.targetX = 0;
+      s.mouse.targetY = 0;
+    };
+
+    const onPointerCancel = (e) => {
+      const isTouch = e.pointerType === 'touch' || e.pointerType === 'pen';
+      if (!isTouch) return;
+
+      if (activeTouchId === e.pointerId) {
+        try {
+          canvas.releasePointerCapture(e.pointerId);
+        } catch {}
+        activeTouchId = null;
+        touchVelocityY = 0;
+        touchMomentumVelocity = 0;
+        s.mouse.targetX = 0;
+        s.mouse.targetY = 0;
+      }
     };
 
     // Native Click Handler for Click-to-Inspect
     const onClick = (e) => {
       if (!interactive || !focusOnClick || e.button > 0) return;
 
-      // Ignore if user dragged or swiped
+      // Ignore synthetic click event fired immediately following a touch tap
+      if (performance.now() - lastTouchTapTime < 450) return;
+
+      // Ignore if user dragged or swiped on mouse
       const dist = Math.hypot(e.clientX - s.pointerDownPos.x, e.clientY - s.pointerDownPos.y);
       if (dist > 15) return;
 
-      const rect = canvas.getBoundingClientRect();
-      const clickPointer = new THREE.Vector2(
-        ((e.clientX - rect.left) / rect.width) * 2 - 1,
-        -((e.clientY - rect.top) / rect.height) * 2 + 1
-      );
-
-      camera.updateMatrixWorld();
-      raycaster.setFromCamera(clickPointer, camera);
-      const hits = raycaster.intersectObjects(photoMeshes, true);
-
-      if (hits.length > 0) {
-        let hitMesh = hits[0].object;
-        while (hitMesh && !photoMeshes.includes(hitMesh) && hitMesh.parent) {
-          hitMesh = hitMesh.parent;
-        }
-
-        if (hitMesh && photoMeshes.includes(hitMesh) && hitMesh.userData?.item) {
-          if (s.focusedMesh === hitMesh) {
-            closeFocus();
-          } else {
-            if (s.focusedMesh && s.focusedOrigin) {
-              s.focusedMesh.position.copy(s.focusedOrigin.pos);
-              s.focusedMesh.rotation.copy(s.focusedOrigin.rot);
-              s.focusedMesh.scale.copy(s.focusedOrigin.scale);
-            }
-            s.focusedMesh = hitMesh;
-            s.focusedOrigin = {
-              pos: hitMesh.position.clone(),
-              rot: hitMesh.rotation.clone(),
-              scale: hitMesh.scale.clone()
-            };
-            setFocusedItem(hitMesh.userData.item);
-          }
-        }
-      } else if (s.focusedMesh) {
-        closeFocus();
-      }
+      inspectPhotoAt(e.clientX, e.clientY);
     };
 
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerdown', onPointerDown);
+    canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerCancel);
     canvas.addEventListener('click', onClick);
-    canvas.addEventListener('touchstart', onTouchStart, { passive: true });
-    canvas.addEventListener('touchmove', onTouchMove, { passive: true });
 
     if (wheel) {
       canvas.addEventListener('wheel', onWheel, { passive: false });
@@ -560,6 +720,7 @@ export default function PassageGallery({
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h, false);
+      if (canvas) cachedCanvasRect = canvas.getBoundingClientRect();
     };
 
     const resizeObserver = new ResizeObserver(handleResize);
@@ -579,9 +740,30 @@ export default function PassageGallery({
         s.targetZ -= speed * 1.5 * dt;
       }
 
-      // Smooth, gentle scroll momentum damping
+      // Smooth, gentle scroll momentum damping (desktop wheel)
       s.targetZ -= s.scrollVelocity * dt * 25;
       s.scrollVelocity *= 0.92;
+
+      // Touch momentum decay with boundary handoff
+      if (Math.abs(touchMomentumVelocity) > 0.0001) {
+        const proposedTargetZ = s.targetZ + touchMomentumVelocity;
+        if (touchMomentumVelocity > 0 && proposedTargetZ >= TUNNEL_START_Z) {
+          s.targetZ = TUNNEL_START_Z;
+          const scrollRemaining = -(touchMomentumVelocity / TOUCH_GLIDE_FACTOR);
+          window.scrollBy(0, scrollRemaining);
+          touchMomentumVelocity *= TOUCH_MOMENTUM_DECAY;
+        } else if (touchMomentumVelocity < 0 && proposedTargetZ <= TUNNEL_END_Z) {
+          s.targetZ = TUNNEL_END_Z;
+          const scrollRemaining = -(touchMomentumVelocity / TOUCH_GLIDE_FACTOR);
+          window.scrollBy(0, scrollRemaining);
+          touchMomentumVelocity *= TOUCH_MOMENTUM_DECAY;
+        } else {
+          s.targetZ = proposedTargetZ;
+          touchMomentumVelocity *= TOUCH_MOMENTUM_DECAY;
+        }
+      } else {
+        touchMomentumVelocity = 0;
+      }
 
       // Camera interpolation (gentle, buttery smooth)
       s.cameraZ += (s.targetZ - s.cameraZ) * 0.08;
@@ -671,9 +853,9 @@ export default function PassageGallery({
       resizeObserver.disconnect();
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerdown', onPointerDown);
+      canvas.removeEventListener('pointerup', onPointerUp);
+      canvas.removeEventListener('pointercancel', onPointerCancel);
       canvas.removeEventListener('click', onClick);
-      canvas.removeEventListener('touchstart', onTouchStart);
-      canvas.removeEventListener('touchmove', onTouchMove);
       if (wheel) canvas.removeEventListener('wheel', onWheel);
 
       floorCeilGeom.dispose();

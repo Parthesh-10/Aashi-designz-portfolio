@@ -190,71 +190,62 @@
    ============================================================ */
 @media (max-width: 767px) {
   .banner-wrap {
-    aspect-ratio: 1850 / 620;
+    aspect-ratio: auto !important;
+    height: auto !important;
+    line-height: normal !important;
+    position: relative !important;
+    width: 100% !important;
+    padding: 26px calc(1rem + var(--mobile-extra-gutter)) 0 !important;
+    box-sizing: border-box !important;
   }
 
   .banner-label-left,
   .banner-label-right {
-    font-size: 10px;
-    top: 10px;
-    color: #B388EB;
-    opacity: 0.9;
+    font-size: 10px !important;
+    top: 0 !important;
+    color: #B388EB !important;
+    opacity: 0.9 !important;
+    position: absolute !important;
+    line-height: 1 !important;
+    pointer-events: none !important;
   }
   .banner-label-left {
-    left: 24px;
+    left: calc(1rem + var(--mobile-extra-gutter)) !important;
   }
   .banner-label-right {
-    right: 24px;
+    right: calc(1rem + var(--mobile-extra-gutter)) !important;
   }
 
-  /* Centered crisp name with blurred all-caps behind it */
+  /* Large crisp name spanning full content width in normal block flow */
   .hi-aashi-text {
-    font-size: clamp(20px, 5.6vw, 24px);
-    position: absolute;
-    top: 52%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    font-size: clamp(38px, 12.2vw, 54px) !important;
+    font-weight: 700 !important;
+    color: #9375D7 !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: baseline !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 5 !important;
   }
 
+  /* Change A: Hide blurred all-caps copy completely on mobile */
   .hi-aashi-text::before {
-    content: "HI! I'M AASHI";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Outfit', sans-serif;
-    font-size: clamp(38px, 10.8vw, 46px);
-    font-weight: 800;
-    color: rgba(179, 136, 235, 0.42);
-    filter: blur(4px);
-    white-space: nowrap;
-    letter-spacing: 0.04em;
-    pointer-events: none;
-    z-index: -1;
-    text-transform: uppercase;
+    display: none !important;
+    content: none !important;
   }
 
-  /* Sparkles positioning matching mobile Figma design */
-  .banner-sparkle.sp-1 {
-    top: 38%;
-    left: 8%;
-    width: clamp(18px, 4.8vw, 24px);
-    height: clamp(18px, 4.8vw, 24px);
-  }
-
-  .banner-sparkle.sp-2 {
-    display: none;
-  }
-
-  .banner-sparkle.sp-3 {
-    top: 38%;
-    left: 92%;
-    width: clamp(18px, 4.8vw, 24px);
-    height: clamp(18px, 4.8vw, 24px);
-  }
-
-  .banner-sparkle.sp-4 {
-    display: none;
+  /* Change A: Hide all sparkles on mobile */
+  .banner-sparkles,
+  .banner-sparkle {
+    display: none !important;
   }
 }
 
@@ -267,12 +258,12 @@
     display: none !important;
   }
 
-  /* Flush top labels to container content edges */
+  /* Align top labels with "H" left edge and "i" right edge */
   .banner-label-left {
-    left: 0 !important;
+    left: var(--hero-left-align, 0) !important;
   }
   .banner-label-right {
-    right: 0 !important;
+    right: var(--hero-right-align, 0) !important;
   }
 
   /* Sized to fit container width on one line */

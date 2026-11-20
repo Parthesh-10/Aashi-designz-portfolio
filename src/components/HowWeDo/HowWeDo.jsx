@@ -237,78 +237,46 @@ export default function HowWeDo() {
                 tabIndex={isVisible ? 0 : -1}
                 aria-label={`${item.imageTitle} (${isCenter ? 'Active' : 'Slide'})`}
               >
-                <div className="howwedo-card-3d">
-                  {/* BACK FACE (0deg): Inactive Purple Gradient Glass Card */}
-                  <div className="howwedo-card-face howwedo-card-back">
-                    {/* Top Right Pill */}
-                    <div className="howwedo-glass-pill">{item.brandCount}</div>
-
-                    {/* Bottom Content Area */}
-                    <div className="howwedo-back-bottom">
-                      <div className="howwedo-back-category">
-                        <span className="howwedo-category-bullet" aria-hidden="true">
-                          ✦
-                        </span>
-                        <span>{item.category}</span>
-                      </div>
-
-                      <h3 className="howwedo-back-title">{item.inactiveTitle}</h3>
-
-                      <div className="howwedo-back-footer">
-                        <span className="howwedo-metric-pill">{item.metric}</span>
-                        <div className="howwedo-arrow-circle howwedo-arrow-light" aria-hidden="true">
-                          <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
-                            <path
-                              d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8"
-                              stroke="#232733"
-                              strokeWidth="1.6"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
+                <div className="howwedo-card-item">
+                  {/* TALL ROUNDED IMAGE CARD */}
+                  <div className="howwedo-image-card">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.image}
+                      alt={item.imageTitle}
+                      className="howwedo-card-image"
+                      loading="lazy"
+                    />
+                    <div className="howwedo-card-pill">{item.imagePill}</div>
                   </div>
 
-                  {/* FRONT FACE (180deg): Active Card with Project Image */}
-                  <div className="howwedo-card-face howwedo-card-front">
-                    {/* Top Image Container */}
-                    <div className="howwedo-front-image-wrap">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.image}
-                        alt={item.imageTitle}
-                        className="howwedo-front-image"
-                        loading="lazy"
-                      />
-                      <div className="howwedo-front-pill">{item.imagePill}</div>
+                  {/* SEPARATED TEXT ROW (Directly on page background below image card) */}
+                  <div className="howwedo-text-row" aria-hidden={!isCenter}>
+                    <div className="howwedo-text-info">
+                      <h3 className="howwedo-text-title">{item.imageTitle}</h3>
+                      <p className="howwedo-text-subtitle">{item.imageSubtitle}</p>
                     </div>
 
-                    {/* Bottom White Info Panel */}
-                    <div className="howwedo-front-info">
-                      <div className="howwedo-front-texts">
-                        <h3 className="howwedo-front-title">{item.imageTitle}</h3>
-                        <p className="howwedo-front-subtitle">{item.imageSubtitle}</p>
-                      </div>
-
-                      <Link
-                        href={item.link}
-                        className="howwedo-arrow-circle howwedo-arrow-dark clickable"
-                        aria-label={`View ${item.imageTitle}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
-                          <path
-                            d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8"
-                            stroke="#ffffff"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </Link>
-                    </div>
+                    <Link
+                      href={item.link}
+                      className="howwedo-arrow-btn clickable"
+                      aria-label={`View ${item.imageTitle}`}
+                      tabIndex={isCenter ? 0 : -1}
+                      onClick={(e) => {
+                        if (!isCenter) e.preventDefault();
+                        else e.stopPropagation();
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path
+                          d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8"
+                          stroke="#ffffff"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Link>
                   </div>
                 </div>
               </div>

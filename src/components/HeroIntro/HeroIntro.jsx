@@ -24,10 +24,12 @@ const F2_HZ = 13.0;
 const TAU_SEC = 0.28;
 
 // Fast lead-in timing constants (ms from first paint)
-const DOT_FADE_MS = 120;
+const DOT_DROP_MS = 450;
+const DOT_HOLD_MS = 50;
 const LINE_STRETCH_MS = 220;
 const HOLD_BEFORE_PLUCK_MS = 30;
-const PLUCK_START_MS = DOT_FADE_MS + LINE_STRETCH_MS + HOLD_BEFORE_PLUCK_MS; // 370ms
+const STRETCH_START_MS = DOT_DROP_MS + DOT_HOLD_MS; // 500ms
+const PLUCK_START_MS = STRETCH_START_MS + LINE_STRETCH_MS + HOLD_BEFORE_PLUCK_MS; // 750ms
 
 // Mid-vibration expansion & reveal timing constants (ms relative to pluck)
 // Mode 1 zero-crossing: t = 9 / (4 * f1) = 9 / 26 ≈ 346.15ms
@@ -57,6 +59,7 @@ export default function HeroIntro() {
   const [mounted, setMounted] = useState(true);
   const overlayRef   = useRef(null);
   const dotRef       = useRef(null);
+  const trailRef     = useRef(null);
   const lineRef      = useRef(null);
   const burstRef     = useRef(null);
   const svgRef       = useRef(null);
@@ -298,15 +301,22 @@ export default function HeroIntro() {
       return d;
     };
 
-    // --- BEAT 1: FAST LEAD-IN (DOT -> LINE) ---
-    // 0 to DOT_FADE_MS (120ms): Dot fades in at exact center
+    // --- BEAT 1: LEAD-IN (DROP -> HOLD -> LINE STRETCH) ---
+    // 0 to DOT_DROP_MS (450ms): Dot drops from offscreen top to exact vertical center
     if (dotRef.current) {
-      dotRef.current.style.transition = `opacity ${DOT_FADE_MS}ms ease-out, transform ${DOT_FADE_MS}ms ease-out`;
       dotRef.current.style.opacity = '1';
-      dotRef.current.style.transform = 'scale(1)';
+      void dotRef.current.offsetHeight;
+      dotRef.current.style.transition = `transform ${DOT_DROP_MS}ms cubic-bezier(0.5, 0, 0.2, 1), box-shadow ${DOT_DROP_MS}ms cubic-bezier(0.5, 0, 0.2, 1)`;
+      dotRef.current.style.transform = 'translateY(0)';
+      dotRef.current.style.boxShadow = '0 0 0px rgba(147, 117, 215, 0)';
     }
 
-    // At DOT_FADE_MS (120ms): Dot stretches horizontally into full-width line (scaleX 0 -> 1 over LINE_STRETCH_MS 220ms)
+    if (trailRef.current) {
+      trailRef.current.style.animation = `introTrailDrop ${DOT_DROP_MS}ms linear forwards`;
+    }
+
+    // At STRETCH_START_MS (500ms = 450ms drop + 50ms hold):
+    // Dot stretches horizontally into full-width line (scaleX 0 -> 1 over LINE_STRETCH_MS 220ms)
     addTimeout(() => {
       if (dotRef.current) {
         dotRef.current.style.transition = 'opacity 60ms ease-out';
@@ -317,7 +327,7 @@ export default function HeroIntro() {
         lineRef.current.style.transition = `transform ${LINE_STRETCH_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
         lineRef.current.style.transform = 'scaleX(1)';
       }
-    }, DOT_FADE_MS);
+    }, STRETCH_START_MS);
 
     // At PLUCK_START_MS (370ms): Line & dot hidden, string plucked, rAF begins immediately
     addTimeout(() => {
@@ -467,7 +477,10 @@ export default function HeroIntro() {
             marginTop: `-${DOT_SIZE / 2}px`,
             marginLeft: `-${DOT_SIZE / 2}px`,
           }}
-        />
+        >
+          <div id="intro-dot-trail" ref={trailRef} />
+          <div id="intro-dot-circle" />
+        </div>
         <div
           id="intro-line"
           ref={lineRef}

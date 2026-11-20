@@ -324,6 +324,7 @@
     font-size: 15px;
     line-height: 1.35;
     margin-bottom: 20px;
+    text-align: center;
   }
   .handcarousel-container {
     aspect-ratio: 16 / 10;

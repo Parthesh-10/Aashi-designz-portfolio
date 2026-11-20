@@ -145,6 +145,10 @@
   .employee-header {
     margin-bottom: 16px;
   }
+
+  .employee-bio p {
+    text-align: center !important;
+  }
 }
 
 @media (max-width: 520px) {

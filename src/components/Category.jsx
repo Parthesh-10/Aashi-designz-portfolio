@@ -234,6 +234,9 @@ export default function Category({ categoryDesc = [] }) {
   return (
     <div className="category">
       <h2 className="heading">WHAT I DO</h2>
+      <p className="headingPara">
+        I help brands define how they look, communicate, and show up in the world.
+      </p>
 
       {/* Desktop & Tablet Folder Grid (>= 768px) */}
       <div className="singleFolderContainer" ref={containerRef}>
@@ -355,10 +358,8 @@ export default function Category({ categoryDesc = [] }) {
         </div>
       </div>
 
+      {/* Bottom CTA Button */}
       <div className="categoryDesc">
-        <p className="headingPara">
-          I help brands define how they look, communicate, and show up in the world.
-        </p>
         <Link href="/contact">
           <button className="contact clickable">
             <h5>Work With Me</h5>
