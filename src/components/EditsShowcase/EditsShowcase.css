@@ -83,17 +83,19 @@
 .edits-de-block {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: clamp(40px, 3.8vw, 56px); /* Controlled column gap of 40-60px */
   margin-bottom: clamp(4.5rem, 6.5vw, 6.5rem); /* Increased vertical breathing room (~1.5x–1.75x cap height) */
   box-sizing: border-box;
   width: 100%;
 }
 
-/* Left Column: Eyebrow + Headline (Flush to container left margin) */
+/* Left Column: Eyebrow + Headline (~40-42% width) */
 .edits-de-left {
   margin-left: 0;
-  width: clamp(280px, 36cqw, 420px);
-  flex-shrink: 0;
+  width: 42%;
+  flex: 0 0 42%;
+  min-width: 0;
   box-sizing: border-box;
 }
 
@@ -101,36 +103,36 @@
   text-align: left !important;
   font-family: 'Outfit', sans-serif;
   font-weight: 700;
-  font-size: clamp(32px, 3.8cqw, 52px);
-  line-height: 1.08;
-  letter-spacing: -0.025em;
+  font-size: clamp(62px, 6.2vw, 96px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
   color: #313944;
 }
 
-/* Right Column: 3 Stat Cards + Quote (Flush to container right margin) */
+/* Right Column: 3 Stat Cards + Quote (~58-60% width) */
 .edits-de-right {
-  margin-left: auto;
+  margin-left: 0;
+  flex: 1 1 0;
   width: auto;
-  max-width: clamp(380px, 56cqw, 640px);
-  flex-shrink: 0;
+  min-width: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
-/* Stats Row: 3 Cards pushed flush right */
+/* Stats Row: 3 Cards positioned with controlled gap from headline */
 .de-stats-row {
   display: flex;
-  gap: clamp(10px, 1.4cqw, 18px);
+  gap: clamp(10px, 1.2vw, 16px);
   width: 100%;
-  justify-content: flex-end;
+  justify-content: flex-start;
   box-sizing: border-box;
 }
 
 .de-stat-card {
-  width: clamp(118px, 16.5cqw, 185px);
-  height: clamp(100px, 14cqw, 156px);
+  width: clamp(136px, 12vw, 185px);
+  height: clamp(116px, 10.2vw, 156px);
   flex-shrink: 0;
   background-color: #F0E8F9;
   border: 1px solid #E3D6F5;

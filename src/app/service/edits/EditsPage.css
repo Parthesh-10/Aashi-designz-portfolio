@@ -641,6 +641,7 @@
     padding-left: 0 !important;
     padding-right: 0 !important;
     min-height: auto !important;
+    height: auto !important;
   }
 
   .edits-included-h2 {
@@ -683,12 +684,16 @@
 }
 
 /* ============================================================
-   SECTION 6 & 7: HOW WE WORK & CLIENT FEEDBACK (UNIFIED SINGLE DESKTOP SCREEN)
+   SECTION 6: HOW WE WORK (COMPACT BALANCED SINGLE VIEWPORT)
    ============================================================ */
 .edits-pricing-wrap {
   width: 100%;
   background-color: #ffffff;
-  padding-top: clamp(1rem, 2vh, 1.8rem);
+  min-height: auto;
+  height: auto;
+  max-height: none;
+  display: block;
+  padding-top: clamp(1.2rem, 2.2vh, 1.8rem);
   padding-bottom: 0;
   box-sizing: border-box;
 }
@@ -698,33 +703,38 @@
   max-width: 1440px;
   margin-inline: auto;
   width: 100%;
-  padding-inline: clamp(24px, 8.8vw, 126px);
+  padding-inline: clamp(24px, 7.5vw, 108px);
   box-sizing: border-box;
 }
 
 .edits-pricing-header {
   text-align: left;
-  max-width: 54%;
-  margin-bottom: 0;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: auto;
+  margin-bottom: clamp(1.4rem, 2.5vh, 2.2rem);
+  padding-left: 0;
+  box-sizing: border-box;
 }
 
 .edits-pricing-h2 {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(1.8rem, 3.4vh + 0.8vw, 2.7rem);
+  font-size: clamp(2.1rem, 3.2vw, 3rem);
   font-weight: 800;
   color: #313944;
-  margin: 0 0 0.35rem 0;
-  line-height: 1.12;
+  margin: 0 0 clamp(8px, 1.2vh, 14px) 0;
+  line-height: 1.15;
   letter-spacing: -0.02em;
 }
 
 .edits-pricing-sub {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(0.78rem, 1.4vh, 1rem);
+  font-size: clamp(0.95rem, 1.25vw, 1.15rem);
   font-weight: 400;
   color: #313944;
   margin: 0;
   line-height: 1.35;
+  max-width: 100%;
 }
 
 /* Staggered Cards Row */
@@ -732,13 +742,17 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: clamp(12px, 1.8%, 20px);
+  gap: 2.4%;
   width: 100%;
+  max-width: min(960px, 100%);
+  margin-inline: auto;
   box-sizing: border-box;
+  margin-top: 0;
 }
 
 .edits-pricing-card {
-  flex: 1;
+  flex: 0 0 31.7%;
+  width: 31.7%;
   min-width: 0;
   border-radius: 16px;
   display: flex;
@@ -754,28 +768,31 @@
   transform: translateY(-4px);
 }
 
-/* Card 1: 1 Month Plan (Shortest, ~64% of Card 3, ~1.35:1 ratio) */
+/* Card 1: 1 Month Plan (Lowest, target width/height ~1.53) */
 .edits-card-month-1 {
   background-color: #ffffff;
   border: 1.5px solid #9C9BA0;
-  min-height: clamp(134px, 18vh, 182px);
-  padding: clamp(16px, 2.1vh, 22px) clamp(10px, 1.2vw, 18px) clamp(14px, 1.8vh, 18px);
+  aspect-ratio: 1.53 / 1;
+  height: auto;
+  padding: clamp(14px, 1.8vh, 20px) clamp(12px, 1.3vw, 18px) clamp(12px, 1.5vh, 18px);
 }
 
-/* Card 2: 3 Month Plan (Medium, ~82% of Card 3, ~1.05:1 ratio) */
+/* Card 2: 3 Month Plan (Middle, target width/height ~1.18) */
 .edits-card-month-3 {
   background-color: #F5ECFF;
   border: 1.5px solid #BDB1D7;
-  min-height: clamp(172px, 23vh, 234px);
-  padding: clamp(20px, 2.6vh, 28px) clamp(10px, 1.2vw, 18px) clamp(16px, 2vh, 22px);
+  aspect-ratio: 1.18 / 1;
+  height: auto;
+  padding: clamp(16px, 2.2vh, 24px) clamp(12px, 1.3vw, 18px) clamp(14px, 1.8vh, 20px);
 }
 
-/* Card 3: 6 Month Plan (Tallest, 100% reference, ~0.86:1 ratio) */
+/* Card 3: 6 Month Plan (Highest, target width/height ~0.96) */
 .edits-card-month-6 {
   background-color: #E2D3FA;
   border: 1.5px solid #CBBDDE;
-  min-height: clamp(210px, 28vh, 285px);
-  padding: clamp(24px, 3.1vh, 34px) clamp(10px, 1.2vw, 18px) clamp(18px, 2.3vh, 24px);
+  aspect-ratio: 0.96 / 1;
+  height: auto;
+  padding: clamp(20px, 2.6vh, 28px) clamp(12px, 1.3vw, 18px) clamp(16px, 2vh, 22px);
 }
 
 .edits-card-top {
@@ -783,25 +800,33 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin: auto 0;
+  padding-top: clamp(4px, 0.6vh, 8px);
 }
 
 .edits-card-title {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(16px, 2.1vh, 21px);
+  font-size: clamp(19px, 1.5vw, 23px);
   font-weight: 700;
   color: #313944;
-  margin: 0 0 0.35rem 0;
+  margin: 0 0 clamp(6px, 0.7vh, 9px) 0;
   line-height: 1.2;
+  text-align: center;
+  width: 100%;
 }
 
 .edits-card-desc {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(11.5px, 1.45vh, 13.5px);
+  font-size: clamp(13px, 1.0vw, 15px);
   font-weight: 400;
-  color: #555E6B;
-  margin: 0;
-  line-height: 1.4;
-  max-width: 78%;
+  color: #4A525D;
+  margin: 0 auto;
+  line-height: 1.42;
+  max-width: 88%;
+  text-align: center;
+  text-wrap: balance;
 }
 
 .edits-card-bottom {
@@ -809,39 +834,45 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: clamp(12px, 1.8vh, 18px);
+  justify-content: center;
+  text-align: center;
+  margin-top: auto;
+  padding-top: clamp(8px, 1.0vh, 12px);
 }
 
 .edits-card-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: clamp(6px, 1vh, 9px);
+  margin-bottom: clamp(4px, 0.6vh, 7px);
 }
 
 .edits-card-icon svg {
-  width: clamp(18px, 2.3vh, 23px);
+  width: clamp(18px, 1.35vw, 22px);
   height: auto;
 }
 
 .edits-card-badge {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(9px, 1.15vh, 10.5px);
+  font-size: clamp(9.5px, 0.74vw, 11px);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   color: #313944;
+  text-align: center;
+  display: block;
+  width: 100%;
 }
 
-/* Centered Statement */
+/* Centered Statement (~4-6% of Card 3 height below cards) */
 .edits-pricing-statement {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(15px, 2vh, 19px);
+  font-size: clamp(14px, 1.1vw, 17px);
   font-weight: 700;
   color: #313944;
   text-align: center;
-  margin-top: clamp(12px, 1.6vh, 18px);
-  margin-bottom: 0;
+  margin-top: clamp(16px, 2.2vh, 24px);
+  margin-bottom: clamp(22px, 2.8vh, 32px);
   line-height: 1.35;
 }
 
@@ -850,34 +881,36 @@
 }
 
 /* ============================================================
-   SECTION 7: CLIENT FEEDBACK (TESTIMONIALS)
+   SECTION 7: CLIENT FEEDBACK (COMPACT BALANCED SINGLE VIEWPORT)
    ============================================================ */
 .edits-feedback-wrap {
   width: 100%;
   background-color: #ffffff;
-  padding-top: clamp(18px, 2.6vh, 28px);
-  padding-bottom: clamp(18px, 2.8vh, 32px);
+  min-height: auto;
+  display: block;
+  padding-top: clamp(3.2rem, 4.8vw, 5.2rem);
+  padding-bottom: clamp(1.4rem, 2.4vh, 2.2rem);
   box-sizing: border-box;
 }
 
 .edits-feedback-eyebrow {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(10px, 1.15vh, 12px);
+  font-size: clamp(9.5px, 0.75vw, 11px);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: #AE88E8;
-  margin: 0 0 clamp(6px, 0.8vh, 10px) 0;
+  margin: 0 0 clamp(4px, 0.6vh, 8px) 0;
   line-height: 1;
 }
 
 .edits-feedback-h2 {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(1.85rem, 3.6vh, 2.75rem);
+  font-size: clamp(1.85rem, 2.8vw, 2.75rem);
   font-weight: 800;
   color: #313944;
-  margin: 0 0 clamp(12px, 1.8vh, 20px) 0;
-  line-height: 1.06;
+  margin: 0 0 clamp(10px, 1.6vh, 16px) 0;
+  line-height: 1.08;
   letter-spacing: -0.02em;
   text-align: left;
 }
@@ -890,22 +923,23 @@
 .edits-testimonials-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: clamp(8px, 1.6%, 14px);
+  gap: clamp(8px, 1.4%, 14px);
   width: 100%;
-  max-width: 82%;
+  max-width: min(920px, 100%);
   margin-inline: auto;
   box-sizing: border-box;
 }
 
 .edits-testimonial-card {
   background-color: #AE88E8;
-  border-radius: 16px;
-  padding: clamp(11px, 1.3vh, 15px);
+  border-radius: 14px;
+  aspect-ratio: 1.25 / 1;
+  min-height: clamp(85px, 11.5vh, 110px);
+  padding: clamp(9px, 1.1vh, 13px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   box-sizing: border-box;
-  min-height: clamp(100px, 14.5vh, 138px);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -917,34 +951,34 @@
   display: flex;
   align-items: center;
   gap: 2.5px;
-  margin-bottom: clamp(4px, 0.6vh, 6px);
+  margin-bottom: clamp(3px, 0.5vh, 5px);
 }
 
 .edits-star-icon {
   flex-shrink: 0;
-  width: clamp(10px, 1.2vh, 12px);
-  height: clamp(10px, 1.2vh, 12px);
+  width: clamp(10px, 1.1vh, 12px);
+  height: clamp(10px, 1.1vh, 12px);
 }
 
 .edits-testimonial-quote {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(8px, 1vh, 9.8px);
+  font-size: clamp(8px, 0.68vw, 9.5px);
   line-height: 1.32;
   font-weight: 400;
   color: #313944;
-  margin: 0 0 clamp(6px, 0.8vh, 8px) 0;
+  margin: 0 0 clamp(4px, 0.6vh, 8px) 0;
 }
 
 .edits-testimonial-author {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   margin-top: auto;
 }
 
 .edits-testimonial-avatar {
-  width: clamp(20px, 2.4vh, 24px);
-  height: clamp(20px, 2.4vh, 24px);
+  width: clamp(18px, 2vh, 22px);
+  height: clamp(18px, 2vh, 22px);
   border-radius: 50%;
   flex-shrink: 0;
   display: flex;
@@ -967,14 +1001,14 @@
 
 .edits-testimonial-name {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(9.5px, 1.15vh, 11px);
+  font-size: clamp(9px, 0.75vw, 10.5px);
   font-weight: 700;
   color: #313944;
 }
 
 .edits-testimonial-role {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(8px, 0.95vh, 9px);
+  font-size: clamp(7.5px, 0.62vw, 8.5px);
   font-weight: 400;
   color: rgba(49, 57, 68, 0.8);
 }
@@ -983,10 +1017,10 @@
    RESPONSIVE BREAKPOINTS FOR SECTIONS 6 & 7
    ============================================================ */
 
-/* Desktop Single-Screen Staircase Layout (>= 1024px) */
+/* Desktop Staircase Layout (>= 1024px) */
 @media (min-width: 1024px) {
   .edits-pricing-cards {
-    margin-top: clamp(-4.8rem, -8.5vh, -3.2rem);
+    margin-top: 0;
   }
 }
 
@@ -994,28 +1028,38 @@
 @media (min-width: 768px) and (max-width: 1023px) {
   .edits-pricing-wrap {
     min-height: auto;
-    padding-top: 2.5rem;
-    padding-bottom: 0;
+    padding-block: 2.5rem 1.8rem;
+    display: block;
   }
 
   .edits-pricing-header {
     max-width: 100%;
+    padding-left: 0;
     margin-bottom: 1.5rem;
+  }
+
+  .edits-pricing-sub {
+    max-width: 100%;
   }
 
   .edits-pricing-cards {
     margin-top: 0;
     gap: 14px;
+    align-items: flex-end;
   }
 
   .edits-pricing-card {
-    min-height: auto;
-    padding: 20px 14px;
+    flex: 1;
+    width: auto;
+    height: auto;
+    min-height: 180px;
+    padding: 16px 12px;
   }
 
   .edits-feedback-wrap {
-    padding-top: 2rem;
-    padding-bottom: 3rem;
+    min-height: auto;
+    padding-block: 2rem 2.5rem;
+    display: block;
   }
 
   .edits-testimonials-row {
@@ -1025,8 +1069,9 @@
   }
 
   .edits-testimonial-card {
+    aspect-ratio: 1.2 / 1;
     min-height: auto;
-    padding: 16px;
+    padding: 14px;
   }
 }
 
@@ -1035,13 +1080,17 @@
   .edits-pricing-wrap {
     min-height: auto;
     display: block;
-    padding-top: 2.5rem;
-    padding-bottom: 1.5rem;
+    padding-block: 2.5rem 1.5rem;
   }
 
   .edits-pricing-header {
     max-width: 100%;
+    padding-left: 0;
     margin-bottom: 1.5rem;
+  }
+
+  .edits-pricing-sub {
+    max-width: 100%;
   }
 
   .edits-pricing-cards {
@@ -1052,8 +1101,12 @@
   }
 
   .edits-pricing-card {
+    flex: none;
+    width: 100%;
+    height: auto;
     min-height: auto;
-    padding: 24px 20px;
+    padding: 20px 18px;
+    aspect-ratio: auto;
   }
 
   .edits-card-desc {
@@ -1061,17 +1114,18 @@
   }
 
   .edits-card-bottom {
-    margin-top: 18px;
+    margin-top: 14px;
   }
 
   .edits-pricing-statement {
-    margin-top: 1.8rem;
-    margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .edits-feedback-wrap {
-    padding-top: 1.5rem;
-    padding-bottom: 3rem;
+    min-height: auto;
+    display: block;
+    padding-block: 1.8rem 2.5rem;
   }
 
   .edits-feedback-br {
@@ -1085,6 +1139,7 @@
   }
 
   .edits-testimonial-card {
+    aspect-ratio: auto;
     min-height: auto;
     padding: 16px;
   }
