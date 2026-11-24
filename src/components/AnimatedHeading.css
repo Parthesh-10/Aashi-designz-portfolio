@@ -1,0 +1,103 @@
+/* ============================================================
+   AnimatedHeading.css — Letter-by-letter entrance, wave & hover
+   ============================================================ */
+
+.ah-heading {
+  margin: 0;
+  display: block;
+  text-align: center;
+  position: relative;
+  user-select: none;
+}
+
+.ah-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.ah-letter-outer {
+  display: inline-block;
+  position: relative;
+  transform-origin: 50% 80%;
+  /* Entrance initial state (before visible) */
+  opacity: 0;
+  translate: 0 0.55em;
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              translate 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              scale 450ms cubic-bezier(0.22, 1, 0.36, 1),
+              color 450ms ease;
+  transition-delay: var(--ah-entrance-delay, 0ms),
+                    var(--ah-entrance-delay, 0ms),
+                    0ms,
+                    0ms;
+}
+
+/* Revealed / In-View state */
+.ah-heading.is-revealed .ah-letter-outer {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* Continuous Wave Keyframes */
+@keyframes ahLetterWave {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.07em);
+  }
+}
+
+.ah-letter-inner {
+  display: inline-block;
+  transform: translateY(0);
+}
+
+.ah-heading.is-revealed .ah-letter-inner {
+  animation: ahLetterWave 2.6s ease-in-out infinite;
+  animation-delay: var(--ah-wave-delay, 0ms);
+}
+
+/* Pause wave when off-screen for performance */
+.ah-heading.is-paused .ah-letter-inner {
+  animation-play-state: paused !important;
+}
+
+/* Interactive Hover on Outer Letter Span */
+.ah-letter-outer:hover {
+  scale: 1.18;
+  transition: scale 180ms cubic-bezier(0.22, 1, 0.36, 1),
+              color 180ms ease !important;
+  transition-delay: 0ms !important;
+  z-index: 2;
+}
+
+/* Color transitions on hover */
+.ah-hover-purple:hover {
+  color: #AE88E8 !important;
+}
+
+.ah-hover-slate:hover {
+  color: #313944 !important;
+}
+
+/* Fallback for disabled JS or timeout */
+.no-js .ah-letter-outer,
+.ah-fallback .ah-letter-outer {
+  opacity: 1 !important;
+  translate: 0 0 !important;
+}
+
+/* Accessibility: prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .ah-letter-outer {
+    opacity: 1 !important;
+    translate: none !important;
+    transition: color 200ms ease !important;
+    animation: none !important;
+  }
+  .ah-letter-inner {
+    transform: none !important;
+    animation: none !important;
+  }
+}

@@ -1,0 +1,235 @@
+/* ============================================================
+   INCLUDED GRID COMPONENT STYLES
+   Interactive 2-axis hover-expand image grid for /service/edits
+   ============================================================ */
+
+.included-grid-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55cqw;
+  margin-inline: 2.6cqw;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+/* Row: Flex sizing on vertical axis
+   Rest state: equal halves (flex-grow: 1 each)
+   Hover state: hovered row flex-grow 2 (2/3 height), other row flex-grow 1 (1/3 height) */
+.included-grid-row {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  gap: 0.55cqw;
+  width: 100%;
+  box-sizing: border-box;
+  transition: flex-grow 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.included-grid-row[data-hovered="true"] {
+  flex-grow: 2;
+}
+
+/* Individual Tile: Flex sizing on horizontal axis
+   Rest state (or unhovered row): equal thirds (flex-grow: 1 each)
+   Hovered row: hovered tile flex-grow 2 (50% width), other two flex-grow 1 (25% each) */
+.included-tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.3cqw;
+  background-color: #1a1e24;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  box-sizing: border-box;
+  height: 100%;
+
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+
+  /* Animating flex-grow ONLY (700ms cubic-bezier(0.22, 1, 0.36, 1)) */
+  transition: flex-grow 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.included-tile[data-hovered="true"] {
+  flex-grow: 2;
+}
+
+/* Keyboard Accessibility Focus Ring */
+.included-tile:focus-visible {
+  outline: 2px solid #AE88E8;
+  outline-offset: 2px;
+  z-index: 10;
+}
+
+/* Image fills tile directly; zooms and refits smoothly as tile expands/contracts in both axes */
+.included-tile-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+}
+
+/* Soft Dark Gradient: fades in with text on hovered tile only */
+.included-tile-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 45%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  z-index: 1;
+}
+
+.included-tile[data-hovered="true"] .included-tile-gradient {
+  opacity: 1;
+  transition: opacity 450ms ease-out 150ms;
+}
+
+/* Text Content: centered at bottom of tile, visible on hovered tile only */
+.included-tile-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: 2cqw;
+  padding-inline: 1.5cqw;
+  text-align: center;
+  z-index: 2;
+  pointer-events: none;
+
+  /* Default compact/rest: invisible, shifted down 14px */
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.included-tile[data-hovered="true"] .included-tile-content {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 450ms ease-out 150ms, transform 450ms ease-out 150ms;
+  will-change: transform, opacity;
+}
+
+.included-tile-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.1cqw;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.included-tile-subtitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.3cqw;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0.35cqw 0 0;
+  line-height: 1.3;
+}
+
+/* ============================================================
+   ACCESSIBILITY: PREFERS-REDUCED-MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .included-grid-row {
+    transition: none !important;
+  }
+
+  .included-tile {
+    transition: none !important;
+  }
+
+  .included-tile-gradient {
+    transition: none !important;
+  }
+
+  .included-tile-content {
+    transition: none !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+}
+
+/* ============================================================
+   TOUCH DEVICES AND SMALL SCREENS (< 768px, or touch pointers)
+   Simple 2-column grid, 3:4 aspect ratio, always visible text
+   ============================================================ */
+@media (max-width: 767px), (hover: none), (pointer: coarse) {
+  .included-grid-container {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    margin-inline: 4vw !important;
+    flex: none !important;
+  }
+
+  .included-grid-row {
+    display: contents !important;
+    min-height: 0 !important;
+    transition: none !important;
+  }
+
+  .included-tile {
+    flex: none !important;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 3 / 4 !important;
+    border-radius: 14px !important;
+    transition: none !important;
+  }
+
+  .included-tile-img {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .included-tile-gradient {
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  .included-tile-content {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    will-change: auto !important;
+    padding-bottom: 16px !important;
+    padding-inline: 12px !important;
+  }
+
+  .included-tile-title {
+    font-size: clamp(16px, 4vw, 20px) !important;
+    line-height: 1.25 !important;
+  }
+
+  .included-tile-subtitle {
+    font-size: clamp(12px, 3vw, 14px) !important;
+    margin-top: 4px !important;
+    line-height: 1.3 !important;
+  }
+}
+
+/* Under 480px: 1 column */
+@media (max-width: 479px) {
+  .included-grid-container {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    margin-inline: 4vw !important;
+  }
+
+  .included-tile {
+    aspect-ratio: 3 / 4 !important;
+    border-radius: 14px !important;
+  }
+}

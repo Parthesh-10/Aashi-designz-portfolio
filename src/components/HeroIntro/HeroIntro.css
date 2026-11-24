@@ -71,11 +71,8 @@
   inset: 0;
   z-index: 99999;
   background-color: #E2CBFF;
-  background-image:
-    radial-gradient(circle, #B388EB 2.5px, transparent 2.5px),
-    radial-gradient(circle, #B388EB 2.5px, transparent 2.5px);
-  background-size: 29px 58px;
-  background-position: 0 0, 14.5px 29px;
+  background-image: radial-gradient(circle at center, #B388EB 1px, transparent 1.5px);
+  background-size: 30px 30px;
   background-repeat: repeat;
   overflow: hidden;
   pointer-events: all;
@@ -439,6 +436,13 @@ body.intro-scroll-lock {
    Mobile Hero Portrait & Layout (max-width: 767px)
    ============================================================ */
 @media (max-width: 767px) {
+  .header,
+  .header.container {
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+    width: auto !important;
+  }
+
   .homeBanner {
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -479,16 +483,16 @@ body.intro-scroll-lock {
 
   .headerContainer1 {
     order: 2 !important;
-    padding-left: calc(28px + var(--mobile-extra-gutter)) !important;
-    padding-right: calc(28px + var(--mobile-extra-gutter)) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
     position: relative !important;
     z-index: 20 !important;
   }
 
   .headerContainer2 {
     order: 3 !important;
-    padding-left: calc(28px + var(--mobile-extra-gutter)) !important;
-    padding-right: calc(28px + var(--mobile-extra-gutter)) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
     position: relative !important;
     z-index: 20 !important;
   }

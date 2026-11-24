@@ -1,4 +1,10 @@
 import { NextResponse } from 'next/server';
+import { isSmtpReady, smtpStartup, transporter } from '@/service/nodemailerStartup';
+
+// Initialize SMTP if configured
+if (typeof smtpStartup === 'function') {
+  smtpStartup().catch(() => {});
+}
 
 // In-memory rate limiting (5 requests per minute per IP)
 const rateLimitMap = new Map();
@@ -41,6 +47,64 @@ const ALLOWED_BUDGETS = [
 ];
 const ALLOWED_PLANS = ['1 Month Plan', '3 Month Plan', '6 Month Plan'];
 const PHONE_REGEX = /^\+91[6-9]\d{9}$/;
+
+async function sendLeadEmail(leadData) {
+  if (!isSmtpReady() || !process.env.EMAIL_USER) {
+    console.log('[Lead Submission - Fallback mode (SMTP inactive)]:', leadData);
+    return;
+  }
+
+  const {
+    finishLine,
+    channel,
+    decisionMaker,
+    budget,
+    plan,
+    businessName,
+    phone,
+    whatsappOptIn,
+    sourcePage,
+  } = leadData;
+
+  const text = `New Strategy Form Submission:
+Business Name: ${businessName}
+Phone: ${phone} (WhatsApp Opt-in: ${whatsappOptIn ? 'Yes' : 'No'})
+Finish Line: ${finishLine}
+Channel: ${channel}
+Decision Maker: ${decisionMaker}
+Budget: ${budget}
+Plan: ${plan}
+Source Page: ${sourcePage}`;
+
+  const html = `
+<h2>New Free Strategy Lead Received!</h2>
+<h3>Client Details:</h3>
+<ul>
+  <li><strong>Business Name:</strong> ${businessName}</li>
+  <li><strong>Phone:</strong> ${phone}</li>
+  <li><strong>WhatsApp Opt-in:</strong> ${whatsappOptIn ? 'Yes' : 'No'}</li>
+  <li><strong>Finish Line Goal:</strong> ${finishLine}</li>
+  <li><strong>Preferred Channel:</strong> ${channel}</li>
+  <li><strong>Decision Maker:</strong> ${decisionMaker}</li>
+  <li><strong>Budget:</strong> ${budget}</li>
+  <li><strong>Selected Plan:</strong> ${plan}</li>
+  <li><strong>Source Page:</strong> ${sourcePage}</li>
+</ul>
+`;
+
+  try {
+    await transporter.sendMail({
+      from: `"Strategy Lead" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER,
+      subject: `New Strategy Lead: ${businessName} (${phone})`,
+      text,
+      html,
+    });
+    console.log('[Lead Mail] Lead notification sent successfully.');
+  } catch (err) {
+    console.error('[Lead Mail Error]:', err.message);
+  }
+}
 
 export async function POST(request) {
   try {
@@ -134,36 +198,22 @@ export async function POST(request) {
       submittedAt: submittedAt || new Date().toISOString(),
     };
 
+    // Forward to Webhook if configured
     const webhookUrl = process.env.LEAD_WEBHOOK_URL;
-
     if (webhookUrl && webhookUrl.trim() !== '') {
       try {
-        const webhookResponse = await fetch(webhookUrl, {
+        await fetch(webhookUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(sanitizedData),
         });
-
-        if (!webhookResponse.ok) {
-          console.error('[Lead Webhook Error] Status:', webhookResponse.status);
-          return NextResponse.json(
-            { ok: false, error: 'Could not forward lead to webhook service.' },
-            { status: 502 }
-          );
-        }
       } catch (webhookErr) {
-        console.error('[Lead Webhook Fetch Exception]:', webhookErr);
-        return NextResponse.json(
-          { ok: false, error: 'Webhook submission failed. Please try again.' },
-          { status: 502 }
-        );
+        console.error('[Lead Webhook Exception]:', webhookErr);
       }
-    } else {
-      // Graceful fallback for local development or when webhook is not yet configured
-      console.log('[Lead Submission - Local/Fallback mode]:', sanitizedData);
     }
+
+    // Send email via nodemailer to site owner
+    await sendLeadEmail(sanitizedData);
 
     return NextResponse.json({ ok: true });
   } catch (error) {

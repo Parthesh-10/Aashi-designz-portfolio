@@ -11,19 +11,6 @@ const headerHeight = header ? header.offsetHeight : null;
 
 let windowSize = window.innerWidth;
 window.addEventListener("scroll", () => {
-  //navbar functionality
-
-  let currentScrollPos = window.scrollY;
-
-  if (!navBar.classList.contains("open")) {
-    if (navPos > currentScrollPos) {
-      navBar.style.top = "0";
-    } else {
-      navBar.style.top = "-80px";
-    }
-    navPos = currentScrollPos;
-  }
-
   //home banner Img scale
 
   if (header && imgContainer) {
@@ -40,41 +27,8 @@ window.addEventListener("scroll", () => {
   }
 });
 
-//navMenu
-
-const navImg = document.querySelector(".navImg");
-const navBtn = document.querySelector(".hamburger");
-
-// function navbarToggle() {
-//   //hamburger Toggle
-//   navBtn.classList.toggle("btnClicked");
-//   navImg.classList.toggle("active");
-//   navBar.classList.toggle("open");
-// }
-
-const hamburger = document.querySelector(".hamburger");
-hamburger.addEventListener("click", () => {
-  navBtn.classList.toggle("btnClicked");
-  navImg.classList.toggle("active");
-  navBar.classList.toggle("open");
-});
-
-// cursor
-const clickable = document.querySelectorAll(".clickable");
-const cursor = document.querySelector(".cursor");
-
-document.addEventListener("mousemove", (e) => {
-  cursor.style.left = e.clientX + 9 + "px";
-  cursor.style.top = e.clientY + 9 + "px";
-});
-clickable.forEach((element) => {
-  element.addEventListener("mouseenter", function () {
-    cursor.style.transform = "scale(0.8)";
-  });
-  element.addEventListener("mouseleave", function () {
-    cursor.style.transform = "scale(1)";
-  });
-});
+// Global navigation menu is managed reliably by Header.jsx (React state)
+// Global custom cursor is managed reliably by CustomCursor.jsx
 
 //slider js
 const sliderContainer = document.querySelector(".swiperContainer");

@@ -1,21 +1,84 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { createPortal } from 'react-dom';
-import * as THREE from 'three';
-import './PassageGallery.css';
+import { useEffect, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
+import * as THREE from "three";
+import "./PassageGallery.css";
+import { scrollTo } from "@/components/SmoothScroll";
 
-const DEFAULT_COLORS = ['#5227FF', '#FF9FFC'];
-const DEFAULT_BG = '#06020c';
+/**
+ * TUNNEL_IMAGES
+ * Exactly 55 optimized portfolio photography assets.
+ * Thumbnails (longest side 512px) used on tunnel 3D cards.
+ * Full images (longest side 1600px) loaded on demand for inspection modal.
+ */
+export const TUNNEL_IMAGES = [
+  { id: "photo-01", thumb: "/tunnel/thumb/photo-01.webp", full: "/tunnel/full/photo-01.webp", alt: "Photo 01" },
+  { id: "photo-02", thumb: "/tunnel/thumb/photo-02.webp", full: "/tunnel/full/photo-02.webp", alt: "Photo 02" },
+  { id: "photo-03", thumb: "/tunnel/thumb/photo-03.webp", full: "/tunnel/full/photo-03.webp", alt: "Photo 03" },
+  { id: "photo-04", thumb: "/tunnel/thumb/photo-04.webp", full: "/tunnel/full/photo-04.webp", alt: "Photo 04" },
+  { id: "photo-05", thumb: "/tunnel/thumb/photo-05.webp", full: "/tunnel/full/photo-05.webp", alt: "Photo 05" },
+  { id: "photo-06", thumb: "/tunnel/thumb/photo-06.webp", full: "/tunnel/full/photo-06.webp", alt: "Photo 06" },
+  { id: "photo-07", thumb: "/tunnel/thumb/photo-07.webp", full: "/tunnel/full/photo-07.webp", alt: "Photo 07" },
+  { id: "photo-08", thumb: "/tunnel/thumb/photo-08.webp", full: "/tunnel/full/photo-08.webp", alt: "Photo 08" },
+  { id: "photo-09", thumb: "/tunnel/thumb/photo-09.webp", full: "/tunnel/full/photo-09.webp", alt: "Photo 09" },
+  { id: "photo-10", thumb: "/tunnel/thumb/photo-10.webp", full: "/tunnel/full/photo-10.webp", alt: "Photo 10" },
+  { id: "photo-11", thumb: "/tunnel/thumb/photo-11.webp", full: "/tunnel/full/photo-11.webp", alt: "Photo 11" },
+  { id: "photo-12", thumb: "/tunnel/thumb/photo-12.webp", full: "/tunnel/full/photo-12.webp", alt: "Photo 12" },
+  { id: "photo-13", thumb: "/tunnel/thumb/photo-13.webp", full: "/tunnel/full/photo-13.webp", alt: "Photo 13" },
+  { id: "photo-14", thumb: "/tunnel/thumb/photo-14.webp", full: "/tunnel/full/photo-14.webp", alt: "Photo 14" },
+  { id: "photo-15", thumb: "/tunnel/thumb/photo-15.webp", full: "/tunnel/full/photo-15.webp", alt: "Photo 15" },
+  { id: "photo-16", thumb: "/tunnel/thumb/photo-16.webp", full: "/tunnel/full/photo-16.webp", alt: "Photo 16" },
+  { id: "photo-17", thumb: "/tunnel/thumb/photo-17.webp", full: "/tunnel/full/photo-17.webp", alt: "Photo 17" },
+  { id: "photo-18", thumb: "/tunnel/thumb/photo-18.webp", full: "/tunnel/full/photo-18.webp", alt: "Photo 18" },
+  { id: "photo-19", thumb: "/tunnel/thumb/photo-19.webp", full: "/tunnel/full/photo-19.webp", alt: "Photo 19" },
+  { id: "photo-20", thumb: "/tunnel/thumb/photo-20.webp", full: "/tunnel/full/photo-20.webp", alt: "Photo 20" },
+  { id: "photo-21", thumb: "/tunnel/thumb/photo-21.webp", full: "/tunnel/full/photo-21.webp", alt: "Photo 21" },
+  { id: "photo-22", thumb: "/tunnel/thumb/photo-22.webp", full: "/tunnel/full/photo-22.webp", alt: "Photo 22" },
+  { id: "photo-23", thumb: "/tunnel/thumb/photo-23.webp", full: "/tunnel/full/photo-23.webp", alt: "Photo 23" },
+  { id: "photo-24", thumb: "/tunnel/thumb/photo-24.webp", full: "/tunnel/full/photo-24.webp", alt: "Photo 24" },
+  { id: "photo-25", thumb: "/tunnel/thumb/photo-25.webp", full: "/tunnel/full/photo-25.webp", alt: "Photo 25" },
+  { id: "photo-26", thumb: "/tunnel/thumb/photo-26.webp", full: "/tunnel/full/photo-26.webp", alt: "Photo 26" },
+  { id: "photo-27", thumb: "/tunnel/thumb/photo-27.webp", full: "/tunnel/full/photo-27.webp", alt: "Photo 27" },
+  { id: "photo-28", thumb: "/tunnel/thumb/photo-28.webp", full: "/tunnel/full/photo-28.webp", alt: "Photo 28" },
+  { id: "photo-29", thumb: "/tunnel/thumb/photo-29.webp", full: "/tunnel/full/photo-29.webp", alt: "Photo 29" },
+  { id: "photo-30", thumb: "/tunnel/thumb/photo-30.webp", full: "/tunnel/full/photo-30.webp", alt: "Photo 30" },
+  { id: "photo-31", thumb: "/tunnel/thumb/photo-31.webp", full: "/tunnel/full/photo-31.webp", alt: "Photo 31" },
+  { id: "photo-32", thumb: "/tunnel/thumb/photo-32.webp", full: "/tunnel/full/photo-32.webp", alt: "Photo 32" },
+  { id: "photo-33", thumb: "/tunnel/thumb/photo-33.webp", full: "/tunnel/full/photo-33.webp", alt: "Photo 33" },
+  { id: "photo-34", thumb: "/tunnel/thumb/photo-34.webp", full: "/tunnel/full/photo-34.webp", alt: "Photo 34" },
+  { id: "photo-35", thumb: "/tunnel/thumb/photo-35.webp", full: "/tunnel/full/photo-35.webp", alt: "Photo 35" },
+  { id: "photo-36", thumb: "/tunnel/thumb/photo-36.webp", full: "/tunnel/full/photo-36.webp", alt: "Photo 36" },
+  { id: "photo-37", thumb: "/tunnel/thumb/photo-37.webp", full: "/tunnel/full/photo-37.webp", alt: "Photo 37" },
+  { id: "photo-38", thumb: "/tunnel/thumb/photo-38.webp", full: "/tunnel/full/photo-38.webp", alt: "Photo 38" },
+  { id: "photo-39", thumb: "/tunnel/thumb/photo-39.webp", full: "/tunnel/full/photo-39.webp", alt: "Photo 39" },
+  { id: "photo-40", thumb: "/tunnel/thumb/photo-40.webp", full: "/tunnel/full/photo-40.webp", alt: "Photo 40" },
+  { id: "photo-41", thumb: "/tunnel/thumb/photo-41.webp", full: "/tunnel/full/photo-41.webp", alt: "Photo 41" },
+  { id: "photo-42", thumb: "/tunnel/thumb/photo-42.webp", full: "/tunnel/full/photo-42.webp", alt: "Photo 42" },
+  { id: "photo-43", thumb: "/tunnel/thumb/photo-43.webp", full: "/tunnel/full/photo-43.webp", alt: "Photo 43" },
+  { id: "photo-44", thumb: "/tunnel/thumb/photo-44.webp", full: "/tunnel/full/photo-44.webp", alt: "Photo 44" },
+  { id: "photo-45", thumb: "/tunnel/thumb/photo-45.webp", full: "/tunnel/full/photo-45.webp", alt: "Photo 45" },
+  { id: "photo-46", thumb: "/tunnel/thumb/photo-46.webp", full: "/tunnel/full/photo-46.webp", alt: "Photo 46" },
+  { id: "photo-47", thumb: "/tunnel/thumb/photo-47.webp", full: "/tunnel/full/photo-47.webp", alt: "Photo 47" },
+  { id: "photo-48", thumb: "/tunnel/thumb/photo-48.webp", full: "/tunnel/full/photo-48.webp", alt: "Photo 48" },
+  { id: "photo-49", thumb: "/tunnel/thumb/photo-49.webp", full: "/tunnel/full/photo-49.webp", alt: "Photo 49" },
+  { id: "photo-50", thumb: "/tunnel/thumb/photo-50.webp", full: "/tunnel/full/photo-50.webp", alt: "Photo 50" },
+  { id: "photo-51", thumb: "/tunnel/thumb/photo-51.webp", full: "/tunnel/full/photo-51.webp", alt: "Photo 51" },
+  { id: "photo-52", thumb: "/tunnel/thumb/photo-52.webp", full: "/tunnel/full/photo-52.webp", alt: "Photo 52" },
+  { id: "photo-53", thumb: "/tunnel/thumb/photo-53.webp", full: "/tunnel/full/photo-53.webp", alt: "Photo 53" },
+  { id: "photo-54", thumb: "/tunnel/thumb/photo-54.webp", full: "/tunnel/full/photo-54.webp", alt: "Photo 54" },
+  { id: "photo-55", thumb: "/tunnel/thumb/photo-55.webp", full: "/tunnel/full/photo-55.webp", alt: "Photo 55" }
+];
+
+const DEFAULT_COLORS = ["#5227FF", "#FF9FFC"];
+const DEFAULT_BG = "#06020c";
 
 // Touch Glide Configuration Constants (mobile / touch input only)
 const TOUCH_GLIDE_FACTOR = 0.0035;        // Finger delta to 3D Z scale (~1.4 units per 400px swipe)
 const TOUCH_STEER_FACTOR = 0.45;          // Subtle steering ratio during touch swipe
 const TOUCH_MOMENTUM_DECAY = 0.92;        // Decay multiplier per frame on release (matches desktop wheel momentum)
 const TOUCH_MOMENTUM_MAX_VELOCITY = 0.06; // Clamps release velocity to prevent over-speed jump
-const TUNNEL_START_Z = 0;                 // Corridor entrance boundary
-const TUNNEL_END_Z = -35.0;               // Corridor exit boundary (~24 row steps of modular travel)
-const TAP_MAX_DISTANCE = 8;               // Maximum movement (px) for a gesture to be classified as a tap
+const TAP_MAX_DISTANCE = 10;              // Maximum movement (px) for a gesture to be classified as a tap
 const TAP_MAX_DURATION = 300;             // Maximum duration (ms) for a tap vs glide
 
 // Helper: Rounded rectangle ShapeGeometry for smooth, non-warping tiles
@@ -45,26 +108,26 @@ function createRoundedPlaneGeometry(width, height, radius) {
     uvs[i * 2] = (px + width / 2) / width;
     uvs[i * 2 + 1] = (py + height / 2) / height;
   }
-  geom.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+  geom.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
   geom.computeVertexNormals();
   return geom;
 }
 
 // Helper: Procedural vibrant gradient accent textures matching React Bits Pro corridor
 function createAccentTexture(variant) {
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = 512;
   canvas.height = 512;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = '#0f051d';
+  ctx.fillStyle = "#0f051d";
   ctx.fillRect(0, 0, 512, 512);
 
   if (variant === 0) {
     const grad = ctx.createLinearGradient(0, 0, 512, 512);
-    grad.addColorStop(0, '#5227FF');
-    grad.addColorStop(0.5, '#FF2A85');
-    grad.addColorStop(1, '#FF9F1C');
+    grad.addColorStop(0, "#5227FF");
+    grad.addColorStop(0.5, "#FF2A85");
+    grad.addColorStop(1, "#FF9F1C");
     ctx.lineWidth = 90;
     ctx.strokeStyle = grad;
     ctx.beginPath();
@@ -72,18 +135,18 @@ function createAccentTexture(variant) {
     ctx.stroke();
   } else if (variant === 1) {
     const grad = ctx.createRadialGradient(256, 200, 30, 256, 200, 220);
-    grad.addColorStop(0, '#FF4B72');
-    grad.addColorStop(0.6, '#9D174D');
-    grad.addColorStop(1, '#1A0B2E');
+    grad.addColorStop(0, "#FF4B72");
+    grad.addColorStop(0.6, "#9D174D");
+    grad.addColorStop(1, "#1A0B2E");
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(256, 220, 140, 0, Math.PI * 2);
     ctx.fill();
   } else if (variant === 2) {
     const grad = ctx.createLinearGradient(0, 0, 512, 0);
-    grad.addColorStop(0, '#7928CA');
-    grad.addColorStop(0.5, '#FF0080');
-    grad.addColorStop(1, '#FF8A00');
+    grad.addColorStop(0, "#7928CA");
+    grad.addColorStop(0.5, "#FF0080");
+    grad.addColorStop(1, "#FF8A00");
     ctx.lineWidth = 80;
     ctx.strokeStyle = grad;
     ctx.beginPath();
@@ -92,9 +155,9 @@ function createAccentTexture(variant) {
     ctx.stroke();
   } else {
     const grad = ctx.createLinearGradient(0, 0, 0, 512);
-    grad.addColorStop(0, '#FF2E93');
-    grad.addColorStop(0.6, '#FF8B3D');
-    grad.addColorStop(1, '#FFD166');
+    grad.addColorStop(0, "#FF2E93");
+    grad.addColorStop(0.6, "#FF8B3D");
+    grad.addColorStop(1, "#FFD166");
     ctx.lineWidth = 85;
     ctx.strokeStyle = grad;
     ctx.beginPath();
@@ -113,8 +176,119 @@ function pseudoRand(seed, r, s) {
   return x - Math.floor(x);
 }
 
+// Inspect modal component showing photo with visible close button, background scroll lock, and back gesture
+function PassageInspectModal({ item, onClose }) {
+  const [loadedFullSrc, setLoadedFullSrc] = useState(null);
+  const mountTimeRef = useRef(0);
+  const isClosingRef = useRef(false);
+
+  useEffect(() => {
+    mountTimeRef.current = performance.now();
+  }, []);
+
+  useEffect(() => {
+    if (!item?.full) return;
+
+    const img = new Image();
+    img.src = item.full;
+    img.onload = () => {
+      setLoadedFullSrc(item.full);
+    };
+  }, [item?.full]);
+
+  const handleClose = useCallback((e) => {
+    if (e) e.stopPropagation();
+    if (isClosingRef.current) return;
+    isClosingRef.current = true;
+    onClose();
+    if (typeof window !== "undefined" && window.history.state?.passageModalOpen) {
+      window.history.back();
+    }
+  }, [onClose]);
+
+  // Lock background scroll, listen for Escape key, and support mobile back gesture
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        handleClose(e);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+
+    // Browser back gesture / button integration
+    const handlePopState = () => {
+      if (!isClosingRef.current) {
+        isClosingRef.current = true;
+        onClose();
+      }
+    };
+    window.history.pushState({ passageModalOpen: true }, "");
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [onClose, handleClose]);
+
+  const isFullLoaded = loadedFullSrc === item?.full;
+
+  const handleBackdropClick = (e) => {
+    if (e) e.stopPropagation();
+    // Ignore clicks dispatched within 250ms of mounting to prevent opening click from immediately closing the modal
+    if (performance.now() - mountTimeRef.current < 250) {
+      return;
+    }
+    handleClose(e);
+  };
+
+  return (
+    <div
+      className="passage-focus-overlay"
+      data-lenis-prevent="true"
+      onClick={handleBackdropClick}
+      onPointerDown={(e) => e.stopPropagation()}
+      onPointerUp={(e) => e.stopPropagation()}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Photo viewer"
+    >
+      <button
+        type="button"
+        className="passage-modal-close clickable"
+        onClick={handleClose}
+        aria-label="Close photo view"
+      >
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path
+            d="M14 4L4 14M4 4L14 14"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={isFullLoaded ? item.full : item.thumb}
+        alt={item.alt || "Portfolio photo"}
+        className="passage-focus-image"
+        loading="eager"
+        decoding="async"
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
+  );
+}
+
 export default function PassageGallery({
-  items = [],
+  items = TUNNEL_IMAGES,
   colors = DEFAULT_COLORS,
   backgroundColor = DEFAULT_BG,
   speed = 0.35,
@@ -128,7 +302,7 @@ export default function PassageGallery({
   captions = true,
   wheel = true,
   seed = 42,
-  ariaLabel = 'Interactive 3D Passage Gallery of creative portfolio works'
+  ariaLabel = "Interactive 3D Passage Gallery of creative portfolio works"
 }) {
   const containerRef = useRef(null);
   const [focusedItem, setFocusedItem] = useState(null);
@@ -155,15 +329,16 @@ export default function PassageGallery({
     }
     s.focusedMesh = null;
     s.focusedOrigin = null;
+    s.scrollVelocity = 0;
     setFocusedItem(null);
   }, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') closeFocus();
+      if (e.key === "Escape") closeFocus();
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [closeFocus]);
 
   useEffect(() => {
@@ -172,7 +347,7 @@ export default function PassageGallery({
 
     const s = stateRef.current;
     s.alive = true;
-    s.reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+    s.reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
     // 1. Scene, Camera, Renderer
     const scene = new THREE.Scene();
@@ -188,7 +363,7 @@ export default function PassageGallery({
       renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: false,
-        powerPreference: 'high-performance'
+        powerPreference: "high-performance"
       });
     } catch {
       return undefined;
@@ -201,8 +376,8 @@ export default function PassageGallery({
     renderer.toneMappingExposure = 1.2;
 
     const canvas = renderer.domElement;
-    canvas.className = 'passage-gallery-canvas';
-    canvas.setAttribute('aria-label', ariaLabel);
+    canvas.className = "passage-gallery-canvas";
+    canvas.setAttribute("aria-label", ariaLabel);
     container.appendChild(canvas);
 
     // 2. Lighting
@@ -216,8 +391,7 @@ export default function PassageGallery({
     const light2 = new THREE.PointLight(color2, 40, 22);
     scene.add(light1, light2);
 
-    // 3. Rectangular Corridor Geometry (Matching Reference Screenshot)
-    // 5 lanes across floor and ceiling, 2 lanes high on walls
+    // 3. Rectangular Corridor Geometry
     const cellWidth = 1.45;
     const cellHeight = 1.15;
     const rowStep = 1.45;
@@ -257,7 +431,7 @@ export default function PassageGallery({
     const floorOutlineGeom = createOutlineGeom(tileW, tileZ, cornerRadius);
     const wallOutlineGeom = createOutlineGeom(tileZ, tileH, cornerRadius);
 
-    // 4. Subtle Wireframe Grid Structure
+    // 4. Wireframe Grid Structure
     const gridMat = new THREE.LineBasicMaterial({
       color: 0x3d226a,
       transparent: true,
@@ -311,23 +485,43 @@ export default function PassageGallery({
       rectRings.push(ring);
     }
 
-    // 5. Preload Photo Textures & Accent Textures
+    // 5. Preload Photo Textures & Accent Textures (Thumbnails ONLY, anisotropy max 4)
     const textureLoader = new THREE.TextureLoader();
-    const photoMaterials = items.map((item) => {
-      const texture = textureLoader.load(item.src);
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.minFilter = THREE.LinearMipmapLinearFilter;
-      texture.generateMipmaps = true;
+    const maxAniso = Math.min(renderer.capabilities.getMaxAnisotropy(), 4);
 
-      return new THREE.MeshStandardMaterial({
-        map: texture,
-        roughness: 0.35,
-        metalness: 0.05,
-        side: THREE.DoubleSide
+    // Apply texture cover crop (proportional crop, no stretching)
+    const applyCover = (tex, planeAspect) => {
+      if (!tex.image || !tex.image.width || !tex.image.height) return;
+      const imgAspect = tex.image.width / tex.image.height;
+      if (imgAspect > planeAspect) {
+        tex.repeat.set(planeAspect / imgAspect, 1);
+        tex.offset.set((1 - tex.repeat.x) / 2, 0);
+      } else {
+        tex.repeat.set(1, imgAspect / planeAspect);
+        tex.offset.set(0, (1 - tex.repeat.y) / 2);
+      }
+    };
+
+    const clonedTextureMap = new Map();
+
+    const loadedThumbTextures = items.map((item, pIdx) => {
+      const tex = textureLoader.load(item.thumb, () => {
+        const list = clonedTextureMap.get(pIdx);
+        if (list) {
+          list.forEach(({ cardTex, planeAspect }) => {
+            applyCover(cardTex, planeAspect);
+            cardTex.needsUpdate = true;
+          });
+        }
       });
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.generateMipmaps = true;
+      tex.anisotropy = maxAniso;
+      return tex;
     });
 
-    // Procedural accent gradient materials
+    // Procedural accent gradient materials (kept as part of design)
     const accentTextures = [0, 1, 2, 3].map((v) => createAccentTexture(v));
     const accentMaterials = accentTextures.map(
       (tex) =>
@@ -345,6 +539,7 @@ export default function PassageGallery({
 
     const photoMeshes = [];
     const allTiles = [];
+    const createdPhotoMaterials = [];
     let photoCursor = 0;
     let accentCursor = 0;
 
@@ -358,7 +553,7 @@ export default function PassageGallery({
         const isAccent = !isPhoto && val < photoFill + accentFill;
 
         if (!isPhoto && !isAccent) {
-          // Empty dark grid cell (matches reference screenshot!)
+          // Empty dark grid cell (matches reference design)
           continue;
         }
 
@@ -395,11 +590,36 @@ export default function PassageGallery({
 
         let material;
         let item = null;
-        if (isPhoto && photoMaterials.length > 0) {
-          const pIdx = photoCursor % photoMaterials.length;
+        let cardId = null;
+        if (isPhoto && items.length > 0) {
+          const pIdx = photoCursor % items.length;
           photoCursor++;
-          material = photoMaterials[pIdx];
           item = items[pIdx];
+          cardId = item.id;
+
+          const isWall = sIdx >= 10;
+          const planeAspect = isWall ? tileZ / tileH : tileW / tileZ;
+
+          const baseTex = loadedThumbTextures[pIdx];
+          const cardTex = baseTex.clone();
+
+          if (baseTex.image && baseTex.image.width > 0) {
+            applyCover(cardTex, planeAspect);
+            cardTex.needsUpdate = true;
+          } else {
+            if (!clonedTextureMap.has(pIdx)) {
+              clonedTextureMap.set(pIdx, []);
+            }
+            clonedTextureMap.get(pIdx).push({ cardTex, planeAspect });
+          }
+
+          material = new THREE.MeshStandardMaterial({
+            map: cardTex,
+            roughness: 0.35,
+            metalness: 0.05,
+            side: THREE.DoubleSide
+          });
+          createdPhotoMaterials.push(material);
         } else {
           const aIdx = accentCursor % accentMaterials.length;
           accentCursor++;
@@ -418,9 +638,11 @@ export default function PassageGallery({
           opacity: 0.32
         });
         const frameLine = new THREE.Line(outlineGeom, frameMat);
+        frameLine.raycast = () => {}; // Never intercept raycast clicks intended for card surface
         mesh.add(frameLine);
 
         mesh.userData = {
+          id: cardId,
           isPhoto,
           item,
           frameMat,
@@ -438,25 +660,22 @@ export default function PassageGallery({
       }
     }
 
-    // 7. Interaction: Calibrated Smooth Scroll & Rock-Solid Click Inspection
+    // 7. Interaction: Unified Pointer Events (Mouse, Touch, Pen) with Tap vs Swipe Disambiguation
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
 
-    // Touch gesture tracking (scoped strictly to pointerType === 'touch' || 'pen')
-    let activeTouchId = null;
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchStartTime = 0;
-    let touchLastX = 0;
-    let touchLastY = 0;
-    let touchLastTime = 0;
-    let touchVelocityY = 0;
+    let activePointerId = null;
+    let pointerDownPos = { x: 0, y: 0 };
+    let pointerDownTime = 0;
+    let pointerMoved = false;
+    let isPointerPressed = false;
+    let lastInspectActionTime = 0;
     let touchMomentumVelocity = 0;
-    let cachedCanvasRect = null;
-    let lastTouchTapTime = 0;
 
     const inspectPhotoAt = (clientX, clientY) => {
       if (!interactive || !focusOnClick) return;
+      const now = performance.now();
+      if (now - lastInspectActionTime < 300) return;
 
       const rect = canvas.getBoundingClientRect();
       const clickPointer = new THREE.Vector2(
@@ -466,301 +685,189 @@ export default function PassageGallery({
 
       camera.updateMatrixWorld();
       raycaster.setFromCamera(clickPointer, camera);
-      const hits = raycaster.intersectObjects(photoMeshes, true);
+      const hits = raycaster.intersectObjects(photoMeshes, false);
 
-      if (hits.length > 0) {
-        let hitMesh = hits[0].object;
-        while (hitMesh && !photoMeshes.includes(hitMesh) && hitMesh.parent) {
-          hitMesh = hitMesh.parent;
+      let hitMesh = null;
+      let cardId = null;
+
+      // 1. Direct hit-test with distance safety (nearest tile <= 18 units, in front of camera)
+      for (let i = 0; i < hits.length; i++) {
+        let obj = hits[i].object;
+        while (obj && !obj.userData?.id && obj.parent) {
+          obj = obj.parent;
         }
-
-        if (hitMesh && photoMeshes.includes(hitMesh) && hitMesh.userData?.item) {
-          if (s.focusedMesh === hitMesh) {
-            closeFocus();
-          } else {
-            if (s.focusedMesh && s.focusedOrigin) {
-              s.focusedMesh.position.copy(s.focusedOrigin.pos);
-              s.focusedMesh.rotation.copy(s.focusedOrigin.rot);
-              s.focusedMesh.scale.copy(s.focusedOrigin.scale);
-            }
-            s.focusedMesh = hitMesh;
-            s.focusedOrigin = {
-              pos: hitMesh.position.clone(),
-              rot: hitMesh.rotation.clone(),
-              scale: hitMesh.scale.clone()
-            };
-            setFocusedItem(hitMesh.userData.item);
+        if (obj && obj.userData?.id && photoMeshes.includes(obj)) {
+          if (hits[i].distance <= 18 && obj.position.z < camera.position.z + 1) {
+            hitMesh = obj;
+            cardId = obj.userData.id;
+            break;
           }
         }
-      } else if (s.focusedMesh) {
-        closeFocus();
       }
+
+      // 2. Proximity fallback: If tap was near tile edge or gap, test slight offsets (~8-10px)
+      if (!hitMesh) {
+        const offsets = [
+          [0.02, 0], [-0.02, 0], [0, 0.02], [0, -0.02],
+          [0.015, 0.015], [-0.015, -0.015], [0.015, -0.015], [-0.015, 0.015]
+        ];
+        for (const [ox, oy] of offsets) {
+          const testPt = new THREE.Vector2(clickPointer.x + ox, clickPointer.y + oy);
+          raycaster.setFromCamera(testPt, camera);
+          const nearbyHits = raycaster.intersectObjects(photoMeshes, false);
+          for (let i = 0; i < nearbyHits.length; i++) {
+            let obj = nearbyHits[i].object;
+            while (obj && !obj.userData?.id && obj.parent) {
+              obj = obj.parent;
+            }
+            if (obj && obj.userData?.id && photoMeshes.includes(obj) && nearbyHits[i].distance <= 18 && obj.position.z < camera.position.z + 1) {
+              hitMesh = obj;
+              cardId = obj.userData.id;
+              break;
+            }
+          }
+          if (hitMesh) break;
+        }
+      }
+
+      if (hitMesh && cardId) {
+        const matchedItem = TUNNEL_IMAGES.find((e) => e.id === cardId);
+        if (matchedItem) {
+          lastInspectActionTime = now;
+          if (s.focusedMesh && s.focusedOrigin) {
+            s.focusedMesh.position.copy(s.focusedOrigin.pos);
+            s.focusedMesh.rotation.copy(s.focusedOrigin.rot);
+            s.focusedMesh.scale.copy(s.focusedOrigin.scale);
+          }
+          s.focusedMesh = hitMesh;
+          s.focusedOrigin = {
+            pos: hitMesh.position.clone(),
+            rot: hitMesh.rotation.clone(),
+            scale: hitMesh.scale.clone()
+          };
+          setFocusedItem(matchedItem);
+        }
+      }
+    };
+
+    const onPointerDown = (e) => {
+      activePointerId = e.pointerId;
+      pointerDownPos = { x: e.clientX, y: e.clientY };
+      pointerDownTime = performance.now();
+      pointerMoved = false;
+      isPointerPressed = true;
+
+      // Update steering target on initial down
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      s.mouse.targetX = x * look * 1.5;
+      s.mouse.targetY = y * look * 1.5;
     };
 
     const onPointerMove = (e) => {
-      if (!interactive) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
 
-      const isTouch = e.pointerType === 'touch' || e.pointerType === 'pen';
-
-      if (isTouch) {
-        if (activeTouchId !== e.pointerId || s.focusedMesh) return;
-
-        const now = performance.now();
-        const dt = Math.max((now - touchLastTime) / 1000, 0.001);
-        const deltaY = e.clientY - touchLastY;
-        const totalDist = Math.hypot(e.clientX - touchStartX, e.clientY - touchStartY);
-
-        const instantVelocityY = deltaY / dt;
-        touchVelocityY = touchVelocityY * 0.4 + instantVelocityY * 0.6;
-
-        touchLastX = e.clientX;
-        touchLastY = e.clientY;
-        touchLastTime = now;
-
-        if (totalDist >= TAP_MAX_DISTANCE) {
-          // Steering via horizontal finger drag
-          if (cachedCanvasRect && cachedCanvasRect.width > 0) {
-            const normX = ((e.clientX - cachedCanvasRect.left) / cachedCanvasRect.width) * 2 - 1;
-            const normY = -((e.clientY - cachedCanvasRect.top) / cachedCanvasRect.height) * 2 + 1;
-            s.mouse.targetX = normX * look * 0.75 * TOUCH_STEER_FACTOR;
-            s.mouse.targetY = normY * look * 0.55 * TOUCH_STEER_FACTOR;
-          }
-
-          // Tunnel Glide & Boundary Handoff:
-          // finger dragging UP (deltaY < 0) glides forward into tunnel (decreases targetZ)
-          // finger dragging DOWN (deltaY > 0) glides backward toward entrance (increases targetZ)
-          const deltaZ = deltaY * TOUCH_GLIDE_FACTOR;
-          const proposedTargetZ = s.targetZ + deltaZ;
-
-          if (deltaY > 0 && s.targetZ >= TUNNEL_START_Z) {
-            // At start boundary pulling down -> hand off to page scroll up
-            s.targetZ = TUNNEL_START_Z;
-            window.scrollBy(0, -deltaY);
-          } else if (deltaY < 0 && s.targetZ <= TUNNEL_END_Z) {
-            // At end boundary pulling up -> hand off to page scroll down
-            s.targetZ = TUNNEL_END_Z;
-            window.scrollBy(0, -deltaY);
-          } else if (proposedTargetZ > TUNNEL_START_Z) {
-            // Crossed entrance boundary in this move
-            const usedDeltaZ = TUNNEL_START_Z - s.targetZ;
-            const usedDeltaY = usedDeltaZ / TOUCH_GLIDE_FACTOR;
-            const remainingDeltaY = deltaY - usedDeltaY;
-            s.targetZ = TUNNEL_START_Z;
-            window.scrollBy(0, -remainingDeltaY);
-          } else if (proposedTargetZ < TUNNEL_END_Z) {
-            // Crossed exit boundary in this move
-            const usedDeltaZ = TUNNEL_END_Z - s.targetZ;
-            const usedDeltaY = usedDeltaZ / TOUCH_GLIDE_FACTOR;
-            const remainingDeltaY = deltaY - usedDeltaY;
-            s.targetZ = TUNNEL_END_Z;
-            window.scrollBy(0, -remainingDeltaY);
-          } else {
-            // Inside corridor
-            s.targetZ = proposedTargetZ;
-          }
-        }
-        return;
+      // Only steer camera when not actively pressing down, preventing scene drift during a click
+      if (e.pointerType !== "touch" && !isPointerPressed) {
+        s.mouse.targetX = x * look * 2;
+        s.mouse.targetY = y * look * 2;
+        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       }
 
-      // Desktop mouse pointer move (100% unchanged)
-      const rect = canvas.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-      pointer.x = x;
-      pointer.y = y;
-
-      s.mouse.targetX = x * look * 0.75;
-      s.mouse.targetY = y * look * 0.55;
-
-      // Hover feedback: pointer cursor & neon glow when over clickable photo
-      if (!s.focusedMesh) {
-        camera.updateMatrixWorld();
-        raycaster.setFromCamera(pointer, camera);
-        const hits = raycaster.intersectObjects(photoMeshes, true);
-        if (hits.length > 0) {
-          canvas.style.cursor = 'pointer';
-        } else {
-          canvas.style.cursor = 'default';
+      if (activePointerId === e.pointerId) {
+        const dist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+        if (dist > 8) {
+          pointerMoved = true;
         }
       }
     };
 
-    // Slower, graceful scroll sensitivity
+    const onPointerUp = (e) => {
+      if (e.pointerId === activePointerId) {
+        isPointerPressed = false;
+        const duration = performance.now() - pointerDownTime;
+        const dist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+
+        // Click / tap detection: <= 8px movement and <= 400ms duration
+        if (!pointerMoved && dist <= 8 && duration <= 400) {
+          inspectPhotoAt(pointerDownPos.x, pointerDownPos.y);
+        }
+        activePointerId = null;
+      }
+    };
+
+    const onPointerCancel = (e) => {
+      if (e.pointerId === activePointerId) {
+        activePointerId = null;
+        isPointerPressed = false;
+        pointerMoved = true;
+      }
+    };
+
+    const onClick = (e) => {
+      if (performance.now() - lastInspectActionTime < 500) return;
+      const dist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+      if (!pointerMoved && dist <= 8) {
+        inspectPhotoAt(pointerDownPos.x, pointerDownPos.y);
+      }
+    };
+
     const onWheel = (e) => {
-      if (!wheel) return;
+      if (!interactive || !wheel) return;
       e.preventDefault();
 
       if (s.focusedMesh) {
         closeFocus();
       }
 
-      // Normalized, significantly gentler scroll delta
-      const raw = e.deltaY;
-      const clamped = Math.sign(raw) * Math.min(Math.abs(raw), 50);
-
-      s.scrollVelocity += clamped * 0.0006;
-      s.targetZ -= clamped * 0.0022;
+      const dy = e.deltaY;
+      const clamped = Math.sign(dy) * Math.min(Math.abs(dy), 60);
+      s.scrollVelocity += clamped * 0.0008;
+      s.targetZ -= clamped * 0.0035;
     };
 
-    // Pointer down: record position to differentiate click from drag
-    const onPointerDown = (e) => {
-      const isTouch = e.pointerType === 'touch' || e.pointerType === 'pen';
-
-      if (isTouch) {
-        if (!interactive || s.focusedMesh) return;
-
-        // Cancel existing momentum on new touch
-        touchMomentumVelocity = 0;
-        touchVelocityY = 0;
-
-        activeTouchId = e.pointerId;
-        touchStartX = e.clientX;
-        touchStartY = e.clientY;
-        touchLastX = e.clientX;
-        touchLastY = e.clientY;
-        touchStartTime = performance.now();
-        touchLastTime = touchStartTime;
-        cachedCanvasRect = canvas.getBoundingClientRect();
-
-        try {
-          canvas.setPointerCapture(e.pointerId);
-        } catch {}
-        return;
-      }
-
-      // Desktop mouse pointer down
-      if (!interactive || e.button > 0) return;
-      s.pointerDownPos.x = e.clientX;
-      s.pointerDownPos.y = e.clientY;
-    };
-
-    const onPointerUp = (e) => {
-      const isTouch = e.pointerType === 'touch' || e.pointerType === 'pen';
-      if (!isTouch) return;
-
-      if (activeTouchId !== e.pointerId) return;
-
-      try {
-        canvas.releasePointerCapture(e.pointerId);
-      } catch {}
-      activeTouchId = null;
-
-      const duration = performance.now() - touchStartTime;
-      const totalDist = Math.hypot(e.clientX - touchStartX, e.clientY - touchStartY);
-
-      // Tap detection (under 8px, under 300ms)
-      if (totalDist < TAP_MAX_DISTANCE && duration < TAP_MAX_DURATION) {
-        lastTouchTapTime = performance.now();
-        inspectPhotoAt(e.clientX, e.clientY);
-        s.mouse.targetX = 0;
-        s.mouse.targetY = 0;
-        return;
-      }
-
-      // Momentum on drag release
-      if (!s.reducedMotion) {
-        let initialMomentum = touchVelocityY * TOUCH_GLIDE_FACTOR * 0.22;
-        initialMomentum = Math.sign(initialMomentum) * Math.min(Math.abs(initialMomentum), TOUCH_MOMENTUM_MAX_VELOCITY);
-        touchMomentumVelocity = initialMomentum;
-      } else {
-        touchMomentumVelocity = 0;
-      }
-
-      // Return steering smoothly to center
-      s.mouse.targetX = 0;
-      s.mouse.targetY = 0;
-    };
-
-    const onPointerCancel = (e) => {
-      const isTouch = e.pointerType === 'touch' || e.pointerType === 'pen';
-      if (!isTouch) return;
-
-      if (activeTouchId === e.pointerId) {
-        try {
-          canvas.releasePointerCapture(e.pointerId);
-        } catch {}
-        activeTouchId = null;
-        touchVelocityY = 0;
-        touchMomentumVelocity = 0;
-        s.mouse.targetX = 0;
-        s.mouse.targetY = 0;
-      }
-    };
-
-    // Native Click Handler for Click-to-Inspect
-    const onClick = (e) => {
-      if (!interactive || !focusOnClick || e.button > 0) return;
-
-      // Ignore synthetic click event fired immediately following a touch tap
-      if (performance.now() - lastTouchTapTime < 450) return;
-
-      // Ignore if user dragged or swiped on mouse
-      const dist = Math.hypot(e.clientX - s.pointerDownPos.x, e.clientY - s.pointerDownPos.y);
-      if (dist > 15) return;
-
-      inspectPhotoAt(e.clientX, e.clientY);
-    };
-
-    canvas.addEventListener('pointermove', onPointerMove);
-    canvas.addEventListener('pointerdown', onPointerDown);
-    canvas.addEventListener('pointerup', onPointerUp);
-    canvas.addEventListener('pointercancel', onPointerCancel);
-    canvas.addEventListener('click', onClick);
-
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("pointercancel", onPointerCancel);
+    canvas.addEventListener("click", onClick);
     if (wheel) {
-      canvas.addEventListener('wheel', onWheel, { passive: false });
+      canvas.addEventListener("wheel", onWheel, { passive: false });
     }
 
-    // 8. Resize Observer
-    const handleResize = () => {
-      if (!container) return;
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h, false);
-      if (canvas) cachedCanvasRect = canvas.getBoundingClientRect();
-    };
-
-    const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(container);
-
-    // 9. Animation Loop
-    let rafId = 0;
+    // 8. Animation Loop
     let lastTime = performance.now();
+    let rafId;
 
-    const animate = (time) => {
+    const animate = () => {
       if (!s.alive) return;
-      const dt = Math.min((time - lastTime) / 1000, 0.1);
-      lastTime = time;
+      rafId = requestAnimationFrame(animate);
 
-      // Gentle auto-cruising when idle
+      const now = performance.now();
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+
+      // Gentle auto-glide forward when not inspecting
       if (!s.focusedMesh && !s.reducedMotion) {
         s.targetZ -= speed * 1.5 * dt;
       }
 
       // Smooth, gentle scroll momentum damping (desktop wheel)
-      s.targetZ -= s.scrollVelocity * dt * 25;
-      s.scrollVelocity *= 0.92;
+      if (!s.focusedMesh) {
+        s.targetZ -= s.scrollVelocity * dt * 25;
+        s.scrollVelocity *= 0.92;
+      } else {
+        s.scrollVelocity = 0;
+      }
 
-      // Touch momentum decay with boundary handoff
-      if (Math.abs(touchMomentumVelocity) > 0.0001) {
-        const proposedTargetZ = s.targetZ + touchMomentumVelocity;
-        if (touchMomentumVelocity > 0 && proposedTargetZ >= TUNNEL_START_Z) {
-          s.targetZ = TUNNEL_START_Z;
-          const scrollRemaining = -(touchMomentumVelocity / TOUCH_GLIDE_FACTOR);
-          window.scrollBy(0, scrollRemaining);
-          touchMomentumVelocity *= TOUCH_MOMENTUM_DECAY;
-        } else if (touchMomentumVelocity < 0 && proposedTargetZ <= TUNNEL_END_Z) {
-          s.targetZ = TUNNEL_END_Z;
-          const scrollRemaining = -(touchMomentumVelocity / TOUCH_GLIDE_FACTOR);
-          window.scrollBy(0, scrollRemaining);
-          touchMomentumVelocity *= TOUCH_MOMENTUM_DECAY;
-        } else {
-          s.targetZ = proposedTargetZ;
-          touchMomentumVelocity *= TOUCH_MOMENTUM_DECAY;
-        }
+      // Touch momentum decay
+      if (!s.focusedMesh && Math.abs(touchMomentumVelocity) > 0.0001) {
+        s.targetZ += touchMomentumVelocity;
+        touchMomentumVelocity *= TOUCH_MOMENTUM_DECAY;
       } else {
         touchMomentumVelocity = 0;
       }
@@ -769,12 +876,14 @@ export default function PassageGallery({
       s.cameraZ += (s.targetZ - s.cameraZ) * 0.08;
       camera.position.z = s.cameraZ;
 
-      // Pointer look interpolation
-      s.mouse.x += (s.mouse.targetX - s.mouse.x) * 0.07;
-      s.mouse.y += (s.mouse.targetY - s.mouse.y) * 0.07;
+      // Pointer look interpolation (paused when inspecting so background stays still)
+      if (!s.focusedMesh) {
+        s.mouse.x += (s.mouse.targetX - s.mouse.x) * 0.07;
+        s.mouse.y += (s.mouse.targetY - s.mouse.y) * 0.07;
 
-      camera.rotation.y = -s.mouse.x * 0.32;
-      camera.rotation.x = s.mouse.y * 0.24;
+        camera.rotation.y = -s.mouse.x * 0.32;
+        camera.rotation.x = s.mouse.y * 0.24;
+      }
 
       // Lights follow camera down corridor
       light1.position.set(-halfW * 0.5, halfH * 0.6, camera.position.z - 3.5);
@@ -789,14 +898,23 @@ export default function PassageGallery({
         }
       });
 
-      // Hover highlight detection
+      // Hover highlight detection & desktop cursor feedback
       if (!s.focusedMesh) {
         camera.updateMatrixWorld();
         raycaster.setFromCamera(pointer, camera);
-        const hits = raycaster.intersectObjects(photoMeshes, true);
-        let hitMesh = hits.length > 0 ? hits[0].object : null;
-        while (hitMesh && !photoMeshes.includes(hitMesh) && hitMesh.parent) {
-          hitMesh = hitMesh.parent;
+        const hits = raycaster.intersectObjects(photoMeshes, false);
+        let hitMesh = null;
+        for (let i = 0; i < hits.length; i++) {
+          let obj = hits[i].object;
+          while (obj && !obj.userData?.id && obj.parent) {
+            obj = obj.parent;
+          }
+          if (obj && obj.userData?.id && photoMeshes.includes(obj)) {
+            if (hits[i].distance <= 18 && obj.position.z < camera.position.z + 1) {
+              hitMesh = obj;
+              break;
+            }
+          }
         }
 
         if (s.hoveredMesh !== hitMesh) {
@@ -809,6 +927,12 @@ export default function PassageGallery({
             hitMesh.userData.frameMat.opacity = 1.0;
             hitMesh.userData.frameMat.color.set(0xffffff);
           }
+        }
+
+        // Pointer cursor feedback on hover
+        if (canvas) {
+          canvas.style.cursor = hitMesh ? "pointer" : "grab";
+          canvas.classList.toggle("clickable", Boolean(hitMesh));
         }
       }
 
@@ -841,22 +965,33 @@ export default function PassageGallery({
       });
 
       renderer.render(scene, camera);
-      rafId = requestAnimationFrame(animate);
     };
 
     rafId = requestAnimationFrame(animate);
 
-    // 10. WebGL Cleanup
+    // 9. Resize Handling
+    const handleResize = () => {
+      if (!container || !renderer || !camera) return;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    };
+
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(container);
+
     return () => {
       s.alive = false;
       cancelAnimationFrame(rafId);
       resizeObserver.disconnect();
-      canvas.removeEventListener('pointermove', onPointerMove);
-      canvas.removeEventListener('pointerdown', onPointerDown);
-      canvas.removeEventListener('pointerup', onPointerUp);
-      canvas.removeEventListener('pointercancel', onPointerCancel);
-      canvas.removeEventListener('click', onClick);
-      if (wheel) canvas.removeEventListener('wheel', onWheel);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointerup", onPointerUp);
+      canvas.removeEventListener("pointercancel", onPointerCancel);
+      canvas.removeEventListener("click", onClick);
+      if (wheel) canvas.removeEventListener("wheel", onWheel);
 
       floorCeilGeom.dispose();
       wallGeom.dispose();
@@ -865,9 +1000,13 @@ export default function PassageGallery({
       rectRingGeom.dispose();
       gridMat.dispose();
 
-      photoMaterials.forEach((mat) => {
+      createdPhotoMaterials.forEach((mat) => {
         if (mat.map) mat.map.dispose();
         mat.dispose();
+      });
+
+      loadedThumbTextures.forEach((tex) => {
+        tex.dispose();
       });
 
       accentMaterials.forEach((mat) => {
@@ -885,33 +1024,45 @@ export default function PassageGallery({
   }, [items, colors, backgroundColor, speed, look, fov, lanes, photoFill, accentFill, interactive, focusOnClick, wheel, seed, ariaLabel, closeFocus]);
 
   return (
-    <div ref={containerRef} className="passage-gallery-container" aria-label={ariaLabel}>
+    <div
+      ref={containerRef}
+      className="passage-gallery-container"
+      data-lenis-prevent="true"
+      aria-label={ariaLabel}
+    >
       {/* Controls Hint Bar with Scroll to Glide and Continue Page Shortcut */}
       {!focusedItem && (
-        <div className="passage-hint-bar" aria-hidden="false">
-          <div className="passage-hint-item">
-            <span className="passage-hint-dot"></span>
+        <div
+          className="passage-hint-bar"
+          aria-label="Gallery controls guide"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="passage-hint-item passage-hint-desktop-only">
+            <span className="passage-hint-dot" aria-hidden="true"></span>
             <span>Scroll to Glide</span>
           </div>
-          <span>•</span>
-          <div className="passage-hint-item">
+          <span className="passage-hint-sep passage-hint-desktop-only" aria-hidden="true">•</span>
+          <div className="passage-hint-item passage-hint-desktop-only">
             <span>Cursor to Steer</span>
           </div>
-          <span>•</span>
+          <span className="passage-hint-sep passage-hint-desktop-only" aria-hidden="true">•</span>
           <div className="passage-hint-item">
+            <span className="passage-hint-dot passage-hint-mobile-dot" aria-hidden="true"></span>
             <span>Click Photo to Inspect</span>
           </div>
-          <span>•</span>
+          <span className="passage-hint-sep" aria-hidden="true">•</span>
           <button
             className="passage-hint-skip"
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               const el =
-                containerRef.current?.closest('.passage-outer-container')?.nextElementSibling ||
-                containerRef.current?.closest('.passage-section-wrapper')?.nextElementSibling;
+                containerRef.current?.closest(".passage-outer-container")?.nextElementSibling ||
+                containerRef.current?.closest(".passage-section-wrapper")?.nextElementSibling;
               if (el) {
-                el.scrollIntoView({ behavior: 'smooth' });
+                scrollTo(el, { duration: 1.2 });
               } else {
-                window.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' });
+                scrollTo(window.scrollY + window.innerHeight * 0.8, { duration: 1.2 });
               }
             }}
             aria-label="Scroll past gallery to next section"
@@ -922,36 +1073,8 @@ export default function PassageGallery({
       )}
 
       {/* Focused Photo Inspection Modal Overlay (Portaled to document.body so it stays full-viewport) */}
-      {focusedItem && captions && typeof document !== 'undefined' && createPortal(
-        <div
-          className="passage-focus-overlay"
-          onClick={closeFocus}
-          role="dialog"
-          aria-modal="true"
-          aria-label={focusedItem.title || 'Focused portfolio item'}
-        >
-          <div className="passage-caption-card" onClick={(e) => e.stopPropagation()}>
-            <div className="passage-focus-image-wrapper">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={focusedItem.src}
-                alt={focusedItem.alt || focusedItem.title}
-                className="passage-focus-image"
-              />
-            </div>
-            <div className="passage-caption-content">
-              <h4 className="passage-caption-title">{focusedItem.title}</h4>
-              <p className="passage-caption-desc">{focusedItem.caption}</p>
-              <button
-                className="passage-close-btn"
-                onClick={closeFocus}
-                aria-label="Close full view"
-              >
-                <span>✕ Return to Passage (Esc)</span>
-              </button>
-            </div>
-          </div>
-        </div>,
+      {focusedItem && captions && typeof document !== "undefined" && createPortal(
+        <PassageInspectModal item={focusedItem} onClose={closeFocus} />,
         document.body
       )}
     </div>

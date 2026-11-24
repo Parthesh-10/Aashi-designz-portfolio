@@ -1,0 +1,282 @@
+/* ============================================================
+   AboutHero.css — Inline-Pill Headline & Hero Layout
+   ============================================================ */
+
+/* Section Outer Container */
+.aboutHeader {
+  overflow: visible;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-top: 0 !important;
+}
+
+/* Headline Typography */
+.about-hero-headline {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  color: var(--font-color, #313944);
+  text-align: left;
+  margin: 0 0 2.5rem 0;
+  padding: 0;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* Desktop Layout (1024px and up): Two-column row, photo on left, text on right */
+@media (min-width: 1024px) {
+  .aboutHeader {
+    padding-left: clamp(2rem, 5vw, 6rem);
+    padding-right: clamp(2rem, 5vw, 6rem);
+  }
+
+  .aboutHeader .aboutContainer {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: clamp(48px, 5vw, 96px) !important;
+    width: 100% !important;
+    margin-top: 8rem !important;
+    margin-bottom: 3rem !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .aboutHeader .aboutImg {
+    order: 1 !important;
+    flex: 0 0 auto !important;
+    width: min(538px, 44%) !important;
+    max-width: 538px !important;
+    margin: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    height: auto !important;
+  }
+
+  .aboutHeader .aboutText {
+    order: 2 !important;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: 100% !important;
+    text-align: left !important;
+    padding: 0 !important;
+  }
+
+  .about-hero-headline {
+    font-size: clamp(1.75rem, 2.7vw, 3.85rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  .about-hero-line {
+    display: block;
+    white-space: nowrap;
+    margin-bottom: 0.31em;
+  }
+
+  .about-hero-line:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Tablet & Mobile Layout (below 1024px): Stack vertically: headline + button on TOP, photo underneath */
+@media (max-width: 1023px) {
+  .aboutHeader {
+    margin-top: 0 !important;
+    padding-top: clamp(76px, 9.5vw, 88px) !important;
+    padding-bottom: clamp(3.5rem, 8vw, 6rem) !important;
+    padding-left: clamp(1.25rem, 4vw, 2.5rem) !important;
+    padding-right: clamp(1.25rem, 4vw, 2.5rem) !important;
+  }
+
+  .aboutHeader .aboutContainer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 56px !important; /* Space between Hire Me button and photo block (48-64px) */
+    width: 100% !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* 1. Headline + Hire Me button block */
+  .aboutHeader .aboutText {
+    order: 1 !important;
+    width: 100% !important;
+    text-align: center !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .about-hero-headline {
+    text-align: center !important;
+    font-size: clamp(1.65rem, 6vw, 2.85rem);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin: 0 0 28px 0 !important; /* Direct gap between headline and Hire Me button (24-32px) */
+  }
+
+  .about-hero-line {
+    display: inline;
+    white-space: normal;
+  }
+
+  .aboutHeader .aboutText a {
+    display: inline-flex !important;
+  }
+
+  .aboutHeader .aboutText .contact {
+    margin-top: 0 !important;
+  }
+
+  /* 2. Photo block */
+  .aboutHeader .aboutImg {
+    order: 2 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    display: flex !important;
+    justify-content: center !important;
+    height: auto !important;
+    min-height: unset !important;
+  }
+}
+
+/* Extra small screens adjustments */
+@media (max-width: 480px) {
+  .aboutHeader {
+    margin-top: 0 !important;
+    padding-top: 76px !important;
+    padding-bottom: 3.5rem !important;
+  }
+
+  .aboutHeader .aboutContainer {
+    gap: 48px !important;
+  }
+}
+
+/* Text Pills: "Ayushi", "Designer" */
+.hero-text-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  height: 1.465em;
+  padding: 0 0.88em;
+  background-color: #ffffff;
+  color: var(--font-color, #313944);
+  border-radius: 9999px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 0.635em;
+  line-height: 1;
+  margin: 0 0.16em;
+  box-shadow: none;
+  box-sizing: border-box;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Inline Image Capsule - Outer Shadow Wrapper */
+.hero-capsule {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  height: 0.93em;
+  border-radius: 9999px;
+  margin: 0 0.12em;
+  position: relative;
+  box-shadow: 0 10px 20px -6px rgba(45, 30, 90, 0.32), 0 3px 6px rgba(45, 30, 90, 0.12);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* Inner Container */
+.hero-capsule-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  position: relative;
+}
+
+/* Capsule Sizes & Background Colors */
+.hero-capsule-avatar {
+  width: 1.4em;
+  background-color: #A97CE8;
+}
+
+.hero-capsule-posters {
+  width: 1.4em;
+  background-color: #A97CE8;
+}
+
+.hero-capsule-chandigarh {
+  width: 1.4em;
+  background-color: #8EB7DC;
+}
+
+.hero-capsule-phone {
+  width: 1.4em;
+  background-color: #DDF76B;
+}
+
+.hero-capsule-tape {
+  width: 1.64em;
+  background-color: #2F4858;
+}
+
+/* Flush capsule inner: clips image to pill shape with no shadow clipping */
+.hero-capsule-flush {
+  overflow: visible;
+}
+
+.hero-capsule-flush .hero-capsule-inner {
+  overflow: hidden;
+}
+
+.hero-capsule-flush .hero-capsule-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 9999px;
+  display: block;
+  pointer-events: none;
+}
+
+/* Pop-out capsules: allow hat/phone to peek above capsule top */
+.hero-capsule-popout {
+  overflow: visible;
+}
+
+.hero-capsule-popout .hero-capsule-inner {
+  overflow: visible;
+}
+
+.hero-capsule-popout .hero-capsule-img {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: block;
+  pointer-events: none;
+}
+
+.hero-capsule-avatar .hero-capsule-img {
+  height: 1.40em;
+  width: auto;
+  max-width: none;
+}
+
+.hero-capsule-phone .hero-capsule-img {
+  height: 1.45em;
+  width: auto;
+  max-width: none;
+}

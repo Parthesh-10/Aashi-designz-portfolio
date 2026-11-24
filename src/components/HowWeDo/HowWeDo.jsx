@@ -21,18 +21,22 @@ export const CAROUSEL_DATA = [
     imageTitle: 'Branding & Strategy',
     imageSubtitle: 'for brands people remember',
     link: '/service/branddesign',
+    overlayLabel: 'BRANDING',
+    overlayTitle: 'A brand people remember',
   },
   {
     id: 2,
     category: 'DESIGN & EDIT',
     brandCount: '130+ Brands',
     inactiveTitle: 'Feeds that look like one brand',
-    metric: '80% Approval rate',
+    metric: '90% Approval rate',
     image: '/services/design-edit.webp',
     imagePill: '300+ Brands',
     imageTitle: 'Design & Edit',
     imageSubtitle: 'for cohesive feeds',
     link: '/service/graphicdesign',
+    overlayLabel: 'DESIGN & EDIT',
+    overlayTitle: 'Feeds that look like one brand',
   },
   {
     id: 3,
@@ -45,6 +49,8 @@ export const CAROUSEL_DATA = [
     imageTitle: 'Digital Marketing',
     imageSubtitle: 'for brands that want sales',
     link: '/service/designstrategy',
+    overlayLabel: 'DIGITAL MARKETING',
+    overlayTitle: 'Ads that pay for themselves',
   },
   {
     id: 4,
@@ -57,6 +63,8 @@ export const CAROUSEL_DATA = [
     imageTitle: 'UI / UX',
     imageSubtitle: 'for sites that convert',
     link: '/service/uiuxdesign',
+    overlayLabel: 'UI / UX',
+    overlayTitle: 'Visitors that become buyers',
   },
   {
     id: 5,
@@ -69,6 +77,8 @@ export const CAROUSEL_DATA = [
     imageTitle: 'Offline Marketing',
     imageSubtitle: 'for shops people walk into',
     link: '/service/videoediting',
+    overlayLabel: 'OFFLINE MARKETING',
+    overlayTitle: 'Be seen where they walk',
   },
 ];
 
@@ -81,9 +91,11 @@ export default function HowWeDo() {
   const [currentIndex, setCurrentIndex] = useState(INITIAL_INDEX);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
-  const isSwiping = useRef(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartX = useRef(0);
+  const dragStartY = useRef(0);
+  const hasDragged = useRef(false);
 
   // Real index in 0..4 for pagination indicator
   const realActiveIndex = ((currentIndex % TOTAL_ORIGINAL) + TOTAL_ORIGINAL) % TOTAL_ORIGINAL;
@@ -91,6 +103,7 @@ export default function HowWeDo() {
   // Advance by step (-2, -1, 1, 2, etc.)
   const goToSlide = useCallback((newIdx) => {
     setIsTransitioning(true);
+    setDragOffset(0);
     setCurrentIndex(newIdx);
   }, []);
 
@@ -128,14 +141,14 @@ export default function HowWeDo() {
     }
   };
 
-  // Auto-advance every 4 seconds, pause on hover
+  // Auto-advance every 4 seconds, pause on hover or dragging
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || isDragging) return;
     const interval = setInterval(() => {
       handleNext();
     }, 4000);
     return () => clearInterval(interval);
-  }, [handleNext, isPaused]);
+  }, [handleNext, isPaused, isDragging]);
 
   // Click on pagination dot
   const handlePaginationClick = (targetRealIdx) => {
@@ -144,31 +157,67 @@ export default function HowWeDo() {
     goToSlide(currentIndex + diff);
   };
 
-  // Touch Swipe handlers
-  const onTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-    isSwiping.current = true;
+  // Drag handlers (Pointer events supporting both touch and mouse)
+  const onPointerDown = (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    dragStartX.current = e.clientX;
+    dragStartY.current = e.clientY;
+    hasDragged.current = false;
+    setIsDragging(true);
     setIsPaused(true);
   };
 
-  const onTouchEnd = (e) => {
-    if (!isSwiping.current) return;
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndY = e.changedTouches[0].clientY;
-    const dx = touchEndX - touchStartX.current;
-    const dy = touchEndY - touchStartY.current;
+  const onPointerMove = (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - dragStartX.current;
+    const dy = e.clientY - dragStartY.current;
 
-    // Ensure horizontal gesture
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 35) {
-      if (dx < 0) {
+    // Detect horizontal drag gesture
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 6) {
+      hasDragged.current = true;
+      setIsTransitioning(false);
+      setDragOffset(dx);
+    }
+  };
+
+  const endDrag = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    setIsPaused(false);
+
+    if (hasDragged.current) {
+      const dx = dragOffset;
+      const threshold = 40;
+      setIsTransitioning(true);
+      setDragOffset(0);
+
+      if (dx < -threshold) {
         handleNext();
-      } else {
+      } else if (dx > threshold) {
         handlePrev();
       }
+    } else {
+      setDragOffset(0);
+      setIsTransitioning(true);
     }
-    isSwiping.current = false;
-    setIsPaused(false);
+  };
+
+  // Responsive slide step estimation for drag distance (card width + card gap)
+  const slideStep = typeof window !== 'undefined'
+    ? (window.innerWidth <= 767 ? window.innerWidth * 0.68 + 12 : (window.innerWidth <= 1024 ? 283 : 316))
+    : 280;
+  const dragFraction = dragOffset / slideStep;
+  const currentPos = currentIndex - dragFraction;
+
+  // Progressive blur calculation based on distance from center:
+  // Center (0) -> 0px (sharp)
+  // Neighbors (1) -> 4.8px (~2/3 of previous 7px)
+  // Farther (2) -> 7.2px
+  // Outermost (>=3) -> 9.6px
+  const computeBlur = (dist) => {
+    if (dist <= 0.04) return 0;
+    if (dist <= 1) return dist * 4.8;
+    return Math.min(4.8 + (dist - 1) * 2.4, 9.6);
   };
 
   return (
@@ -201,14 +250,18 @@ export default function HowWeDo() {
       <div
         className="howwedo-carousel-viewport"
         onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
+        onMouseLeave={() => {
+          if (!isDragging) setIsPaused(false);
+        }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
       >
         <div
           className={`howwedo-track ${isTransitioning ? 'is-animating' : ''}`}
           style={{
-            transform: `translateX(calc(-1 * (${currentIndex} + 0.5) * (var(--card-width) + var(--card-gap))))`,
+            transform: `translateX(calc(-1 * (${currentIndex} + 0.5) * (var(--card-width) + var(--card-gap)) + ${dragOffset}px))`,
           }}
           onTransitionEnd={handleTransitionEnd}
         >
@@ -219,6 +272,9 @@ export default function HowWeDo() {
             const isOuter = Math.abs(slot) === 2;
             const isVisible = Math.abs(slot) <= 2;
 
+            const dist = Math.abs(idx - currentPos);
+            const cardBlurVal = computeBlur(dist);
+
             let slotClass = 'howwedo-slot-far';
             if (isCenter) slotClass = 'howwedo-slot-center';
             else if (isImmediate) slotClass = slot === -1 ? 'howwedo-slot-left-1' : 'howwedo-slot-right-1';
@@ -228,8 +284,12 @@ export default function HowWeDo() {
               <div
                 key={`${item.id}-${idx}`}
                 className={`howwedo-slide ${slotClass} ${isCenter ? 'is-active' : ''}`}
+                style={{
+                  '--card-dist': dist.toFixed(3),
+                  '--card-blur': `${cardBlurVal.toFixed(2)}px`,
+                }}
                 onClick={() => {
-                  if (!isCenter && isVisible) {
+                  if (!hasDragged.current && !isCenter && isVisible) {
                     goToSlide(idx);
                   }
                 }}
@@ -247,6 +307,47 @@ export default function HowWeDo() {
                       className="howwedo-card-image"
                       loading="lazy"
                     />
+
+                    {/* Gradient scrim along bottom 45% of card behind text */}
+                    <div className="howwedo-card-scrim" aria-hidden="true" />
+
+                    {/* Side Card Overlay Text (Visible when NOT center) */}
+                    <div className="howwedo-card-overlay" aria-hidden={isCenter}>
+                      <div className="howwedo-overlay-label">
+                        <svg className="howwedo-concentric-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                          <circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.2" />
+                          <circle cx="6" cy="6" r="2.2" fill="currentColor" />
+                        </svg>
+                        <span>{item.overlayLabel}</span>
+                      </div>
+
+                      <h4 className="howwedo-overlay-headline">{item.overlayTitle}</h4>
+
+                      <div className="howwedo-overlay-footer">
+                        {item.metric && (
+                          <span className="howwedo-overlay-pill">{item.metric}</span>
+                        )}
+                        <Link
+                          href={item.link}
+                          className="howwedo-overlay-arrow clickable"
+                          aria-label={`View ${item.imageTitle}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                            <path
+                              d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8"
+                              stroke="#173E5A"
+                              strokeWidth="1.8"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </Link>
+                      </div>
+                    </div>
+
                     <div className="howwedo-card-pill">{item.imagePill}</div>
                   </div>
 

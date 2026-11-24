@@ -1,219 +1,338 @@
-/* ==========================================================================
-   FindYourFit Component CSS
-   Scoped styles for "Find your fit" interactive 3-state form
-   ========================================================================== */
+/* ============================================================
+   FindYourFit.css — Multi-Step Qualification Form Component
+   ============================================================ */
 
 .findyourfit-wrapper {
+  position: relative;
   width: 100%;
-  background-color: #f7f2fc;
-  padding: clamp(48px, 6vw, 84px) 16px;
-  box-sizing: border-box;
-}
-
-.findyourfit-card {
-  max-width: 790px;
-  margin: 0 auto;
-  background-color: #ffffff;
-  border-radius: clamp(24px, 3vw, 32px);
-  padding: clamp(28px, 4vw, 44px) clamp(24px, 4vw, 48px);
-  box-shadow: 0 10px 40px rgba(135, 75, 215, 0.06), 0 2px 12px rgba(0, 0, 0, 0.02);
+  margin: 2.5rem 0;
   box-sizing: border-box;
   font-family: 'Outfit', sans-serif;
-  color: #232733;
 }
 
-.findyourfit-state-animate {
-  animation: fitFadeSlide 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+/* White Form Card */
+.findyourfit-card {
+  position: relative;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  background-color: #FFFFFF;
+  border-radius: 24px;
+  padding: 34px 38px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  transition: height 450ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: height;
 }
 
-@keyframes fitFadeSlide {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* --------------------------------------------------------------------------
-   Header
-   -------------------------------------------------------------------------- */
+/* ------------------------------------------------------------
+   Shared Header (Screens 1A, 1B, 2)
+   ------------------------------------------------------------ */
 .findyourfit-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: clamp(24px, 3.2vw, 34px);
+  margin-bottom: 24px;
   gap: 16px;
 }
 
 .findyourfit-header-left {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.findyourfit-title {
-  font-size: clamp(28px, 3.4vw, 42px);
+.findyourfit-header-title {
+  font-size: clamp(24px, 2.4vw, 34px);
   font-weight: 700;
-  color: #232733;
-  line-height: 1.15;
-  margin: 0 0 6px 0;
-  letter-spacing: -0.015em;
-}
-
-.findyourfit-subtitle {
-  font-size: clamp(14px, 1.2vw, 15px);
-  color: #717784;
+  color: #333943;
+  line-height: 1.1;
   margin: 0;
-  font-weight: 400;
+  letter-spacing: -0.02em;
+  outline: none;
 }
 
-.findyourfit-step-indicator {
+.findyourfit-header-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: #5B5F66;
+  margin: 6px 0 0 0;
+  letter-spacing: -0.01em;
+}
+
+.findyourfit-header-right {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-shrink: 0;
-  margin-top: 6px;
+  padding-top: 4px;
 }
 
 .findyourfit-step-pill {
-  background-color: #efe5fc;
-  color: #8a57ea;
+  background-color: #E5DBF7;
+  color: #AD89E8;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 5px 12px;
-  border-radius: 999px;
+  font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-radius: 9999px;
+  padding: 4px 11px;
+  white-space: nowrap;
 }
 
-.findyourfit-progress-bar {
+.findyourfit-progress-track {
   display: flex;
-  gap: 6px;
   align-items: center;
+  gap: 6px;
 }
 
-.findyourfit-progress-segment {
-  width: 32px;
-  height: 4px;
-  border-radius: 999px;
-  background-color: #e8dcf7;
-  transition: background-color 0.25s ease;
+.findyourfit-progress-bar-slot {
+  width: 48px;
+  height: 5px;
+  border-radius: 9999px;
+  background-color: #E5DBF7;
+  overflow: hidden;
+  position: relative;
 }
 
-.findyourfit-progress-segment.active {
-  background-color: #a166f3;
+.findyourfit-progress-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  background-color: #AD89E8;
+  border-radius: 9999px;
+  transition: width 400ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* --------------------------------------------------------------------------
-   Form Labels & Sections
-   -------------------------------------------------------------------------- */
-.findyourfit-group {
-  margin-bottom: clamp(22px, 2.8vw, 28px);
+.findyourfit-progress-bar-fill.filled {
+  width: 100%;
 }
 
-.findyourfit-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  color: #5f6573;
-  text-transform: uppercase;
-  margin: 0 0 12px 0;
-}
-
-/* --------------------------------------------------------------------------
-   Q1: Finish Line (4 square cards)
-   -------------------------------------------------------------------------- */
-.findyourfit-finish-grid {
+/* ------------------------------------------------------------
+   Screens Staging & Transition Mechanism
+   ------------------------------------------------------------ */
+.findyourfit-screens-stage {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  position: relative;
+  width: 100%;
+}
+
+.findyourfit-screen {
+  grid-area: 1 / 1;
+  width: 100%;
+}
+
+.findyourfit-screen-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+}
+
+/* Transition Animations */
+.findyourfit-screen.outgoing {
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+.findyourfit-screen.incoming {
+  z-index: 2;
+}
+
+.findyourfit-screen.outgoing.forward {
+  animation: screenSlideOutForward 280ms ease forwards;
+}
+
+.findyourfit-screen.outgoing.backward {
+  animation: screenSlideOutBackward 280ms ease forwards;
+}
+
+.findyourfit-screen.incoming.forward {
+  animation: screenSlideInForward 450ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+}
+
+.findyourfit-screen.incoming.backward {
+  animation: screenSlideInBackward 450ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+}
+
+@keyframes screenSlideOutForward {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-24px); }
+}
+
+@keyframes screenSlideOutBackward {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(24px); }
+}
+
+@keyframes screenSlideInForward {
+  0% { opacity: 0; transform: translateX(24px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes screenSlideInBackward {
+  0% { opacity: 0; transform: translateX(-24px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Staggered Children Entrance */
+.findyourfit-screen.incoming .findyourfit-group,
+.findyourfit-screen.incoming .findyourfit-actions-row,
+.findyourfit-screen.incoming .findyourfit-step2-grid {
+  opacity: 0;
+  animation: childStaggerIn 380ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.findyourfit-screen.incoming .findyourfit-group:nth-child(1) { animation-delay: 140ms; }
+.findyourfit-screen.incoming .findyourfit-group:nth-child(2) { animation-delay: 180ms; }
+.findyourfit-screen.incoming .findyourfit-group:nth-child(3) { animation-delay: 220ms; }
+.findyourfit-screen.incoming .findyourfit-actions-row { animation-delay: 260ms; }
+.findyourfit-screen.incoming .findyourfit-step2-grid { animation-delay: 140ms; }
+
+@keyframes childStaggerIn {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ------------------------------------------------------------
+   Common Group Labels & Button Styles
+   ------------------------------------------------------------ */
+.findyourfit-group {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
-.findyourfit-finish-card {
-  height: 94px;
-  border-radius: 18px;
-  background-color: #f3f3f6;
-  color: #232733;
-  border: none;
-  padding: 14px 16px;
+.findyourfit-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #5B5F66;
+  margin: 0;
+}
+
+/* Focus styles for keyboard accessibility */
+.findyourfit-card-opt:focus-visible,
+.findyourfit-outline-pill:focus-visible,
+.findyourfit-circle-btn:focus-visible,
+.findyourfit-send-btn:focus-visible,
+.findyourfit-plan-stair:focus-visible,
+.findyourfit-lime-btn:focus-visible,
+.findyourfit-purple-submit-btn:focus-visible,
+.findyourfit-back-text-btn:focus-visible,
+.findyourfit-down-scroll-btn:focus-visible,
+.findyourfit-input-rounded:focus-visible,
+.findyourfit-phone-input:focus-visible {
+  outline: 3px solid #AD89E8 !important;
+  outline-offset: 2px !important;
+}
+
+/* Press micro-interaction */
+.findyourfit-card-opt:active,
+.findyourfit-outline-pill:active,
+.findyourfit-circle-btn:active,
+.findyourfit-plan-stair:active {
+  transform: scale(0.97);
+  transition: transform 120ms ease;
+}
+
+/* ------------------------------------------------------------
+   Screen 1A: Options Styles
+   ------------------------------------------------------------ */
+
+/* 1. Finish Line Option Cards (4 in a row) */
+.findyourfit-finish-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.findyourfit-card-opt {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
+  height: 96px;
+  background-color: #F3F2F7;
+  border-radius: 14px;
+  padding: 12px 16px;
+  border: 1.5px solid transparent;
   cursor: pointer;
   box-sizing: border-box;
   text-align: left;
-  transition: transform 0.15s ease, background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 180ms ease, color 180ms ease, transform 120ms ease;
 }
 
-.findyourfit-finish-card:hover {
-  transform: translateY(-2px);
-}
-
-.findyourfit-finish-card.selected {
-  background-color: #a166f3;
-  color: #ffffff;
-}
-
-.findyourfit-finish-dot {
-  width: 14px;
-  height: 14px;
+.findyourfit-card-circle {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background-color: #e1d5f8;
-  display: block;
-}
-
-.findyourfit-finish-check {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 1.5px solid #ffffff;
+  background-color: #E5DBF7;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 180ms ease, border 180ms ease;
 }
 
-.findyourfit-finish-text {
-  font-size: clamp(16px, 1.6vw, 19px);
+.findyourfit-card-title {
+  font-size: clamp(19px, 1.8vw, 24px);
   font-weight: 700;
+  color: #333943;
+  margin: 0;
+  line-height: 1.1;
+  transition: color 180ms ease;
 }
 
-/* --------------------------------------------------------------------------
-   Pill Buttons (Channel & Budget)
-   -------------------------------------------------------------------------- */
+/* Selected State */
+.findyourfit-card-opt.selected {
+  background-color: #AD89E8;
+}
+
+.findyourfit-card-opt.selected .findyourfit-card-circle {
+  background-color: transparent;
+  border: 2px solid #FFFFFF;
+}
+
+.findyourfit-card-opt.selected .findyourfit-card-title {
+  color: #FFFFFF;
+}
+
+/* 2. Outline Pills (Channel & Budget) */
 .findyourfit-pills-row {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
 }
 
-.findyourfit-pill-btn {
-  background-color: #ffffff;
-  border: 1.5px solid #232733;
-  color: #232733;
-  border-radius: 999px;
-  padding: 8px 18px;
+.findyourfit-outline-pill {
+  min-height: 38px;
+  padding: 0 18px;
+  border-radius: 9999px;
+  border: 1.5px solid #333943;
+  background-color: transparent;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
+  color: #333943;
   cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 120ms ease;
 }
 
-.findyourfit-pill-btn:hover {
-  background-color: #f7f6f9;
+.findyourfit-outline-pill.selected {
+  background-color: #E5DBF7;
+  border-color: #AD89E8;
+  color: #333943;
 }
 
-.findyourfit-pill-btn.selected {
-  background-color: #efe5fc;
-  border-color: #a166f3;
-  color: #232733;
-}
-
-/* --------------------------------------------------------------------------
-   Q3: Who Decides
-   -------------------------------------------------------------------------- */
+/* 3. Who Decides (Circles & Send button) */
 .findyourfit-decides-row {
   display: flex;
   align-items: center;
@@ -222,370 +341,398 @@
 }
 
 .findyourfit-circle-btn {
-  width: 68px;
-  height: 68px;
+  width: 92px;
+  height: 92px;
   border-radius: 50%;
+  background-color: #F3F2F7;
   border: none;
-  background-color: #f3f3f6;
-  color: #232733;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 700;
+  color: #333943;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: transform 0.15s ease, background-color 0.2s ease, color 0.2s ease;
-  font-family: inherit;
-}
-
-.findyourfit-circle-btn:hover {
-  transform: translateY(-2px);
+  transition: background-color 180ms ease, color 180ms ease, transform 120ms ease;
 }
 
 .findyourfit-circle-btn.selected {
-  background-color: #a166f3;
-  color: #ffffff;
+  background-color: #AD89E8;
+  color: #FFFFFF;
 }
 
-.findyourfit-share-btn {
-  background-color: #efe5fc;
-  border: none;
-  border-radius: 999px;
-  padding: 10px 18px;
-  color: #232733;
-  font-size: 14px;
-  font-weight: 600;
+.findyourfit-send-btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  background-color: #E5DBF7;
+  border: none;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333943;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.15s ease;
-  font-family: inherit;
+  transition: background-color 180ms ease, transform 120ms ease;
 }
 
-.findyourfit-share-btn:hover {
-  background-color: #e5d6fa;
-  transform: translateY(-1px);
+.findyourfit-send-btn:hover {
+  background-color: #DECCFB;
 }
 
-.findyourfit-share-icon {
-  width: 22px;
-  height: 22px;
+.findyourfit-send-arrow-circle {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background-color: #ffffff;
+  background-color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #232733;
+  flex-shrink: 0;
 }
 
-/* --------------------------------------------------------------------------
-   Q5: Plan Cards
-   -------------------------------------------------------------------------- */
-.findyourfit-plans-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  align-items: stretch;
-}
-
-.findyourfit-plan-card {
-  border-radius: 20px;
-  padding: 18px 16px;
-  box-sizing: border-box;
-  text-align: left;
-  border: 2px solid transparent;
-  cursor: pointer;
+/* ------------------------------------------------------------
+   Action Buttons (Lime Primary & Subtle Back)
+   ------------------------------------------------------------ */
+.findyourfit-actions-row {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  font-family: inherit;
-  height: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  width: 100%;
 }
 
-.findyourfit-plan-card:hover {
-  transform: translateY(-2px);
-}
-
-.findyourfit-plan-card.plan-1 {
-  background-color: #f7f2fe;
-}
-
-.findyourfit-plan-card.plan-3 {
-  background-color: #eadcf8;
-}
-
-.findyourfit-plan-card.plan-6 {
-  background-color: #c7a2f7;
-}
-
-.findyourfit-plan-card.selected {
-  border-color: #a166f3;
-  box-shadow: 0 0 0 2px #a166f3;
-}
-
-.findyourfit-plan-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #232733;
-  margin: 0 0 8px 0;
-}
-
-.findyourfit-plan-desc {
-  font-size: 12px;
-  line-height: 1.45;
-  color: #3b3f49;
-  margin: 0;
-  font-weight: 400;
-}
-
-/* --------------------------------------------------------------------------
-   Step 1 Bottom Button
-   -------------------------------------------------------------------------- */
-.findyourfit-step1-actions {
-  display: flex;
+.findyourfit-actions-row.right-only {
   justify-content: flex-end;
-  margin-top: clamp(24px, 3vw, 32px);
 }
 
-.findyourfit-primary-btn {
-  background-color: #a166f3;
-  color: #ffffff;
-  border: none;
-  border-radius: 999px;
-  padding: 10px 14px 10px 24px;
-  font-size: 15px;
-  font-weight: 600;
+.findyourfit-lime-btn {
   display: inline-flex;
   align-items: center;
   gap: 12px;
+  height: 44px;
+  padding: 0 8px 0 20px;
+  border-radius: 9999px;
+  background-color: #F0FE8C;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333943;
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.15s ease, background-color 0.15s ease;
-  font-family: inherit;
+  transition: transform 150ms ease, opacity 200ms ease, background-color 150ms ease;
 }
 
-.findyourfit-primary-btn:hover:not(:disabled) {
-  background-color: #9253ec;
-  transform: translateY(-1px);
+.findyourfit-lime-btn:hover:not(:disabled) {
+  transform: scale(1.02);
 }
 
-.findyourfit-primary-btn:disabled {
+.findyourfit-lime-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.findyourfit-btn-arrow-circle {
-  width: 26px;
-  height: 26px;
+.findyourfit-lime-arrow-wrap {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background-color: #ffffff;
+  background-color: #333943;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #a166f3;
   flex-shrink: 0;
 }
 
-/* --------------------------------------------------------------------------
-   Step 2: Almost There (2 Columns)
-   -------------------------------------------------------------------------- */
+.findyourfit-back-text-btn {
+  background: none;
+  border: none;
+  color: #333943;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: opacity 180ms ease, background-color 180ms ease;
+}
+
+.findyourfit-back-text-btn:hover {
+  opacity: 0.7;
+}
+
+/* ------------------------------------------------------------
+   Screen 1B: Staircase Plan Cards
+   ------------------------------------------------------------ */
+.findyourfit-staircase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.findyourfit-plan-stair {
+  border-radius: 16px;
+  padding: 16px 14px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: transform 120ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.findyourfit-plan-stair.plan-step-1 {
+  background-color: #EFE6FD;
+  min-height: 125px;
+  color: #333943;
+}
+
+.findyourfit-plan-stair.plan-step-2 {
+  background-color: #DECCFB;
+  min-height: 155px;
+  color: #333943;
+}
+
+.findyourfit-plan-stair.plan-step-3 {
+  background-color: #AD89E8;
+  min-height: 188px;
+  color: #FFFFFF;
+}
+
+.findyourfit-plan-stair.selected {
+  border-color: #AD89E8;
+  box-shadow: 0 0 0 3px #E5DBF7;
+}
+
+.findyourfit-plan-heading {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  line-height: 1.2;
+}
+
+.findyourfit-plan-paragraph {
+  font-size: 11.5px;
+  line-height: 1.35;
+  margin: 0;
+  max-width: 220px;
+  opacity: 0.9;
+}
+
+/* ------------------------------------------------------------
+   Screen 2: Form & Media Strategy Card
+   ------------------------------------------------------------ */
 .findyourfit-step2-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(24px, 3.5vw, 36px);
-  align-items: start;
+  gap: 28px;
+  align-items: stretch;
+  width: 100%;
 }
 
 .findyourfit-step2-form {
   display: flex;
   flex-direction: column;
+  gap: 16px;
 }
 
-.findyourfit-input-text {
-  width: 100%;
-  border: 1.5px solid #d9cbf5;
-  border-radius: 999px;
-  padding: 12px 20px;
+.findyourfit-field-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.findyourfit-input-rounded {
+  height: 44px;
+  border-radius: 9999px;
+  border: 1.5px solid #AD89E8;
+  background-color: transparent;
+  padding: 0 18px;
   font-size: 15px;
-  color: #232733;
+  font-family: inherit;
+  color: #333943;
   outline: none;
-  background-color: #ffffff;
   box-sizing: border-box;
-  font-family: inherit;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 180ms ease;
 }
 
-.findyourfit-input-text:focus {
-  border-color: #a166f3;
-  box-shadow: 0 0 0 3px rgba(161, 102, 243, 0.15);
+.findyourfit-input-rounded::placeholder {
+  color: #A3A7AF;
 }
 
-.findyourfit-phone-container {
+.findyourfit-input-rounded.has-error {
+  border-color: #6F45C2;
+}
+
+/* Phone input with +91 chip */
+.findyourfit-phone-pill-wrap {
+  height: 44px;
+  border-radius: 9999px;
+  background-color: #F3F2F7;
   display: flex;
   align-items: center;
-  background-color: #f5f3f9;
-  border-radius: 999px;
-  padding: 4px;
+  padding: 3px;
+  box-sizing: border-box;
   border: 1.5px solid transparent;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 180ms ease;
 }
 
-.findyourfit-phone-container.focused {
-  border-color: #a166f3;
-  background-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(161, 102, 243, 0.15);
+.findyourfit-phone-pill-wrap.has-error {
+  border-color: #6F45C2;
 }
 
-.findyourfit-phone-prefix {
-  background-color: #efe5fc;
-  color: #232733;
-  font-weight: 700;
+.findyourfit-phone-chip {
+  background-color: #E5DBF7;
+  color: #333943;
   font-size: 14px;
-  padding: 10px 16px;
-  border-radius: 999px;
-  user-select: none;
-  flex-shrink: 0;
-}
-
-.findyourfit-input-phone {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 15px;
-  color: #232733;
-  width: 100%;
-  padding: 10px 14px 10px 10px;
-  font-family: inherit;
-}
-
-.findyourfit-field-error {
-  color: #dc2626;
-  font-size: 12px;
-  margin-top: 6px;
-  padding-left: 12px;
-}
-
-.findyourfit-checkbox-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 16px 0 24px 0;
-  cursor: pointer;
-  user-select: none;
-}
-
-.findyourfit-checkbox-custom {
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  border: 1.5px solid #a166f3;
-  background-color: #ffffff;
+  font-weight: 600;
+  padding: 0 14px;
+  height: 100%;
+  border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.15s ease;
   flex-shrink: 0;
 }
 
-.findyourfit-checkbox-custom.checked {
-  background-color: #a166f3;
-}
-
-.findyourfit-checkbox-label {
-  font-size: 14px;
-  color: #232733;
-  font-weight: 500;
-}
-
-.findyourfit-step2-submit-btn {
-  background-color: #a166f3;
-  color: #ffffff;
+.findyourfit-phone-input {
+  flex: 1;
+  background: transparent;
   border: none;
-  border-radius: 999px;
-  padding: 14px 28px;
+  outline: none;
+  padding: 0 14px;
   font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  width: fit-content;
-  transition: background-color 0.15s ease, transform 0.15s ease, opacity 0.2s ease;
   font-family: inherit;
+  color: #333943;
 }
 
-.findyourfit-step2-submit-btn:hover:not(:disabled) {
-  background-color: #9253ec;
-  transform: translateY(-1px);
+.findyourfit-phone-input::placeholder {
+  color: #A3A7AF;
 }
 
-.findyourfit-step2-submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.findyourfit-back-btn {
-  background: none;
-  border: none;
-  color: #717784;
-  font-size: 13px;
+/* Inline error */
+.findyourfit-error-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #6F45C2;
+  font-size: 12px;
   font-weight: 500;
-  cursor: pointer;
-  text-decoration: underline;
-  margin-top: 14px;
-  align-self: flex-start;
-  padding: 0;
-  font-family: inherit;
+  margin-top: 2px;
 }
 
-.findyourfit-back-btn:hover {
-  color: #232733;
+/* WhatsApp Checkbox */
+.findyourfit-checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.findyourfit-hidden-cb {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.findyourfit-cb-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 2px solid #AD89E8;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 150ms ease;
+}
+
+.findyourfit-cb-box.checked {
+  background-color: #AD89E8;
+}
+
+.findyourfit-cb-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333943;
 }
 
 .findyourfit-server-error {
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #b91c1c;
-  padding: 10px 14px;
-  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6F45C2;
   font-size: 13px;
-  margin-bottom: 16px;
+  font-weight: 500;
 }
 
-/* --------------------------------------------------------------------------
-   Step 2 Info Card (Right side)
-   -------------------------------------------------------------------------- */
-.findyourfit-info-card {
-  background-color: #a166f3;
-  border-radius: 24px;
-  padding: 26px 24px;
-  color: #ffffff;
+/* Step 2 Actions */
+.findyourfit-step2-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.findyourfit-purple-submit-btn {
+  height: 44px;
+  padding: 0 26px;
+  border-radius: 9999px;
+  background-color: #AD89E8;
+  color: #FFFFFF;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 150ms ease, opacity 200ms ease;
+}
+
+.findyourfit-purple-submit-btn:hover:not(:disabled) {
+  transform: scale(1.02);
+}
+
+.findyourfit-purple-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Media Strategy Card */
+.findyourfit-media-card {
+  background-color: #AD89E8;
+  border-radius: 18px;
+  padding: 24px 26px;
+  color: #FFFFFF;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   box-sizing: border-box;
-  min-height: 290px;
 }
 
-.findyourfit-lime-pill {
-  background-color: #d8fa3c;
-  color: #232733;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  padding: 4px 12px;
-  border-radius: 999px;
-  text-transform: uppercase;
+.findyourfit-media-badge {
   display: inline-block;
-  width: fit-content;
-}
-
-.findyourfit-info-title {
-  font-size: clamp(22px, 2.5vw, 26px);
+  background-color: #F0FE8C;
+  color: #333943;
+  font-size: 11px;
   font-weight: 700;
-  color: #ffffff;
-  margin: 14px 0 18px 0;
+  letter-spacing: 0.08em;
+  padding: 3px 12px;
+  border-radius: 9999px;
 }
 
-.findyourfit-info-list {
+.findyourfit-media-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 12px 0 16px 0;
+  line-height: 1.15;
+}
+
+.findyourfit-media-bullets {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -594,101 +741,112 @@
   gap: 12px;
 }
 
-.findyourfit-info-item {
+.findyourfit-media-bullet {
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 14px;
   font-weight: 500;
-  color: #ffffff;
+  color: #FFFFFF;
 }
 
-.findyourfit-info-check {
+.findyourfit-bullet-circle {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 1.5px solid #ffffff;
+  border: 2px solid #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.findyourfit-price-row {
+.findyourfit-media-price-row {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  margin-top: 24px;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-.findyourfit-price-old {
-  font-size: 17px;
+.findyourfit-media-price-old {
+  font-size: 18px;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   text-decoration: line-through;
-  font-weight: 600;
 }
 
-.findyourfit-price-free {
-  font-size: 38px;
-  font-weight: 800;
-  color: #d8fa3c;
+.findyourfit-media-price-free {
+  font-size: 34px;
+  font-weight: 700;
+  color: #F0FE8C;
   line-height: 1;
 }
 
-/* --------------------------------------------------------------------------
-   State 3: Thank You
-   -------------------------------------------------------------------------- */
-.findyourfit-thankyou-container {
-  text-align: center;
-  padding: clamp(32px, 5vw, 48px) clamp(16px, 4vw, 36px) 24px clamp(16px, 4vw, 36px);
-}
-
-.findyourfit-thankyou-icon-wrap {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: #a166f3;
-  box-shadow: 0 0 0 4px #d8fa3c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 24px auto;
-  color: #ffffff;
-}
-
-.findyourfit-thankyou-heading {
-  font-size: clamp(24px, 3.2vw, 34px);
-  font-weight: 700;
-  color: #232733;
-  margin: 0 0 12px 0;
-  line-height: 1.2;
-}
-
-.findyourfit-thankyou-desc {
-  font-size: clamp(14px, 1.4vw, 15px);
-  color: #5f6573;
-  max-width: 480px;
-  margin: 0 auto clamp(32px, 4vw, 42px) auto;
-  line-height: 1.5;
-}
-
-.findyourfit-tracker {
-  max-width: 460px;
-  margin: 0 auto clamp(32px, 4.5vw, 44px) auto;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-.findyourfit-tracker-step {
+/* ------------------------------------------------------------
+   Thank-You Screen
+   ------------------------------------------------------------ */
+.findyourfit-thankyou-screen {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100px;
+  justify-content: center;
   text-align: center;
+  padding: 24px 16px 16px 16px;
 }
 
-.findyourfit-tracker-badge {
+.findyourfit-thankyou-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #AD89E8;
+  box-shadow: 0 0 0 3px #F0FE8C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  animation: popIn 450ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.findyourfit-thankyou-title {
+  font-size: clamp(22px, 2.2vw, 30px);
+  font-weight: 700;
+  color: #333943;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.findyourfit-thankyou-subtitle {
+  font-size: 14px;
+  color: #5B5F66;
+  max-width: 440px;
+  margin: 0 0 28px 0;
+  line-height: 1.45;
+}
+
+/* 3-Node Tracker */
+.findyourfit-tracker-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 34px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.findyourfit-tracker-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.findyourfit-node-circle {
   width: 34px;
   height: 34px;
   border-radius: 50%;
@@ -697,137 +855,601 @@
   justify-content: center;
   font-size: 14px;
   font-weight: 700;
-  box-sizing: border-box;
 }
 
-.findyourfit-tracker-badge.completed {
-  background-color: #a166f3;
-  color: #ffffff;
+.findyourfit-node-circle.node-1 {
+  background-color: #AD89E8;
+  color: #FFFFFF;
 }
 
-.findyourfit-tracker-badge.current {
-  background-color: #d8fa3c;
-  color: #232733;
+.findyourfit-node-circle.node-2 {
+  background-color: #F0FE8C;
+  color: #333943;
 }
 
-.findyourfit-tracker-badge.upcoming {
-  background-color: #ededf2;
-  color: #8f94a0;
+.findyourfit-node-circle.node-3 {
+  background-color: #E5DBF7;
+  color: #AD89E8;
 }
 
-.findyourfit-tracker-label {
+.findyourfit-node-label {
   font-size: 12px;
-  font-weight: 600;
-  color: #232733;
-  margin-top: 8px;
-  line-height: 1.3;
+  font-weight: 500;
+  color: #5B5F66;
+  white-space: nowrap;
 }
 
-.findyourfit-tracker-line {
+.findyourfit-tracker-line-container {
   flex: 1;
   height: 2px;
-  background-color: #e5dcf8;
-  margin-top: 16px;
+  background-color: #E5DBF7;
+  margin: 0 10px 22px 10px;
+  overflow: hidden;
+  position: relative;
 }
 
-.findyourfit-scroll-next-btn {
+.findyourfit-tracker-line-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #AD89E8;
+  animation: fillTracker 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fillTracker {
+  0% { transform: scaleX(0); transform-origin: left; }
+  100% { transform: scaleX(1); transform-origin: left; }
+}
+
+.findyourfit-down-scroll-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background-color: #a166f3;
-  color: #ffffff;
+  background-color: #AD89E8;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
   cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.15s ease;
+  transition: transform 180ms ease, background-color 180ms ease;
 }
 
-.findyourfit-scroll-next-btn:hover {
-  transform: translateY(3px);
-  background-color: #9253ec;
+.findyourfit-down-scroll-btn:hover {
+  transform: translateY(4px);
+  background-color: #9B75DC;
 }
 
-/* --------------------------------------------------------------------------
+/* ------------------------------------------------------------
    Responsive Breakpoints
-   -------------------------------------------------------------------------- */
-@media (max-width: 768px) {
-  .findyourfit-wrapper {
-    padding-left: calc(16px + var(--mobile-extra-gutter));
-    padding-right: calc(16px + var(--mobile-extra-gutter));
-  }
-
-  .findyourfit-finish-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .findyourfit-plans-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .findyourfit-step2-grid {
-    grid-template-columns: 1fr;
+   ------------------------------------------------------------ */
+@media (max-width: 1023px) {
+  .findyourfit-card {
+    padding: 28px 22px;
+    border-radius: 20px;
+    max-width: 100%;
   }
 
   .findyourfit-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 14px;
   }
 
-  .findyourfit-step-indicator {
-    margin-top: 0;
+  .findyourfit-finish-cards {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .findyourfit-tracker {
-    max-width: 100%;
+  .findyourfit-staircase-grid {
+    grid-template-columns: 1fr;
+    align-items: stretch;
   }
 
-  .findyourfit-tracker-step {
-    width: 80px;
+  .findyourfit-plan-stair.plan-step-1,
+  .findyourfit-plan-stair.plan-step-2,
+  .findyourfit-plan-stair.plan-step-3 {
+    min-height: auto;
+    padding: 16px;
+  }
+
+  .findyourfit-step2-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .findyourfit-lime-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .findyourfit-actions-row {
+    flex-direction: column-reverse;
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .findyourfit-back-text-btn {
+    text-align: center;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 767px) {
   .findyourfit-wrapper {
-    padding-top: 36px;
-    padding-bottom: 36px;
-    padding-left: calc(12px + var(--mobile-extra-gutter));
-    padding-right: calc(12px + var(--mobile-extra-gutter));
+    margin: 1.5rem 0;
   }
 
   .findyourfit-card {
-    padding: 24px 18px;
+    padding: 16px 16px 18px 16px;
+    border-radius: 18px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   }
 
-  .findyourfit-finish-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+  /* Header: compact horizontal layout */
+  .findyourfit-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
   }
 
-  .findyourfit-finish-card {
-    height: 84px;
-    padding: 12px;
+  .findyourfit-header-left {
+    flex: 1;
   }
 
-  .findyourfit-pills-row {
-    gap: 8px;
+  .findyourfit-header-title {
+    font-size: 26px;
+    line-height: 1.1;
   }
 
-  .findyourfit-pill-btn {
-    padding: 7px 14px;
+  .findyourfit-header-subtitle {
     font-size: 13px;
+    margin: 3px 0 0 0;
+  }
+
+  .findyourfit-header-right {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    padding-top: 2px;
+  }
+
+  .findyourfit-step-pill {
+    font-size: 10px;
+    padding: 3px 8px;
+    letter-spacing: 0.08em;
+  }
+
+  .findyourfit-progress-track {
+    gap: 4px;
+  }
+
+  .findyourfit-progress-bar-slot {
+    width: 32px;
+    height: 4px;
+  }
+
+  /* Screen inner layout */
+  .findyourfit-screen-inner {
+    gap: 12px;
+  }
+
+  .findyourfit-group {
+    gap: 6px;
+  }
+
+  .findyourfit-group-label {
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+  }
+
+  /* 1. Finish Line options (Sales, Trust, Eyes, All) - 4 in a single horizontal row */
+  .findyourfit-finish-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .findyourfit-card-opt {
+    height: 46px;
+    min-height: 44px;
+    padding: 0 4px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+    width: 100%;
+    transition: background-color 180ms ease, color 180ms ease, transform 120ms ease;
+  }
+
+  /* Decorative circle icon hidden on mobile to give clean centered space to label */
+  .findyourfit-card-circle {
+    display: none !important;
+  }
+
+  .findyourfit-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    width: 100%;
+  }
+
+  .findyourfit-card-opt.selected {
+    background-color: #AD89E8;
+  }
+
+  .findyourfit-card-opt.selected .findyourfit-card-title {
+    color: #FFFFFF;
+  }
+
+  /* 2. Channel Chips (Organic / Paid / Both / Not sure) - single horizontal row */
+  .findyourfit-pills-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 3px 0;
+  }
+
+  .findyourfit-pills-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .findyourfit-outline-pill {
+    height: 38px;
+    min-height: 38px;
+    padding: 0 12px;
+    border-radius: 9999px;
+    font-size: 13.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  /* Accessible >= 44px tap target without inflating visual pill size */
+  .findyourfit-outline-pill::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    left: 0;
+    right: 0;
+  }
+
+  /* 3. Who Decides (Me / Me + 1 side by side, Send this to them full width) */
+  .findyourfit-decides-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
   }
 
   .findyourfit-circle-btn {
-    width: 58px;
-    height: 58px;
+    flex: 1 1 calc(50% - 4px);
+    width: auto;
+    height: 44px;
+    min-height: 44px;
+    border-radius: 9999px;
+    padding: 0 16px;
     font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
   }
 
-  .findyourfit-share-btn {
-    padding: 8px 14px;
+  .findyourfit-send-btn {
+    width: 100%;
+    height: 48px;
+    min-height: 44px;
+    border-radius: 9999px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-sizing: border-box;
+    margin-top: 2px;
+  }
+
+  .findyourfit-send-arrow-circle {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* 4. Action Buttons (Next / Back) */
+  .findyourfit-actions-row {
+    flex-direction: column-reverse;
+    gap: 8px;
+    align-items: stretch;
+    margin-top: 4px;
+    width: 100%;
+  }
+
+  .findyourfit-lime-btn {
+    width: 100%;
+    height: 48px;
+    min-height: 44px;
+    border-radius: 9999px;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .findyourfit-back-text-btn {
+    width: 100%;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 13.5px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Step 1B: Budget & Plan Options */
+  .findyourfit-staircase-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .findyourfit-plan-stair.plan-step-1,
+  .findyourfit-plan-stair.plan-step-2,
+  .findyourfit-plan-stair.plan-step-3 {
+    min-height: auto;
+    padding: 10px 14px;
+    border-radius: 12px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    box-sizing: border-box;
+  }
+
+  .findyourfit-plan-heading {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .findyourfit-plan-paragraph {
+    font-size: 11px;
+    margin: 0;
+    max-width: 60%;
+    text-align: right;
+    line-height: 1.25;
+  }
+
+  /* Step 2 of 2: Form Fields & Value Card */
+  .findyourfit-step2-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .findyourfit-step2-form {
+    gap: 10px;
+  }
+
+  .findyourfit-field-wrap {
+    gap: 5px;
+  }
+
+  .findyourfit-input-rounded {
+    height: 42px;
+    font-size: 14px;
+    padding: 0 16px;
+  }
+
+  .findyourfit-phone-pill-wrap {
+    height: 42px;
+  }
+
+  .findyourfit-phone-chip {
+    font-size: 13.5px;
+    padding: 0 12px;
+  }
+
+  .findyourfit-phone-input {
+    font-size: 14px;
+    padding: 0 10px;
+  }
+
+  .findyourfit-checkbox-row {
+    margin-top: 2px;
+    gap: 8px;
+  }
+
+  .findyourfit-cb-label {
     font-size: 13px;
   }
+
+  .findyourfit-step2-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+    align-items: stretch;
+    margin-top: 4px;
+  }
+
+  .findyourfit-purple-submit-btn {
+    width: 100%;
+    height: 48px;
+    min-height: 44px;
+    border-radius: 9999px;
+    font-size: 15px;
+    font-weight: 600;
+    justify-content: center;
+  }
+
+  .findyourfit-media-card {
+    padding: 14px 16px;
+    border-radius: 14px;
+  }
+
+  .findyourfit-media-badge {
+    font-size: 10px;
+    padding: 2px 10px;
+  }
+
+  .findyourfit-media-title {
+    font-size: 17px;
+    margin: 6px 0 10px 0;
+  }
+
+  .findyourfit-media-bullets {
+    gap: 8px;
+  }
+
+  .findyourfit-media-bullet {
+    font-size: 12.5px;
+    gap: 8px;
+  }
+
+  .findyourfit-media-price-row {
+    margin-top: 12px;
+  }
+
+  .findyourfit-media-price-old {
+    font-size: 15px;
+  }
+
+  .findyourfit-media-price-free {
+    font-size: 24px;
+  }
+
+  /* Thank You Screen on Mobile */
+  .findyourfit-thankyou-screen {
+    padding: 14px 10px;
+  }
+
+  .findyourfit-thankyou-circle {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+  }
+
+  .findyourfit-thankyou-title {
+    font-size: 20px;
+  }
+
+  .findyourfit-thankyou-subtitle {
+    font-size: 13px;
+    margin: 0 0 16px 0;
+  }
+
+  .findyourfit-tracker-row {
+    margin-bottom: 20px;
+  }
+}
+
+/* Extra compact fine-tuning for ultra-narrow mobile viewports (<= 350px, e.g. iPhone SE 320px) */
+@media (max-width: 350px) {
+  .findyourfit-card {
+    padding: 14px 12px 16px 12px;
+  }
+
+  .findyourfit-header-title {
+    font-size: 22px;
+  }
+
+  .findyourfit-finish-cards {
+    gap: 5px;
+  }
+
+  .findyourfit-card-opt {
+    height: 44px;
+    padding: 0 2px;
+  }
+
+  .findyourfit-card-title {
+    font-size: 12.5px;
+  }
+
+  .findyourfit-outline-pill {
+    padding: 0 10px;
+    font-size: 12px;
+    height: 36px;
+    min-height: 36px;
+  }
+
+  .findyourfit-circle-btn {
+    height: 40px;
+    font-size: 13px;
+  }
+
+  .findyourfit-send-btn {
+    height: 44px;
+    font-size: 13px;
+  }
+
+  .findyourfit-lime-btn {
+    height: 44px;
+    font-size: 14px;
+  }
+}
+
+/* ------------------------------------------------------------
+   prefers-reduced-motion: reduce
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .findyourfit-card {
+    transition: none !important;
+  }
+
+  .findyourfit-screen.outgoing {
+    animation: fadeOutSimple 150ms ease forwards !important;
+  }
+
+  .findyourfit-screen.incoming {
+    animation: fadeInSimple 150ms ease forwards !important;
+  }
+
+  .findyourfit-screen.incoming .findyourfit-group,
+  .findyourfit-screen.incoming .findyourfit-actions-row,
+  .findyourfit-screen.incoming .findyourfit-step2-grid {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .findyourfit-tracker-line-fill {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .findyourfit-thankyou-circle {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+@keyframes fadeOutSimple {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes fadeInSimple {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }

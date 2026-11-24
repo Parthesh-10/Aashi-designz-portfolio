@@ -12,7 +12,7 @@
   font-weight: 400;
   line-height: 1.5;
   margin-top: 0;
-  margin-bottom: 56px;
+  margin-bottom: 107px;
   padding: 0 1rem;
 }
 
@@ -20,7 +20,7 @@
   width: 100%;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  column-gap: 2.5%;
+  column-gap: 14px;
   row-gap: 5rem;
   align-items: start;
   margin-top: 0;
@@ -53,9 +53,9 @@
   position: absolute;
   inset: 0;
   border-radius: 28px;
-  background: linear-gradient(145deg, #a778f2 0%, #9a66ea 100%);
-  box-shadow: 0 16px 36px rgba(125, 75, 205, 0.28);
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  background: linear-gradient(145deg, var(--folder-back-start, #a778f2) 0%, var(--folder-back-end, #9a66ea) 100%);
+  box-shadow: 0 16px 36px var(--folder-shadow, rgba(125, 75, 205, 0.28));
+  transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
 }
 
 /* Tab at top-left of the back panel */
@@ -228,7 +228,7 @@
   pointer-events: none;
   border-radius: 0 0 28px 28px;
   overflow: hidden;
-  background: rgba(182, 140, 245, 0.65);
+  background: var(--folder-front-bg, rgba(182, 140, 245, 0.65));
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
   border-bottom: 1.5px solid rgba(255, 255, 255, 0.35);
@@ -243,6 +243,7 @@
     100% 100%,
     0% 100%
   );
+  transition: background 0.4s ease;
 }
 
 /* Top highlight rim on the front flap */
@@ -254,6 +255,10 @@
   height: 250px;
   pointer-events: none;
   z-index: 5;
+}
+
+.folderFrontRim path {
+  stroke: var(--folder-rim, rgba(255, 255, 255, 0.55));
 }
 
 /* Bottom-right circular arrow button */
@@ -305,6 +310,7 @@
   font-size: 28px;
   line-height: 1.15;
   color: #ffffff;
+  text-shadow: var(--folder-text-shadow, 0 2px 8px rgba(60, 30, 120, 0.35));
   z-index: 6;
   pointer-events: none;
   margin: 0;
@@ -319,6 +325,10 @@
 
 /* Tablet: 3 columns (768px - 1024px) */
 @media (max-width: 1024px) and (min-width: 768px) {
+  .category .headingPara {
+    margin-bottom: 56px;
+  }
+
   .singleFolderContainer {
     grid-template-columns: repeat(3, 1fr);
     column-gap: 3%;
@@ -360,8 +370,9 @@
     position: absolute;
     inset: 0;
     border-radius: 22px;
-    background: linear-gradient(145deg, #a778f2 0%, #9a66ea 100%);
-    box-shadow: 0 14px 32px rgba(125, 75, 205, 0.26);
+    background: linear-gradient(145deg, var(--folder-back-start, #a778f2) 0%, var(--folder-back-end, #9a66ea) 100%);
+    box-shadow: 0 14px 32px var(--folder-shadow, rgba(125, 75, 205, 0.26));
+    transition: background 0.4s ease, box-shadow 0.4s ease;
   }
 
   .categoryMobileCardBack::before {
@@ -454,7 +465,7 @@
     pointer-events: none;
     border-radius: 0 0 22px 22px;
     overflow: hidden;
-    background: rgba(182, 140, 245, 0.68);
+    background: var(--folder-front-bg, rgba(182, 140, 245, 0.68));
     backdrop-filter: blur(16px) saturate(160%);
     -webkit-backdrop-filter: blur(16px) saturate(160%);
     border-bottom: 1.5px solid rgba(255, 255, 255, 0.35);
@@ -469,6 +480,7 @@
       100% 100%,
       0% 100%
     );
+    transition: background 0.4s ease;
   }
 
   /* Highlight rim along top cut of front flap */
@@ -482,6 +494,10 @@
     z-index: 5;
   }
 
+  .categoryMobileFrontRim path {
+    stroke: var(--folder-rim, rgba(255, 255, 255, 0.55));
+  }
+
   /* Title on front flap */
   .categoryMobileTitle {
     position: absolute;
@@ -493,6 +509,7 @@
     font-size: clamp(20px, 5.5vw, 23px);
     line-height: 1.15;
     color: #ffffff;
+    text-shadow: var(--folder-text-shadow, 0 2px 8px rgba(60, 30, 120, 0.35));
     z-index: 6;
     pointer-events: none;
     margin: 0;

@@ -5,13 +5,25 @@
    ========================================================================== */
 
 .howwedo-section {
-  --carousel-band: #F8F5FE;
+  --carousel-band: #F7F3FD;
   --card-width: 290px;
   --card-image-height: 380px;
-  --card-height: 454px;
-  --card-gap: 24px;
-  --card-blur: 7px;
-  --card-unfocused-opacity: 0.7;
+  --card-lift: 65px;
+  --card-height: 380px;
+  --card-gap: 26px;
+  --card-blur-near: 4.8px;
+  --card-blur-far: 7.2px;
+  --card-blur: 4.8px;
+  --card-unfocused-opacity: 1;
+  --card-scrim: rgba(0, 0, 0, 0.35);
+  --card-overlay-text: #ffffff;
+  --card-overlay-label: #ffffff;
+  --card-overlay-headline: #ffffff;
+  --card-overlay-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  --card-overlay-pill-bg: #333943;
+  --card-overlay-pill-text: #ffffff;
+  --card-overlay-btn-bg: #ffffff;
+  --card-overlay-arrow: #173E5A;
   width: 100%;
   background-color: var(--carousel-band);
   margin-top: 0;
@@ -85,14 +97,11 @@
   overflow: hidden;
   position: relative;
   box-sizing: border-box;
-  padding-top: 28px; /* Room for raised center card */
+  padding-top: 74px; /* Room for 65px lifted center card with safe clearance */
   padding-bottom: 8px;
   user-select: none;
   -webkit-user-select: none;
   touch-action: pan-y pinch-zoom;
-  /* Edge fade bleed */
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
 }
 
 .howwedo-track {
@@ -101,7 +110,6 @@
   display: flex;
   align-items: flex-end;
   width: max-content;
-  will-change: transform;
 }
 
 .howwedo-track.is-animating {
@@ -120,6 +128,7 @@
   box-sizing: border-box;
   cursor: pointer;
   outline: none;
+  position: relative;
   transition: opacity 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -130,29 +139,27 @@
 .howwedo-card-item {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  position: relative;
   box-sizing: border-box;
 }
 
-/* Image Card */
+/* Image Card (Crisp clipping container, never blurred) */
 .howwedo-image-card {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: var(--card-image-height);
   border-radius: 28px;
   overflow: hidden;
-  background: #f1edfa;
+  background: #000000;
   transform-origin: bottom center;
+  isolation: isolate;
+  transform: translateY(0) translateZ(0);
+  will-change: transform;
   transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1),
-              filter 400ms cubic-bezier(0.4, 0, 0.2, 1),
               opacity 400ms cubic-bezier(0.4, 0, 0.2, 1),
               box-shadow 400ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.howwedo-track.is-animating .howwedo-image-card {
-  will-change: transform, filter, opacity;
 }
 
 .howwedo-card-image {
@@ -160,15 +167,162 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transform-origin: center center;
+  transform: scale(1.0);
+  filter: blur(0px);
+  opacity: 1;
+  will-change: transform, filter, opacity;
+  transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1),
+              filter 400ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Semi-transparent black overlay tint on inactive blurred cards */
+.howwedo-card-scrim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--card-scrim, rgba(0, 0, 0, 0.35));
+  pointer-events: none;
+  z-index: 2;
+  opacity: 1;
+  transition: opacity 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Side Card Overlay Text (on top of card at bottom) */
+.howwedo-card-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20px 18px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 3;
+  pointer-events: none;
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.howwedo-overlay-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+  opacity: 0.95;
+  line-height: 1;
+  transform: translateY(0);
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1) 150ms,
+              opacity 450ms ease 150ms;
+}
+
+.howwedo-concentric-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: #ffffff;
+}
+
+.howwedo-concentric-icon circle {
+  opacity: 1 !important;
+  stroke: #ffffff;
+}
+
+.howwedo-concentric-icon circle:last-child {
+  fill: #ffffff;
+}
+
+.howwedo-overlay-headline {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 1.2;
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+  opacity: 1;
+  margin: 0;
+  letter-spacing: -0.015em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  max-width: 215px;
+  transform: translateY(0);
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1) 210ms,
+              opacity 450ms ease 210ms;
+}
+
+.howwedo-overlay-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1) 270ms,
+              opacity 450ms ease 270ms;
+}
+
+.howwedo-overlay-pill {
+  background: var(--card-overlay-pill-bg, #333943);
+  color: var(--card-overlay-pill-text, #ffffff);
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.howwedo-overlay-arrow {
+  pointer-events: auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  flex-shrink: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s ease,
+              background-color 0.2s ease;
+}
+
+.howwedo-overlay-arrow:hover {
+  transform: scale(1.1) translate(1px, -1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  background: #ffffff;
+}
+
+.howwedo-overlay-arrow svg {
+  display: block;
+}
+
+.howwedo-overlay-arrow svg path {
+  stroke: #173E5A;
 }
 
 .howwedo-card-pill {
   position: absolute;
   top: 14px;
   right: 14px;
-  background: rgba(0, 0, 0, 0.42);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(18, 14, 28, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 9999px;
   padding: 4px 12px;
@@ -177,19 +331,23 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  z-index: 2;
+  z-index: 3;
 }
 
-/* Separated Text Row outside image card directly on page background */
+/* Separated Text Row positioned in the freed 65px space below the lifted center card */
 .howwedo-text-row {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--card-lift);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 14px;
   padding: 0 4px;
   box-sizing: border-box;
-  min-height: 54px;
+  pointer-events: none;
 }
 
 .howwedo-text-info {
@@ -206,6 +364,11 @@
   line-height: 1.2;
   margin: 0;
   letter-spacing: -0.01em;
+  opacity: 0;
+  transform: translateY(-16px);
+  pointer-events: none;
+  transition: opacity 250ms ease,
+              transform 250ms ease;
 }
 
 .howwedo-text-subtitle {
@@ -215,6 +378,11 @@
   color: #6B6B75;
   line-height: 1.3;
   margin: 4px 0 0 0;
+  opacity: 0;
+  transform: translateY(-16px);
+  pointer-events: none;
+  transition: opacity 250ms ease,
+              transform 250ms ease;
 }
 
 .howwedo-arrow-btn {
@@ -228,12 +396,12 @@
   justify-content: center;
   flex-shrink: 0;
   text-decoration: none;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.howwedo-arrow-btn:hover {
-  transform: scale(1.08);
-  background-color: #07222c;
+  opacity: 0;
+  transform: translateY(-16px);
+  pointer-events: none;
+  transition: opacity 250ms ease,
+              transform 250ms ease,
+              background-color 0.2s ease;
 }
 
 /* ==========================================================================
@@ -246,20 +414,70 @@
 }
 
 .howwedo-slot-center .howwedo-image-card {
-  transform: scale(1.0);
-  filter: blur(0);
+  transform: translateY(calc(-1 * var(--card-lift))) translateZ(0);
   opacity: 1;
   box-shadow: 0 20px 48px -12px rgba(135, 100, 205, 0.32);
 }
 
-.howwedo-slot-center .howwedo-text-row {
+.howwedo-slot-center .howwedo-card-image {
+  filter: blur(0px);
+  transform: scale(1.0);
   opacity: 1;
-  visibility: visible;
+}
+
+/* Scrim & overlay hide when center */
+.howwedo-slot-center .howwedo-card-scrim {
+  opacity: 0;
+}
+
+.howwedo-slot-center .howwedo-card-overlay {
+  transform: translateY(44px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 350ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.howwedo-slot-center .howwedo-overlay-label,
+.howwedo-slot-center .howwedo-overlay-headline,
+.howwedo-slot-center .howwedo-overlay-footer {
+  transform: translateY(44px);
+  opacity: 0;
+  transition: transform 350ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Caption entrance in freed space below card */
+.howwedo-slot-center .howwedo-text-row {
+  pointer-events: auto;
+}
+
+.howwedo-slot-center .howwedo-text-title {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1) 150ms,
+              transform 600ms cubic-bezier(0.22, 1, 0.36, 1) 150ms;
+}
+
+.howwedo-slot-center .howwedo-text-subtitle {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1) 220ms,
+              transform 600ms cubic-bezier(0.22, 1, 0.36, 1) 220ms;
+}
+
+.howwedo-slot-center .howwedo-arrow-btn {
+  opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
-  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.08s,
-              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.08s,
-              visibility 0.35s ease 0.08s;
+  transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1) 290ms,
+              transform 600ms cubic-bezier(0.22, 1, 0.36, 1) 290ms,
+              background-color 0.2s ease;
+}
+
+.howwedo-slot-center .howwedo-arrow-btn:hover {
+  transform: translateY(0) scale(1.08);
+  background-color: #07222c;
 }
 
 /* State: Immediate Neighbors (Left-1, Right-1) */
@@ -270,47 +488,37 @@
 
 .howwedo-slot-left-1 .howwedo-image-card,
 .howwedo-slot-right-1 .howwedo-image-card {
-  transform: scale(0.86);
-  filter: blur(var(--card-blur));
-  opacity: var(--card-unfocused-opacity);
+  transform: translateY(0) translateZ(0);
+  opacity: 1;
   box-shadow: 0 8px 24px -8px rgba(135, 100, 205, 0.16);
 }
 
-.howwedo-slot-left-1 .howwedo-text-row,
-.howwedo-slot-right-1 .howwedo-text-row {
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(8px);
-  pointer-events: none;
-  transition: opacity 0.15s ease,
-              transform 0.15s ease,
-              visibility 0.15s ease;
+.howwedo-slot-left-1 .howwedo-card-image,
+.howwedo-slot-right-1 .howwedo-card-image {
+  filter: blur(var(--card-blur, 4.8px));
+  transform: scale(1.08);
+  opacity: var(--card-unfocused-opacity);
 }
 
 /* State: Outer Neighbors (Left-2, Right-2) */
 .howwedo-slot-left-2,
 .howwedo-slot-right-2 {
-  opacity: 0.65;
+  opacity: 1;
   z-index: 2;
 }
 
 .howwedo-slot-left-2 .howwedo-image-card,
 .howwedo-slot-right-2 .howwedo-image-card {
-  transform: scale(0.80);
-  filter: blur(var(--card-blur));
-  opacity: calc(var(--card-unfocused-opacity) * 0.7);
+  transform: translateY(0) translateZ(0);
+  opacity: 1;
   box-shadow: 0 6px 18px -6px rgba(135, 100, 205, 0.12);
 }
 
-.howwedo-slot-left-2 .howwedo-text-row,
-.howwedo-slot-right-2 .howwedo-text-row {
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(8px);
-  pointer-events: none;
-  transition: opacity 0.15s ease,
-              transform 0.15s ease,
-              visibility 0.15s ease;
+.howwedo-slot-left-2 .howwedo-card-image,
+.howwedo-slot-right-2 .howwedo-card-image {
+  filter: blur(var(--card-blur, 7.2px));
+  transform: scale(1.10);
+  opacity: calc(var(--card-unfocused-opacity) * 0.7);
 }
 
 /* State: Far / Hidden Slides */
@@ -321,14 +529,12 @@
 }
 
 .howwedo-slot-far .howwedo-image-card {
-  transform: scale(0.75);
-  filter: none;
+  transform: translateY(0) translateZ(0);
 }
 
-.howwedo-slot-far .howwedo-text-row {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+.howwedo-slot-far .howwedo-card-image {
+  filter: blur(var(--card-blur, 9.6px));
+  transform: scale(1.12);
 }
 
 /* ==========================================================================
@@ -376,8 +582,13 @@
   .howwedo-section {
     --card-width: 260px;
     --card-image-height: 350px;
-    --card-height: 420px;
-    --card-gap: 20px;
+    --card-lift: 60px;
+    --card-height: 350px;
+    --card-gap: 23px;
+  }
+
+  .howwedo-carousel-viewport {
+    padding-top: 68px;
   }
 
   .howwedo-text-title {
@@ -392,92 +603,201 @@
     width: 42px;
     height: 42px;
   }
+
+  .howwedo-overlay-headline {
+    font-size: 21px;
+    max-width: 200px;
+  }
+
+  .howwedo-overlay-arrow {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 @media (max-width: 767px) {
   .howwedo-section {
-    --card-width: 260px;
-    --card-image-height: 340px;
-    --card-height: 410px;
-    --card-gap: 16px;
+    --card-width: 68vw;
+    --card-image-height: calc(var(--card-width) * 1.31);
+    --card-lift: clamp(44px, 12vw, 50px);
+    --card-height: calc(var(--card-width) * 1.31);
+    --card-gap: 12px;
     margin-top: 0;
     margin-bottom: 0;
-    padding-top: 40px;
-    padding-bottom: 40px;
+    padding-top: 28px;
+    padding-bottom: 32px;
+    overflow: hidden;
   }
 
   .howwedo-carousel-viewport {
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
-    padding-top: 22px;
+    padding-top: calc(var(--card-lift) + 8px);
+    padding-bottom: 4px;
   }
 
   .howwedo-header-container {
-    margin-bottom: 20px;
+    margin-bottom: 14px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .howwedo-title {
-    font-size: 28px;
+    font-size: 26px;
   }
 
   .howwedo-cta-pill {
-    padding: 7px 14px;
-    font-size: 12px;
+    padding: 6px 13px;
+    font-size: 11.5px;
+  }
+
+  /* Card inner content scaling */
+  .howwedo-card-pill {
+    top: 10px;
+    right: 10px;
+    padding: 3px 9px;
+    font-size: 9.5px;
+  }
+
+  .howwedo-text-row {
+    height: var(--card-lift);
+    padding: 0 4px;
+    gap: 10px;
+  }
+
+  .howwedo-text-info {
+    flex: 1;
+    min-width: 0;
   }
 
   .howwedo-text-title {
-    font-size: 20px;
+    font-size: clamp(16px, 4.8vw, 19px);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .howwedo-text-subtitle {
-    font-size: 13px;
+    font-size: clamp(11.5px, 3.4vw, 13px);
+    line-height: 1.25;
+    margin-top: 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .howwedo-arrow-btn {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
   }
 
-  .howwedo-slot-left-1,
-  .howwedo-slot-right-1 {
+  .howwedo-arrow-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Side Card depth scaling (~0.92) & anchored to center card */
+  .howwedo-slot-left-1 .howwedo-image-card {
+    transform: translateY(0) scale(0.92) translateZ(0) !important;
+    transform-origin: right bottom !important;
+    box-shadow: 0 6px 18px -6px rgba(135, 100, 205, 0.16) !important;
+  }
+
+  .howwedo-slot-right-1 .howwedo-image-card {
+    transform: translateY(0) scale(0.92) translateZ(0) !important;
+    transform-origin: left bottom !important;
+    box-shadow: 0 6px 18px -6px rgba(135, 100, 205, 0.16) !important;
+  }
+
+  .howwedo-slot-left-2 .howwedo-image-card {
+    transform: translateY(0) scale(0.85) translateZ(0) !important;
+    transform-origin: right bottom !important;
+  }
+
+  .howwedo-slot-right-2 .howwedo-image-card {
+    transform: translateY(0) scale(0.85) translateZ(0) !important;
+    transform-origin: left bottom !important;
+  }
+
+  /* Side Card overlay text proportional scaling */
+  .howwedo-card-overlay {
+    padding: 12px 10px;
+    gap: 5px;
+  }
+
+  .howwedo-overlay-headline {
+    font-size: clamp(14px, 4.2vw, 17px);
+    line-height: 1.2;
+    max-width: 160px;
+  }
+
+  .howwedo-overlay-label {
+    font-size: 9px;
+    gap: 4px;
+  }
+
+  .howwedo-overlay-footer {
+    margin-top: 4px;
+  }
+
+  .howwedo-overlay-pill {
+    font-size: 9.5px;
+    padding: 3px 8px;
+  }
+
+  .howwedo-overlay-arrow {
+    width: 28px;
+    height: 28px;
+  }
+
+  .howwedo-pagination {
+    margin-top: 20px;
+  }
+
+  .howwedo-slot-left-1 .howwedo-card-image,
+  .howwedo-slot-right-1 .howwedo-card-image {
     opacity: 0.85;
   }
 
-  .howwedo-slot-left-1 .howwedo-image-card,
-  .howwedo-slot-right-1 .howwedo-image-card {
-    transform: scale(0.88);
-  }
-
-  .howwedo-slot-left-2,
-  .howwedo-slot-right-2 {
+  .howwedo-slot-left-2 .howwedo-card-image,
+  .howwedo-slot-right-2 .howwedo-card-image {
     opacity: 0.35;
-  }
-}
-
-@media (max-width: 380px) {
-  .howwedo-section {
-    --card-width: 240px;
-    --card-image-height: 320px;
-    --card-height: 386px;
-    --card-gap: 12px;
-  }
-
-  .howwedo-title {
-    font-size: 25px;
-  }
-
-  .howwedo-cta-pill {
-    padding: 6px 12px;
-    font-size: 11px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .howwedo-track,
   .howwedo-image-card,
-  .howwedo-text-row {
-    transition: none !important;
+  .howwedo-card-image,
+  .howwedo-card-overlay,
+  .howwedo-overlay-label,
+  .howwedo-overlay-headline,
+  .howwedo-overlay-footer,
+  .howwedo-card-scrim {
+    transition: opacity 150ms ease !important;
     animation: none !important;
-    filter: none !important;
+    transform: none !important;
+  }
+
+  .howwedo-slot-center .howwedo-image-card {
+    transform: none !important;
+  }
+
+  .howwedo-slot-center .howwedo-card-overlay,
+  .howwedo-slot-center .howwedo-overlay-label,
+  .howwedo-slot-center .howwedo-overlay-headline,
+  .howwedo-slot-center .howwedo-overlay-footer {
+    transform: none !important;
+  }
+
+  .howwedo-text-title,
+  .howwedo-text-subtitle,
+  .howwedo-arrow-btn {
+    transform: none !important;
+    transition: opacity 150ms ease !important;
   }
 }
+
+
+

@@ -1,14 +1,14 @@
-import ServicesHero from '@/components/ServicesHero/ServicesHero';
+import BrandDesignHero from '@/components/BrandDesignHero/BrandDesignHero';
 import HowWeDo from '@/components/HowWeDo/HowWeDo';
-import CanWeHelpYou from '@/components/CanWeHelpYou/CanWeHelpYou';
+import ServiceOutcomes from '@/components/ServiceOutcomes/ServiceOutcomes';
 import FindYourFit from '@/components/FindYourFit/FindYourFit';
 
 export default function BrandDesign() {
   return (
     <>
-      <ServicesHero />
+      <BrandDesignHero />
       <HowWeDo />
-      <CanWeHelpYou />
+      <ServiceOutcomes />
       <FindYourFit />
       <div className="container4 container">
         <div className="banner">

@@ -5,19 +5,80 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import './Category.css';
 
-const FOLDER_TITLES = [
-  'Branding & Strategy',
-  'Design & Edit',
-  'Digital Marketing',
-  'UI / UX',
-  'Offline Marketing',
+const FOLDER_ITEMS = [
+  {
+    title: 'Branding & Strategy',
+    colorName: 'Lavender Veil',
+    hex: '#EBE0FF',
+    backStart: '#f3edff',
+    backEnd: '#d8c2ff',
+    frontBg: 'rgba(235, 224, 255, 0.68)',
+    shadow: 'rgba(165, 135, 225, 0.22)',
+    rim: 'rgba(255, 255, 255, 0.70)',
+    textShadow: '0 2px 8px rgba(95, 70, 150, 0.45)',
+  },
+  {
+    title: 'Design & Edit',
+    colorName: 'Periwinkle',
+    hex: '#DAC7FF',
+    backStart: '#e5d5ff',
+    backEnd: '#caaeff',
+    frontBg: 'rgba(218, 199, 255, 0.68)',
+    shadow: 'rgba(150, 115, 225, 0.25)',
+    rim: 'rgba(255, 255, 255, 0.62)',
+    textShadow: '0 2px 8px rgba(90, 65, 150, 0.40)',
+  },
+  {
+    title: 'Digital Marketing',
+    colorName: 'Mauve',
+    hex: '#C7ADFF',
+    backStart: '#d4bfff',
+    backEnd: '#b595fa',
+    frontBg: 'rgba(199, 173, 255, 0.68)',
+    shadow: 'rgba(135, 95, 220, 0.27)',
+    rim: 'rgba(255, 255, 255, 0.58)',
+    textShadow: '0 2px 8px rgba(85, 55, 145, 0.35)',
+  },
+  {
+    title: 'UI / UX',
+    colorName: 'Soft Periwinkle',
+    hex: '#AC8BEE',
+    backStart: '#b899f4',
+    backEnd: '#9c73e8',
+    frontBg: 'rgba(172, 139, 238, 0.68)',
+    shadow: 'rgba(120, 75, 210, 0.28)',
+    rim: 'rgba(255, 255, 255, 0.55)',
+    textShadow: '0 2px 8px rgba(75, 45, 140, 0.30)',
+  },
+  {
+    title: 'Offline Marketing',
+    colorName: 'Lavender Purple',
+    hex: '#916DD5',
+    backStart: '#9d7ae0',
+    backEnd: '#8258cc',
+    frontBg: 'rgba(145, 109, 213, 0.68)',
+    shadow: 'rgba(105, 60, 185, 0.30)',
+    rim: 'rgba(255, 255, 255, 0.55)',
+    textShadow: '0 2px 8px rgba(60, 30, 120, 0.25)',
+  },
 ];
 
-function FolderItem({ title, card1, card2, card3, onArrowClick }) {
+function FolderItem({ title, colors, card1, card2, card3, onArrowClick }) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const styleVars = colors
+    ? {
+        '--folder-back-start': colors.backStart,
+        '--folder-back-end': colors.backEnd,
+        '--folder-front-bg': colors.frontBg,
+        '--folder-shadow': colors.shadow,
+        '--folder-rim': colors.rim,
+        '--folder-text-shadow': colors.textShadow,
+      }
+    : undefined;
+
   return (
-    <div className="folderCol">
+    <div className="folderCol" style={styleVars}>
       <div
         className={`singleFolderWrapper ${isOpen ? 'isOpen' : ''}`}
         onClick={() => setIsOpen((prev) => !prev)}
@@ -88,7 +149,7 @@ function FolderItem({ title, card1, card2, card3, onArrowClick }) {
           <path
             d="M 0 0 L 175 0 C 200 0, 225 38, 255 38 L 460 38"
             fill="none"
-            stroke="rgba(255, 255, 255, 0.55)"
+            stroke="var(--folder-rim, rgba(255, 255, 255, 0.55))"
             strokeWidth="2"
           />
         </svg>
@@ -193,6 +254,7 @@ export default function Category({ categoryDesc = [] }) {
   const MOBILE_CATEGORIES = [
     {
       title: 'Branding & Strategy',
+      colors: FOLDER_ITEMS[0],
       destination: branding.pageLink,
       cardLeft: { src: `/img/${uiux.imgSrc}`, alt: uiux.heading, link: uiux.pageLink },
       cardMiddle: { src: `/img/${branding.imgSrc}`, alt: branding.heading, link: branding.pageLink },
@@ -200,6 +262,7 @@ export default function Category({ categoryDesc = [] }) {
     },
     {
       title: 'Design & Edit',
+      colors: FOLDER_ITEMS[1],
       destination: graphic.pageLink,
       cardLeft: { src: `/img/${graphic.imgSrc}`, alt: graphic.heading, link: graphic.pageLink },
       cardMiddle: { src: `/img/${video.imgSrc}`, alt: video.heading, link: video.pageLink },
@@ -207,6 +270,7 @@ export default function Category({ categoryDesc = [] }) {
     },
     {
       title: 'Digital Marketing',
+      colors: FOLDER_ITEMS[2],
       destination: strategy.pageLink,
       cardLeft: { src: `/img/${strategy.imgSrc}`, alt: strategy.heading, link: strategy.pageLink },
       cardMiddle: { src: `/img/${branding.imgSrc}`, alt: branding.heading, link: branding.pageLink },
@@ -214,6 +278,7 @@ export default function Category({ categoryDesc = [] }) {
     },
     {
       title: 'UI / UX',
+      colors: FOLDER_ITEMS[3],
       destination: uiux.pageLink,
       cardLeft: { src: `/img/${uiux.imgSrc}`, alt: uiux.heading, link: uiux.pageLink },
       cardMiddle: { src: `/img/${branding.imgSrc}`, alt: branding.heading, link: branding.pageLink },
@@ -221,6 +286,7 @@ export default function Category({ categoryDesc = [] }) {
     },
     {
       title: 'Offline Marketing',
+      colors: FOLDER_ITEMS[4],
       destination: graphic.pageLink,
       cardLeft: { src: `/img/${graphic.imgSrc}`, alt: graphic.heading, link: graphic.pageLink },
       cardMiddle: { src: `/img/${branding.imgSrc}`, alt: branding.heading, link: branding.pageLink },
@@ -230,6 +296,15 @@ export default function Category({ categoryDesc = [] }) {
 
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
   const activeCategory = MOBILE_CATEGORIES[activeCategoryIndex] || MOBILE_CATEGORIES[0];
+  const activeColors = activeCategory.colors || FOLDER_ITEMS[activeCategoryIndex] || FOLDER_ITEMS[0];
+  const mobileStyleVars = {
+    '--folder-back-start': activeColors.backStart,
+    '--folder-back-end': activeColors.backEnd,
+    '--folder-front-bg': activeColors.frontBg,
+    '--folder-shadow': activeColors.shadow,
+    '--folder-rim': activeColors.rim,
+    '--folder-text-shadow': activeColors.textShadow,
+  };
 
   return (
     <div className="category">
@@ -240,10 +315,11 @@ export default function Category({ categoryDesc = [] }) {
 
       {/* Desktop & Tablet Folder Grid (>= 768px) */}
       <div className="singleFolderContainer" ref={containerRef}>
-        {FOLDER_TITLES.map((title, idx) => (
+        {FOLDER_ITEMS.map((item, idx) => (
           <FolderItem
             key={idx}
-            title={title}
+            title={item.title}
+            colors={item}
             card1={card1}
             card2={card2}
             card3={card3}
@@ -254,7 +330,7 @@ export default function Category({ categoryDesc = [] }) {
 
       {/* Mobile Featured Showcase (< 768px) */}
       <div className="categoryMobileShowcase">
-        <div className="categoryMobileCardWrapper">
+        <div className="categoryMobileCardWrapper" style={mobileStyleVars}>
           <div className="categoryMobileCardBack" />
 
           <div className="categoryMobileMockups">
@@ -311,7 +387,7 @@ export default function Category({ categoryDesc = [] }) {
             <path
               d="M 0 0 L 114 0 C 131 0, 147 21, 165 21 L 300 21"
               fill="none"
-              stroke="rgba(255, 255, 255, 0.55)"
+              stroke="var(--folder-rim, rgba(255, 255, 255, 0.55))"
               strokeWidth="2"
             />
           </svg>
@@ -342,6 +418,7 @@ export default function Category({ categoryDesc = [] }) {
         <div className="categoryMobileNav" role="tablist" aria-label="Service categories">
           {MOBILE_CATEGORIES.map((cat, idx) => {
             const isSelected = idx === activeCategoryIndex;
+            const catColors = cat.colors || FOLDER_ITEMS[idx];
             return (
               <button
                 key={idx}
@@ -349,6 +426,15 @@ export default function Category({ categoryDesc = [] }) {
                 role="tab"
                 aria-selected={isSelected}
                 className={`categoryMobilePill ${isSelected ? 'active' : ''}`}
+                style={
+                  isSelected
+                    ? {
+                        borderColor: catColors.backEnd,
+                        background: catColors.frontBg,
+                        boxShadow: `0 2px 8px ${catColors.shadow}`,
+                      }
+                    : undefined
+                }
                 onClick={() => setActiveCategoryIndex(idx)}
               >
                 {cat.title}

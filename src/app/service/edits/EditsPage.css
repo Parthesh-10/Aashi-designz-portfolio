@@ -1,0 +1,1091 @@
+/* ============================================================
+   EditsPage.css — Modern High-Performance Service Edits Page
+   ============================================================ */
+
+.edits-page {
+  width: 100%;
+  background-color: #ffffff;
+  color: #313944;
+  font-family: 'Outfit', sans-serif;
+  font-style: normal;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.ah-space {
+  display: inline-block;
+  width: 0.28em;
+}
+
+/* ============================================================
+   SECTION 1: HERO (Full-bleed dark photo)
+   ============================================================ */
+.edits-hero-wrap {
+  position: relative;
+  width: 100%;
+  background: #0c0814;
+  overflow: hidden;
+  /* Start directly below fixed navbar */
+  padding-top: var(--navbar-h, 66px);
+  box-sizing: border-box;
+}
+
+.edits-hero-inner {
+  container-type: inline-size;
+  container-name: edits-hero;
+  max-width: 1440px;
+  margin-inline: auto;
+  width: 100%;
+  position: relative;
+  aspect-ratio: 1.57 / 1;
+  min-height: 520px;
+  max-height: calc(100svh - var(--navbar-h, 66px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 0 4cqw;
+}
+
+/* Hero Background Image & Legibility Overlay */
+.edits-hero-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.edits-hero-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(12, 8, 20, 0.45) 0%,
+    rgba(12, 8, 20, 0.35) 45%,
+    rgba(12, 8, 20, 0.65) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+.edits-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Hero Heading (Page's single <h1>) */
+.edits-hero-h1 {
+  font-family: 'Outfit', sans-serif;
+  font-style: normal;
+  font-size: 9.6cqw;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  text-align: center;
+  max-width: 85cqw;
+  margin: 0 auto;
+}
+
+.edits-serif-accent {
+  font-family: var(--font-instrument-serif, 'Instrument Serif', Georgia, serif) !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+  font-size: 1.08em;
+}
+
+.ah-desktop-br {
+  display: inline;
+}
+
+/* Subtitle */
+.edits-hero-sub {
+  font-style: normal;
+  font-size: 2.2cqw;
+  font-weight: 400;
+  line-height: 1.38;
+  color: #ffffff;
+  max-width: 52cqw;
+  text-wrap: balance;
+  margin-top: 3.0cqw;
+  margin-bottom: 0;
+  text-align: center;
+  opacity: 0.95;
+}
+
+/* Hero CTA Buttons */
+.edits-hero-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5cqw;
+  margin-top: 3.4cqw;
+}
+
+.edits-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #B28CE8;
+  color: #ffffff;
+  font-family: 'Outfit', sans-serif;
+  font-style: normal;
+  font-size: 1.6cqw;
+  font-weight: 500;
+  height: 3.85cqw;
+  padding: 0 2.5cqw;
+  min-width: 12cqw;
+  border-radius: 9999px;
+  border: none;
+  text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.edits-btn-primary:hover {
+  background-color: #9f76db;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(178, 140, 232, 0.4);
+}
+
+.edits-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-family: 'Outfit', sans-serif;
+  font-style: normal;
+  font-size: 1.6cqw;
+  font-weight: 500;
+  height: 3.85cqw;
+  padding: 0 2.5cqw;
+  min-width: 13.5cqw;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.edits-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.7);
+  transform: translateY(-2px);
+}
+
+/* Trusted By Row */
+.edits-trusted-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2cqw;
+  margin-top: 4.8cqw;
+}
+
+.edits-trusted-img-wrap {
+  width: 6.8cqw;
+  height: 3.1cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edits-trusted-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.edits-trusted-text {
+  font-family: 'Outfit', sans-serif;
+  font-style: normal;
+  font-size: 1.55cqw;
+  font-weight: 400;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+}
+
+/* ============================================================
+   SECTION 2: WHY IT MATTERS (White background)
+   ============================================================ */
+.edits-why-wrap {
+  width: 100%;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.edits-why-inner {
+  container-type: inline-size;
+  container-name: edits-why;
+  max-width: 1440px;
+  margin-inline: auto;
+  width: 100%;
+  padding-top: 4.2cqw;
+  box-sizing: border-box;
+}
+
+/* Eyebrow */
+.edits-eyebrow {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9cqw;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #AE88E8;
+  text-align: center;
+  margin-bottom: 1.2cqw;
+}
+
+/* Heading (h2) */
+.edits-why-h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 4.1cqw;
+  font-weight: 400;
+  line-height: 1.12;
+  color: #313944;
+  text-align: center;
+  margin: 0 auto 2cqw;
+}
+
+.edits-why-h2-accent {
+  font-size: 4.5cqw !important;
+  color: #AE88E8 !important;
+}
+
+/* Before / After Cards Grid */
+.edits-cards-grid {
+  margin-inline: 13.9cqw;
+  display: grid;
+  grid-template-columns: repeat(2, 35.4cqw);
+  gap: 1.4cqw;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.edits-card {
+  position: relative;
+  width: 35.4cqw;
+  aspect-ratio: 1 / 1;
+  background-color: #E4DAF6;
+  border-radius: 1.5cqw;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Tag Pills */
+.edits-card-pill {
+  position: absolute;
+  top: 4.5%;
+  left: 4.5%;
+  height: 1.7cqw;
+  padding: 0 0.9cqw;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.75cqw;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  z-index: 2;
+}
+
+.edits-pill-before {
+  background-color: #5B5F68;
+  color: #ffffff;
+}
+
+.edits-pill-after {
+  background-color: #EAF77F;
+  color: #313944;
+}
+
+/* Card Phone Graphic */
+.edits-card-phone-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 90.5%;
+  width: auto;
+  aspect-ratio: 819 / 1024;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.edits-card-phone-img {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Stats Row */
+.edits-stats-row {
+  margin-top: 2.1cqw;
+  margin-inline: 13.9cqw;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.edits-stat-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+}
+
+/* Floating entrance for stats */
+.edits-stat-outer {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+.edits-stat-outer.is-in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Continuous gentle desynchronized floating */
+@keyframes editsStatFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.6cqw);
+  }
+}
+
+.edits-stat-inner-float {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.edits-stat-outer.is-in-view .edits-stat-float-1 {
+  animation: editsStatFloat 4.5s ease-in-out infinite;
+  animation-delay: 800ms;
+}
+
+.edits-stat-outer.is-in-view .edits-stat-float-2 {
+  animation: editsStatFloat 5.5s ease-in-out infinite;
+  animation-delay: 960ms;
+}
+
+.edits-stat-outer.is-in-view .edits-stat-float-3 {
+  animation: editsStatFloat 6.5s ease-in-out infinite;
+  animation-delay: 1120ms;
+}
+
+/* Number & Unit styling */
+.edits-stat-num-row {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 6.2cqw;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  color: #313944;
+}
+
+.edits-stat-purple {
+  color: #AE88E8 !important;
+}
+
+.edits-stat-unit-s {
+  margin-left: 0.18em;
+}
+
+/* Stat Caption */
+.edits-stat-caption {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.1cqw;
+  font-weight: 300;
+  color: rgba(49, 57, 68, 0.4);
+  margin-top: 0.4cqw;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.edits-stat-outer.is-in-view .edits-stat-caption {
+  opacity: 1;
+}
+
+/* Visually hidden for accessible screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ============================================================
+   SECTION 3: WHAT'S INCLUDED
+   ============================================================ */
+.edits-included-wrap {
+  width: 100%;
+  background-color: #ffffff;
+  overflow: hidden;
+  scroll-margin-top: var(--navbar-h, 66px);
+}
+
+.edits-included-inner {
+  container-type: inline-size;
+  container-name: edits-included;
+  max-width: 1920px;
+  margin-inline: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--navbar-h, 66px));
+  height: calc(100svh - var(--navbar-h, 66px));
+  min-height: 560px;
+  text-align: center;
+  padding-top: 2.2cqw;
+  padding-bottom: 1.2cqw;
+  box-sizing: border-box;
+}
+
+.edits-included-h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 4.9cqw;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #313944;
+  margin: 0 auto;
+}
+
+.edits-included-sub {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.9cqw;
+  font-weight: 400;
+  color: rgba(49, 57, 68, 0.85);
+  margin-top: 0.8cqw;
+  margin-bottom: 1.4cqw;
+  text-align: center;
+}
+
+/* ============================================================
+   SMALLER SCREENS / MOBILE RESPONSIVENESS (< 768px)
+   ============================================================ */
+@media (max-width: 767px) {
+  .ah-desktop-br {
+    display: none !important;
+  }
+
+  /* Section 1: Hero */
+  .edits-hero-wrap {
+    padding-top: var(--navbar-h, 66px);
+  }
+
+  .edits-hero-inner {
+    aspect-ratio: auto;
+    min-height: 520px;
+    height: auto;
+    max-height: none;
+    padding: 36px 20px 48px;
+  }
+
+  .edits-hero-h1 {
+    font-size: clamp(36px, 11vw, 56px);
+    line-height: 1.1;
+    max-width: 100%;
+    margin-top: 10px;
+  }
+
+  .edits-hero-sub {
+    font-size: 15px;
+    line-height: 1.4;
+    max-width: 100%;
+    margin-top: 16px;
+  }
+
+  .edits-hero-btns {
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+    width: 100%;
+  }
+
+  .edits-btn-primary,
+  .edits-btn-secondary {
+    font-size: 15px;
+    height: 48px;
+    padding: 0 24px;
+    min-width: 140px;
+    flex: 1 1 140px;
+  }
+
+  .edits-trusted-row {
+    margin-top: 28px;
+    gap: 10px;
+  }
+
+  .edits-trusted-img-wrap {
+    width: 68px;
+    height: 30px;
+  }
+
+  .edits-trusted-text {
+    font-size: 14px;
+  }
+
+  /* Section 2: Why it matters */
+  .edits-why-inner {
+    padding-top: 48px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .edits-eyebrow {
+    font-size: 12px;
+    margin-bottom: 12px;
+    letter-spacing: 0.12em;
+  }
+
+  .edits-why-h2 {
+    font-size: clamp(28px, 7.5vw, 44px);
+    line-height: 1.15;
+    margin-bottom: 32px;
+  }
+
+  .edits-why-h2-accent {
+    font-size: clamp(30px, 8vw, 48px) !important;
+  }
+
+  /* Cards Stack Vertically */
+  .edits-cards-grid {
+    margin-inline: 0;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .edits-card {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 16px;
+  }
+
+  .edits-card-pill {
+    top: 14px;
+    left: 14px;
+    height: 26px;
+    padding: 0 12px;
+    font-size: 11px;
+    z-index: 2;
+  }
+
+  .edits-card-phone-wrap {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 86%;
+    width: auto;
+    aspect-ratio: 819 / 1024;
+  }
+
+  /* Stats in 1 row (equal columns) */
+  .edits-stats-row {
+    margin-top: 32px;
+    margin-inline: 0;
+    gap: 8px;
+  }
+
+  .edits-stat-num-row {
+    font-size: clamp(28px, 9vw, 42px);
+  }
+
+  .edits-stat-caption {
+    font-size: 11px;
+    margin-top: 6px;
+  }
+
+  /* Section 3: What's Included */
+  .edits-included-inner {
+    padding-top: 56px !important;
+    padding-bottom: 56px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    min-height: auto !important;
+  }
+
+  .edits-included-h2 {
+    font-size: clamp(28px, 7.5vw, 44px);
+    line-height: 1.15;
+    padding-inline: 20px;
+  }
+
+  .edits-included-sub {
+    font-size: 15px;
+    line-height: 1.35;
+    margin-top: 12px;
+    margin-bottom: 24px !important;
+    padding-inline: 20px;
+  }
+}
+
+/* Accessibility: prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .edits-stat-outer {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .edits-stat-inner-float {
+    animation: none !important;
+  }
+
+  .edits-stat-caption {
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  .edits-pricing-card,
+  .edits-testimonial-card {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* ============================================================
+   SECTION 6 & 7: HOW WE WORK & CLIENT FEEDBACK (UNIFIED SINGLE DESKTOP SCREEN)
+   ============================================================ */
+.edits-pricing-wrap {
+  width: 100%;
+  background-color: #ffffff;
+  padding-top: clamp(1rem, 2vh, 1.8rem);
+  padding-bottom: 0;
+  box-sizing: border-box;
+}
+
+.edits-pricing-inner,
+.edits-feedback-inner {
+  max-width: 1440px;
+  margin-inline: auto;
+  width: 100%;
+  padding-inline: clamp(24px, 8.8vw, 126px);
+  box-sizing: border-box;
+}
+
+.edits-pricing-header {
+  text-align: left;
+  max-width: 54%;
+  margin-bottom: 0;
+}
+
+.edits-pricing-h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1.8rem, 3.4vh + 0.8vw, 2.7rem);
+  font-weight: 800;
+  color: #313944;
+  margin: 0 0 0.35rem 0;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.edits-pricing-sub {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(0.78rem, 1.4vh, 1rem);
+  font-weight: 400;
+  color: #313944;
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* Staggered Cards Row */
+.edits-pricing-cards {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(12px, 1.8%, 20px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.edits-pricing-card {
+  flex: 1;
+  min-width: 0;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  box-sizing: border-box;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.edits-pricing-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Card 1: 1 Month Plan (Shortest, ~64% of Card 3, ~1.35:1 ratio) */
+.edits-card-month-1 {
+  background-color: #ffffff;
+  border: 1.5px solid #9C9BA0;
+  min-height: clamp(134px, 18vh, 182px);
+  padding: clamp(16px, 2.1vh, 22px) clamp(10px, 1.2vw, 18px) clamp(14px, 1.8vh, 18px);
+}
+
+/* Card 2: 3 Month Plan (Medium, ~82% of Card 3, ~1.05:1 ratio) */
+.edits-card-month-3 {
+  background-color: #F5ECFF;
+  border: 1.5px solid #BDB1D7;
+  min-height: clamp(172px, 23vh, 234px);
+  padding: clamp(20px, 2.6vh, 28px) clamp(10px, 1.2vw, 18px) clamp(16px, 2vh, 22px);
+}
+
+/* Card 3: 6 Month Plan (Tallest, 100% reference, ~0.86:1 ratio) */
+.edits-card-month-6 {
+  background-color: #E2D3FA;
+  border: 1.5px solid #CBBDDE;
+  min-height: clamp(210px, 28vh, 285px);
+  padding: clamp(24px, 3.1vh, 34px) clamp(10px, 1.2vw, 18px) clamp(18px, 2.3vh, 24px);
+}
+
+.edits-card-top {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.edits-card-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(16px, 2.1vh, 21px);
+  font-weight: 700;
+  color: #313944;
+  margin: 0 0 0.35rem 0;
+  line-height: 1.2;
+}
+
+.edits-card-desc {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(11.5px, 1.45vh, 13.5px);
+  font-weight: 400;
+  color: #555E6B;
+  margin: 0;
+  line-height: 1.4;
+  max-width: 78%;
+}
+
+.edits-card-bottom {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: clamp(12px, 1.8vh, 18px);
+}
+
+.edits-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: clamp(6px, 1vh, 9px);
+}
+
+.edits-card-icon svg {
+  width: clamp(18px, 2.3vh, 23px);
+  height: auto;
+}
+
+.edits-card-badge {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(9px, 1.15vh, 10.5px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #313944;
+}
+
+/* Centered Statement */
+.edits-pricing-statement {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(15px, 2vh, 19px);
+  font-weight: 700;
+  color: #313944;
+  text-align: center;
+  margin-top: clamp(12px, 1.6vh, 18px);
+  margin-bottom: 0;
+  line-height: 1.35;
+}
+
+.edits-pricing-highlight {
+  color: #AE88E8;
+}
+
+/* ============================================================
+   SECTION 7: CLIENT FEEDBACK (TESTIMONIALS)
+   ============================================================ */
+.edits-feedback-wrap {
+  width: 100%;
+  background-color: #ffffff;
+  padding-top: clamp(18px, 2.6vh, 28px);
+  padding-bottom: clamp(18px, 2.8vh, 32px);
+  box-sizing: border-box;
+}
+
+.edits-feedback-eyebrow {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(10px, 1.15vh, 12px);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #AE88E8;
+  margin: 0 0 clamp(6px, 0.8vh, 10px) 0;
+  line-height: 1;
+}
+
+.edits-feedback-h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1.85rem, 3.6vh, 2.75rem);
+  font-weight: 800;
+  color: #313944;
+  margin: 0 0 clamp(12px, 1.8vh, 20px) 0;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  text-align: left;
+}
+
+.edits-feedback-br {
+  display: block;
+}
+
+/* 4 Testimonial Cards in One Horizontal Row */
+.edits-testimonials-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(8px, 1.6%, 14px);
+  width: 100%;
+  max-width: 82%;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+.edits-testimonial-card {
+  background-color: #AE88E8;
+  border-radius: 16px;
+  padding: clamp(11px, 1.3vh, 15px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  min-height: clamp(100px, 14.5vh, 138px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.edits-testimonial-card:hover {
+  transform: translateY(-3px);
+}
+
+.edits-testimonial-stars {
+  display: flex;
+  align-items: center;
+  gap: 2.5px;
+  margin-bottom: clamp(4px, 0.6vh, 6px);
+}
+
+.edits-star-icon {
+  flex-shrink: 0;
+  width: clamp(10px, 1.2vh, 12px);
+  height: clamp(10px, 1.2vh, 12px);
+}
+
+.edits-testimonial-quote {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(8px, 1vh, 9.8px);
+  line-height: 1.32;
+  font-weight: 400;
+  color: #313944;
+  margin: 0 0 clamp(6px, 0.8vh, 8px) 0;
+}
+
+.edits-testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.edits-testimonial-avatar {
+  width: clamp(20px, 2.4vh, 24px);
+  height: clamp(20px, 2.4vh, 24px);
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.edits-testimonial-avatar svg {
+  width: 100%;
+  height: 100%;
+}
+
+.edits-testimonial-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.2;
+}
+
+.edits-testimonial-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(9.5px, 1.15vh, 11px);
+  font-weight: 700;
+  color: #313944;
+}
+
+.edits-testimonial-role {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(8px, 0.95vh, 9px);
+  font-weight: 400;
+  color: rgba(49, 57, 68, 0.8);
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS FOR SECTIONS 6 & 7
+   ============================================================ */
+
+/* Desktop Single-Screen Staircase Layout (>= 1024px) */
+@media (min-width: 1024px) {
+  .edits-pricing-cards {
+    margin-top: clamp(-4.8rem, -8.5vh, -3.2rem);
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .edits-pricing-wrap {
+    min-height: auto;
+    padding-top: 2.5rem;
+    padding-bottom: 0;
+  }
+
+  .edits-pricing-header {
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .edits-pricing-cards {
+    margin-top: 0;
+    gap: 14px;
+  }
+
+  .edits-pricing-card {
+    min-height: auto;
+    padding: 20px 14px;
+  }
+
+  .edits-feedback-wrap {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+  }
+
+  .edits-testimonials-row {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 100%;
+    gap: 14px;
+  }
+
+  .edits-testimonial-card {
+    min-height: auto;
+    padding: 16px;
+  }
+}
+
+/* Mobile (<= 767px) */
+@media (max-width: 767px) {
+  .edits-pricing-wrap {
+    min-height: auto;
+    display: block;
+    padding-top: 2.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .edits-pricing-header {
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .edits-pricing-cards {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    margin-top: 0;
+  }
+
+  .edits-pricing-card {
+    min-height: auto;
+    padding: 24px 20px;
+  }
+
+  .edits-card-desc {
+    max-width: 100%;
+  }
+
+  .edits-card-bottom {
+    margin-top: 18px;
+  }
+
+  .edits-pricing-statement {
+    margin-top: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .edits-feedback-wrap {
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
+  }
+
+  .edits-feedback-br {
+    display: inline;
+  }
+
+  .edits-testimonials-row {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+    gap: 14px;
+  }
+
+  .edits-testimonial-card {
+    min-height: auto;
+    padding: 16px;
+  }
+}

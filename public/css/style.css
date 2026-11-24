@@ -1,13 +1,49 @@
+/* Lenis smooth scrolling rules */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
 :root {
   --font-color: #313944;
   --mobile-extra-gutter: 0px;
+  --navbar-h: 66px;
 }
 
 body {
   font-family: "Outfit", sans-serif;
   color: var(--font-color);
-  cursor: none;
   overflow-x: hidden;
+  transition: background-color 0.3s ease;
+}
+
+/* Page-specific background wrappers */
+.about-page-layout {
+  background-color: #F3EDFC;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.service-page-layout {
+  background-color: #F7F3FD;
+  min-height: 100vh;
+  width: 100%;
 }
 
 * {
@@ -21,46 +57,74 @@ a {
   text-decoration: none;
   display: inline-block;
 }
-body:hover .cursor {
-  opacity: 1;
+
+/* Custom cursor element */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  z-index: 99999999;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-100px, -100px, 0);
+  transform-origin: 0 0;
+  transition: opacity 0.15s ease;
+  will-change: transform;
 }
 
-@media (hover: none) and (pointer: coarse) {
+.cursor img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+.cursor.cursor--visible {
+  opacity: 1 !important;
+}
+
+.cursor.cursor--hidden {
+  opacity: 0 !important;
+}
+
+/* Only hide native cursor when custom cursor is active on fine-pointer desktop */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+  body.has-custom-cursor,
+  body.has-custom-cursor a,
+  body.has-custom-cursor button,
+  body.has-custom-cursor .clickable,
+  body.has-custom-cursor div {
+    cursor: none !important;
+  }
+
+  /* Form inputs and text fields preserve native text selection and I-beam caret */
+  body.has-custom-cursor input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+  body.has-custom-cursor textarea,
+  body.has-custom-cursor [contenteditable="true"] {
+    cursor: text !important;
+  }
+}
+
+/* Touch devices & mobile viewport: restore native cursor completely */
+@media (max-width: 767px), (hover: none), (pointer: coarse) {
   .cursor {
+    display: none !important;
     opacity: 0 !important;
   }
 
   body,
+  body.has-custom-cursor,
   a,
   button,
   input,
-  div {
+  textarea,
+  select,
+  div,
+  * {
     cursor: auto !important;
   }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  body,
-  a,
-  button,
-  input,
-  div {
-    cursor: none;
-  }
-  .cursor {
-    opacity: 1 !important;
-  }
-}
-.cursor {
-  transition: scale ease-in-out 0.3s;
-  position: fixed;
-  width: 18px;
-  height: 18px;
-  z-index: 999;
-  pointer-events: none;
-  transform: translate(-100%, -100%);
-  opacity: 0;
-  transition: opacity 0.2s ease;
 }
 
 p {
@@ -112,6 +176,11 @@ li a {
   overflow: hidden;
   transition: margin ease-in-out 0.3s;
   margin-right: 2rem;
+  background: transparent;
+  border: none;
+  padding: 0;
+  outline: none;
+  cursor: pointer;
 }
 
 .bar {
@@ -160,11 +229,20 @@ li a {
 .navbar {
   position: fixed;
   top: 0;
+  left: 0;
   width: 100%;
-  z-index: 99;
+  z-index: 999;
+  background: transparent;
+  pointer-events: none;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
 
-  backdrop-filter: blur(30px);
-  background-color: #b487ef70;
+.navbar.open {
+  top: 0 !important;
+}
+
+body.menu-open {
+  overflow: hidden !important;
 }
 
 .navbarContainer {
@@ -179,6 +257,9 @@ li a {
   display: none;
   width: 100vw;
   height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .navbar.open .navMenuDiv {
@@ -1150,6 +1231,7 @@ a:nth-child(2) .card-item .skillTab h3 {
   width: 25%;
   font-size: 30px;
   color: #65696e;
+  text-align: left;
 }
 .aboutDiv div {
   width: 75%;
@@ -2115,9 +2197,11 @@ textarea:focus {
 /********************************************************************************************************************* */
 /********************************************************************************************************************* */
 @media (max-width: 600px) {
-  .header,
-  .aboutHeader {
+  .header {
     margin-top: 5rem;
+  }
+  .aboutHeader {
+    margin-top: 0 !important;
   }
   .nameHeading {
     margin: 0 0 -2rem;
@@ -2256,7 +2340,7 @@ textarea:focus {
   }
   .aboutDiv h4 {
     width: 100%;
-    text-align: center;
+    text-align: left;
     margin-bottom: 1rem;
   }
 
@@ -2423,6 +2507,7 @@ textarea:focus {
   html,
   body {
     --mobile-extra-gutter: 20px;
+    --navbar-h: 66px;
   }
 
   .container {
@@ -2430,17 +2515,23 @@ textarea:focus {
     padding-right: calc(1rem + var(--mobile-extra-gutter));
   }
 
-  /* Hide custom cursor on mobile touch */
+  /* Hide custom cursor on mobile touch & ensure system cursor is always visible */
   .cursor {
     display: none !important;
+    opacity: 0 !important;
+  }
+  body,
+  body.has-custom-cursor,
+  * {
+    cursor: auto !important;
   }
 
   /* ======== SECTION 1: HEADER ======== */
   .navbar {
-    height: 66px;
-    background-color: #d9c9f2;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    height: auto;
+    background-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .navbarContainer {
@@ -2541,6 +2632,9 @@ textarea:focus {
     padding: 0;
     overflow: visible;
     margin-top: 66px;
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+    width: auto !important;
   }
 
   .header::after {
@@ -2648,8 +2742,6 @@ textarea:focus {
 
   /* Global mobile center-alignment for paragraphs and descriptive text */
   .text p,
-  .aboutDiv div h3,
-  .aboutDiv div h6,
   .serviceParagraph p,
   .serviceParagraph div p,
   .skillPara p,
@@ -2707,16 +2799,22 @@ textarea:focus {
     -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
   }
 
-  /* About Me Section — Mobile Line Height */
+  /* About Me Section — Mobile Line Height & Text Alignment */
+  .aboutDiv h4 {
+    text-align: left !important;
+  }
+
   .aboutDiv div h3 {
     line-height: 1.2;
+    text-align: left !important;
   }
 
   .aboutDiv div h6 {
     line-height: 1.38;
+    text-align: left !important;
   }
 
-  /* About Page Hero — Move Photo Card above Text and adjust Heading Line Height */
+  /* About Page Hero — Managed via AboutHero.css */
   .aboutContainer {
     display: flex;
     flex-direction: column;
@@ -2724,8 +2822,7 @@ textarea:focus {
   }
 
   .aboutImg {
-    order: -1 !important;
-    margin: 0 auto 1.5rem !important;
+    margin: 0 auto !important;
     width: 100% !important;
     display: flex !important;
     justify-content: center !important;
@@ -2733,7 +2830,6 @@ textarea:focus {
   }
 
   .aboutText {
-    order: 1 !important;
     width: 100% !important;
   }
 
@@ -2743,6 +2839,7 @@ textarea:focus {
 
   /* Content sections with independent mobile gutters */
   .aboutHeader {
+    margin-top: 0 !important;
     padding-left: calc(1rem + var(--mobile-extra-gutter));
     padding-right: calc(1rem + var(--mobile-extra-gutter));
   }

@@ -2,6 +2,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Script from "next/script";
 import SiteGradualBlur from "@/components/GradualBlur/SiteGradualBlur";
+import SmoothScroll from "@/components/SmoothScroll";
+import CustomCursor from "@/components/CustomCursor";
+import PageBackgroundSync from "@/components/PageBackgroundSync";
 
 export const metadata = {
   title: "Aashidesignz",
@@ -31,6 +34,9 @@ export default function RootLayout({ children }) {
         {/* GA Script goes here if needed */}
       </head>
       <body>
+        <PageBackgroundSync />
+        <CustomCursor />
+        <SmoothScroll />
         <Header />
         {children}
         <Footer />

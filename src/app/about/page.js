@@ -1,23 +1,100 @@
-import LanyardCard from '@/components/Lanyard/LanyardCard';
+import ProfileFrame from '@/components/ProfileFrame/ProfileFrame';
 import PassageSection from '@/components/PassageGallery/PassageSection';
 import ProblemSection from '@/components/ProblemSection/ProblemSection';
 import HandCarouselSection from '@/components/HandCarousel/HandCarouselSection';
 import Link from 'next/link';
+import './AboutHero.css';
 
 export default function About() {
   return (
     <>
       <div className="aboutHeader">
   <div className="aboutContainer">
+    <div className="aboutImg">
+      <ProfileFrame />
+    </div>
     <div className="aboutText">
-      <div className="dotContainer">
-        <div className="dot"></div>
-        <h6>Who am I</h6>
-      </div>
-      <h3>
-        <span style={{}}> I&apos;m Ayushi, </span>a UI/UX designer and
-        design strategist.
-      </h3>
+      <h1 className="about-hero-headline">
+        <span className="about-hero-line">
+          Hi! I&apos;m{' '}
+          <span className="hero-capsule hero-capsule-avatar hero-capsule-popout">
+            <span className="hero-capsule-inner">
+              <img
+                src="/images/hero/avatar.png"
+                alt=""
+                aria-hidden="true"
+                width="144"
+                height="144"
+                className="hero-capsule-img"
+              />
+            </span>
+          </span>
+          <span className="hero-text-pill">Ayushi</span>
+        </span>{' '}
+        <span className="about-hero-line">
+          a{' '}
+          <span className="hero-capsule hero-capsule-posters hero-capsule-flush">
+            <span className="hero-capsule-inner">
+              <img
+                src="/images/hero/posters.png"
+                alt=""
+                aria-hidden="true"
+                width="170"
+                height="114"
+                className="hero-capsule-img"
+              />
+            </span>
+          </span>
+          <span className="hero-text-pill">Designer</span> from{' '}
+          <span className="hero-capsule hero-capsule-chandigarh hero-capsule-flush">
+            <span className="hero-capsule-inner">
+              <img
+                src="/images/hero/chandigarh.png"
+                alt=""
+                aria-hidden="true"
+                width="170"
+                height="114"
+                className="hero-capsule-img"
+              />
+            </span>
+          </span>{' '}
+          Chandigarh
+        </span>{' '}
+        <span className="about-hero-line">
+          Blending creativity with
+        </span>{' '}
+        <span className="about-hero-line">
+          technology{' '}
+          <span className="hero-capsule hero-capsule-phone hero-capsule-popout">
+            <span className="hero-capsule-inner">
+              <img
+                src="/images/hero/phone.png"
+                alt=""
+                aria-hidden="true"
+                width="158"
+                height="156"
+                className="hero-capsule-img"
+              />
+            </span>
+          </span>
+        </span>{' '}
+        <span className="about-hero-line">
+          and{' '}
+          <span className="hero-capsule hero-capsule-tape hero-capsule-flush">
+            <span className="hero-capsule-inner">
+              <img
+                src="/images/hero/tape.png"
+                alt=""
+                aria-hidden="true"
+                width="200"
+                height="114"
+                className="hero-capsule-img"
+              />
+            </span>
+          </span>{' '}
+          strategy.
+        </span>
+      </h1>
       <a href="/contact">
         <button className="contact clickable">
           <h5>Hire Me</h5>
@@ -27,9 +104,6 @@ export default function About() {
           </div>
         </button>
       </a>
-    </div>
-    <div className="aboutImg">
-      <LanyardCard />
     </div>
   </div>
 </div>
