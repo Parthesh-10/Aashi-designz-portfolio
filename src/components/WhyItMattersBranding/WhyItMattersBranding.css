@@ -1,0 +1,135 @@
+/* ============================================================
+   WhyItMattersBranding.css — "Why it matters" Section for /service/branding
+   Centered single column with eyebrow, two-line headline & 72% image card
+   ============================================================ */
+
+.wim-branding-section {
+  width: 100%;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  padding: clamp(60px, 5.5vw, 80px) clamp(20px, 4vw, 48px) clamp(60px, 5.5vw, 80px);
+  position: relative;
+  overflow: hidden;
+}
+
+.wim-branding-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* 1. Eyebrow: WHY IT MATTERS */
+.wim-branding-eyebrow {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(11px, 0.8vw, 12px);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #AE88E8;
+  margin: 0 0 6px 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+/* 2. Headline: Two lines, centered, matching Apps & websites page sizes */
+.wim-branding-h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(28px, 4.3vw, 72px);
+  line-height: 1.08;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  max-width: 1000px;
+}
+
+.wim-branding-line-1 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  color: #343A4A;
+  letter-spacing: -0.02em;
+}
+
+.wim-branding-line-2 {
+  font-family: var(--font-instrument-serif, 'Instrument Serif', Georgia, serif) !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+  font-size: 1.07em;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: #AE88E8;
+}
+
+.wim-purple {
+  color: #AE88E8;
+}
+
+.wim-ink {
+  color: #343A4A;
+}
+
+/* 3. Large Image Card below headline (~36px gap, 72% desktop width) */
+.wim-branding-card {
+  width: 72%;
+  max-width: 1050px;
+  margin: 36px auto 0;
+  border: 3px solid #111113;
+  border-radius: clamp(14px, 1.8vw, 24px);
+  overflow: hidden;
+  box-sizing: border-box;
+  background-color: #111113;
+  box-shadow: none;
+  position: relative;
+}
+
+.wim-branding-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================ */
+
+/* Tablet (below 1024px) */
+@media (max-width: 1024px) {
+  .wim-branding-h2 {
+    font-size: clamp(32px, 5.5vw, 56px);
+  }
+
+  .wim-branding-card {
+    width: 88%;
+    max-width: 880px;
+    margin-top: 32px;
+  }
+}
+
+/* Mobile (below 768px) */
+@media (max-width: 767px) {
+  .wim-branding-section {
+    padding: 60px 20px 60px;
+  }
+
+  .wim-branding-eyebrow {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+
+  .wim-branding-h2 {
+    font-size: clamp(26px, 8vw, 36px);
+    line-height: 1.18;
+  }
+
+  .wim-branding-card {
+    width: 92%;
+    max-width: 100%;
+    margin-top: 24px;
+    border-radius: 14px;
+  }
+}

@@ -1,9 +1,11 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore, useRef, useState, useEffect } from 'react';
 import './PassageGallery.css';
 import { TUNNEL_IMAGES } from './PassageGallery';
+
+const PASSAGE_COLORS = ['#5227FF', '#FF9FFC'];
 
 const PassageGallery = dynamic(() => import('./PassageGallery'), {
   ssr: false,
@@ -42,6 +44,8 @@ function PassageFallback() {
 }
 
 export default function PassageSection() {
+  const sectionRef = useRef(null);
+  const [inView, setInView] = useState(false);
   const isClient = useSyncExternalStore(
     emptySubscribe,
     () => true,
@@ -50,13 +54,29 @@ export default function PassageSection() {
 
   const hasWebGL = isClient && checkWebGLSupport();
 
+  // Lazy-mount 3D gallery when scrolled within 500px of section
+  useEffect(() => {
+    if (!sectionRef.current || !hasWebGL) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '500px' }
+    );
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [hasWebGL]);
+
   return (
-    <div className="passage-outer-container container">
+    <div className="passage-outer-container container" ref={sectionRef}>
       <section className="passage-section-wrapper" aria-label="Passage Gallery Section">
-        {isClient && hasWebGL ? (
+        {hasWebGL && inView ? (
           <PassageGallery
             items={TUNNEL_IMAGES}
-            colors={['#5227FF', '#FF9FFC']}
+            colors={PASSAGE_COLORS}
             backgroundColor="#06020c"
             speed={0.35}
             look={0.65}

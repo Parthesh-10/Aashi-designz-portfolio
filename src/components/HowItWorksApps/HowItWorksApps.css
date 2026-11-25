@@ -1,0 +1,488 @@
+/* ============================================================
+   HowItWorksApps.css — "HOW IT WORKS?" Section
+   8-step interactive / auto-playing stepper with laptop mockup
+   ============================================================ */
+
+.hiw-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: clamp(48px, 4.5vw, 68px) clamp(20px, 4vw, 48px) clamp(16px, 2vw, 28px);
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+}
+
+.hiw-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   1. Heading Block
+   ============================================================ */
+.hiw-heading-block {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 450ms cubic-bezier(0.4, 0, 0.2, 1),
+              transform 450ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hiw-heading-block.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hiw-heading {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 1.0;
+  color: #2E2F43;
+  font-size: clamp(32px, 4.4vw, 63px);
+  margin: 0;
+  padding: 0;
+}
+
+.hiw-sub {
+  font-family: var(--font-instrument-serif, 'Instrument Serif', Georgia, serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(18px, 2vw, 28px);
+  color: #AE88E8;
+  margin: 6px 0 0 0;
+  padding: 0;
+  line-height: 1.3;
+}
+
+/* ============================================================
+   2. Two-Column Layout
+   ============================================================ */
+.hiw-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 73%;
+  max-width: 1140px;
+  margin: clamp(40px, 4.2vw, 60px) auto 0;
+  gap: 7%;
+  box-sizing: border-box;
+}
+
+/* Left Column: Stepper */
+.hiw-stepper-col {
+  flex: 0 0 41%;
+  width: 41%;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.hiw-steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ============================================================
+   3. Step Item & Segmented Connector Track
+   ============================================================ */
+.hiw-step-item {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 450ms cubic-bezier(0.4, 0, 0.2, 1),
+              transform 450ms cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 2px;
+}
+
+.hiw-step-item.is-step-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Connector Line Segment behind circles & active box */
+.hiw-connector-track {
+  position: absolute;
+  left: 41px; /* 20px padding + 21px radius */
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hiw-line-segment {
+  position: absolute;
+  width: 2px;
+  background-color: #D9DAE0;
+  left: 0;
+}
+
+.hiw-line-top {
+  top: 0;
+  height: 37px; /* reaches vertical center of circle */
+}
+
+.hiw-line-bottom {
+  top: 37px; /* starts from vertical center of circle */
+  bottom: 0;
+}
+
+/* ============================================================
+   4. Step Button & Visual States
+   ============================================================ */
+.hiw-step-btn {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 22px;
+  border: 2px solid transparent;
+  background-color: transparent;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  transition: background-color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hiw-step-btn:focus-visible {
+  outline: 2px solid #2E2F43;
+  outline-offset: 3px;
+}
+
+/* ACTIVE STATE: Lime box extends 20px left of circle and across right edge */
+.hiw-state-active .hiw-step-btn {
+  background-color: #EAFF80;
+  border-color: #2E2F43;
+  box-shadow: 0 4px 20px rgba(46, 47, 67, 0.08);
+}
+
+/* ============================================================
+   5. Circle Indicator (Number vs. Check Icon)
+   ============================================================ */
+.hiw-circle {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 14px;
+  margin-top: 1px;
+  position: relative;
+  z-index: 3;
+  box-sizing: border-box;
+  transition: background-color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+              color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hiw-circle-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hiw-circle-num,
+.hiw-circle-check {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  transition: opacity 400ms ease, transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hiw-num-hidden {
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+}
+
+.hiw-circle-check {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.hiw-check-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* COMPLETED Circle: Dark ink with lime checkmark */
+.hiw-circle-completed {
+  background-color: #2E2F43;
+  border: none;
+  color: #EAFF80;
+}
+
+/* ACTIVE Circle: Dark ink with lime number and soft lime glow ring */
+.hiw-circle-active {
+  background-color: #2E2F43;
+  border: none;
+  color: #EAFF80;
+  box-shadow: 0 0 0 5px rgba(234, 255, 128, 0.65);
+}
+
+/* UPCOMING Circle: White with 1.5px light-grey border */
+.hiw-circle-upcoming {
+  background-color: #ffffff;
+  border: 1.5px solid #D9DAE0;
+  color: #5F6070;
+  box-shadow: none;
+}
+
+/* ============================================================
+   6. Text Column (Label, Title, Expandable Description)
+   ============================================================ */
+.hiw-text-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.hiw-step-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #8A8D99;
+  letter-spacing: 0.02em;
+  transition: color 400ms ease;
+}
+
+.hiw-state-active .hiw-step-label {
+  color: #2E2F43;
+  font-weight: 600;
+}
+
+.hiw-step-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 2px;
+  transition: color 400ms ease;
+}
+
+.hiw-state-completed .hiw-step-title {
+  color: #5F6070;
+}
+
+.hiw-state-active .hiw-step-title {
+  color: #2E2F43;
+  font-weight: 700;
+}
+
+.hiw-state-upcoming .hiw-step-title {
+  color: #3D3E50;
+}
+
+/* Smooth Expand/Collapse Description via CSS Grid (0fr -> 1fr) */
+.hiw-desc-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 600ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 500ms ease;
+  opacity: 0;
+}
+
+.hiw-desc-wrap.is-visible {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.hiw-desc-inner {
+  overflow: hidden;
+}
+
+.hiw-step-desc {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 6px 0 0 0;
+  padding: 0;
+  transition: color 400ms ease;
+}
+
+.hiw-state-active .hiw-step-desc {
+  color: #2E2F43;
+}
+
+.hiw-state-upcoming .hiw-step-desc {
+  color: #767985;
+}
+
+/* ============================================================
+   7. Right Column: Laptop Mockup
+   ============================================================ */
+.hiw-laptop-col {
+  flex: 0 0 52%;
+  width: 52%;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 450ms cubic-bezier(0.4, 0, 0.2, 1),
+              transform 450ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+.hiw-laptop-col.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hiw-laptop-sticky {
+  position: sticky;
+  top: 110px;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.hiw-laptop-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.05));
+}
+
+/* ============================================================
+   8. Responsive Breakpoints
+   ============================================================ */
+
+/* Tablet (below 1024px) */
+@media (max-width: 1024px) {
+  .hiw-row {
+    width: 88%;
+    gap: 5%;
+  }
+
+  .hiw-stepper-col {
+    flex: 0 0 48%;
+    width: 48%;
+  }
+
+  .hiw-laptop-col {
+    flex: 0 0 47%;
+    width: 47%;
+  }
+
+  .hiw-step-title {
+    font-size: 18px;
+  }
+
+  .hiw-step-desc {
+    font-size: 12.5px;
+  }
+}
+
+/* Mobile (below 768px) */
+@media (max-width: 767px) {
+  .hiw-section {
+    padding: 48px 20px 48px;
+  }
+
+  .hiw-heading {
+    font-size: clamp(26px, 8vw, 36px);
+  }
+
+  .hiw-sub {
+    font-size: clamp(16px, 4.5vw, 18px);
+    margin-top: 4px;
+  }
+
+  .hiw-row {
+    width: 100%;
+    flex-direction: column;
+    gap: 36px;
+    margin-top: 32px;
+  }
+
+  .hiw-stepper-col {
+    flex: 1 1 100%;
+    width: 100%;
+    min-height: auto !important;
+  }
+
+  .hiw-step-btn {
+    padding: 14px 16px;
+    border-radius: 18px;
+  }
+
+  .hiw-connector-track {
+    left: 34px; /* 16px pad + 18px circle radius */
+  }
+
+  .hiw-line-top,
+  .hiw-line-bottom {
+    top: 32px;
+  }
+
+  .hiw-circle {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    margin-right: 12px;
+  }
+
+  .hiw-circle-num {
+    font-size: 14px;
+  }
+
+  .hiw-step-title {
+    font-size: 17px;
+  }
+
+  .hiw-step-desc {
+    font-size: 13px;
+  }
+
+  .hiw-laptop-col {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .hiw-laptop-sticky {
+    position: static;
+  }
+}
+
+/* Accessibility: prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .hiw-heading-block,
+  .hiw-step-item,
+  .hiw-laptop-col,
+  .hiw-step-btn,
+  .hiw-circle,
+  .hiw-desc-wrap,
+  .hiw-circle-num,
+  .hiw-circle-check {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}

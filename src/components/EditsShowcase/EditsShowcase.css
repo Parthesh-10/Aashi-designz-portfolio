@@ -1,3 +1,4 @@
+
 /* ============================================================
    EditsShowcase.css — Unified Constant-Margin Showcase Section
    Block 1: DESIGN & EDIT (Eyebrow + 5-line Headline + 3 Stats + Quote)
@@ -172,17 +173,25 @@
   align-items: baseline;
 }
 
+.de-stat-purple {
+  color: #AE88E8 !important;
+}
+
 .de-stat-unit {
   margin-left: 0.04em;
 }
 
+.de-stat-unit-s {
+  margin-left: 0.18em;
+}
+
 .de-stat-label {
   font-family: 'Outfit', sans-serif;
-  font-size: clamp(8.5px, 0.85cqw, 11px);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  line-height: 1.15;
+  font-size: clamp(9.5px, 0.95cqw, 12.5px);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
   color: rgba(49, 57, 68, 0.6);
   margin-top: 0.35rem;
   display: flex;

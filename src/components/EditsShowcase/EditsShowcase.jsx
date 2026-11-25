@@ -22,24 +22,30 @@ export const DESIGN_EDIT_DATA = {
   ],
   stats: [
     {
-      target: 10,
-      unit: '+',
-      label: '10+ CATEGORIES SERVED',
-      captionLines: ['CATEGORIES', 'SERVED'],
+      target: 3,
+      unit: 's',
+      unitClass: 'de-stat-unit-s',
+      colorClass: '',
+      label: '3 s to catch attention',
+      captionLines: ['to catch attention'],
       delay: 0,
     },
     {
-      target: 360,
-      unit: '°',
-      label: '360° VISUAL CONTENT, FROM CONCEPT TO FINISH',
-      captionLines: ['VISUAL CONTENT, FROM', 'CONCEPT TO FINISH'],
+      target: 45,
+      unit: '%',
+      unitClass: '',
+      colorClass: 'de-stat-purple',
+      label: '45% more watch time',
+      captionLines: ['more watch time'],
       delay: 160,
     },
     {
-      target: 1,
-      unit: '',
-      label: '1 CONSISTENT CREATIVE DIRECTION',
-      captionLines: ['CONSISTENT CREATIVE', 'DIRECTION'],
+      target: 3,
+      unit: 'x',
+      unitClass: '',
+      colorClass: '',
+      label: '3x more saves',
+      captionLines: ['more saves'],
       delay: 320,
     },
   ],
@@ -189,11 +195,11 @@ function DesignStatItem({ stat, isTriggered }) {
       style={{ transitionDelay: `${stat.delay}ms` }}
     >
       <div className="de-stat-inner">
-        <div className="de-stat-num-row" aria-hidden="true">
+        <div className={`de-stat-num-row ${stat.colorClass || ''}`} aria-hidden="true">
           <span ref={numRef} className="de-stat-number">
             {isTriggered ? stat.target : 0}
           </span>
-          <span className="de-stat-unit">{stat.unit}</span>
+          <span className={`de-stat-unit ${stat.unitClass || ''}`}>{stat.unit}</span>
         </div>
         {/* Accessible screen reader announcement */}
         <span className="sr-only">{stat.label}</span>

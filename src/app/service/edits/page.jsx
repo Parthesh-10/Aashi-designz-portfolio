@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Instrument_Serif } from 'next/font/google';
 import AnimatedHeading from '@/components/AnimatedHeading';
+import ServiceHero from '@/components/ServiceHero/ServiceHero';
 import IncludedGrid from '@/components/IncludedGrid/IncludedGrid';
 import EditsShowcase from '@/components/EditsShowcase/EditsShowcase';
 import './EditsPage.css';
@@ -26,7 +27,7 @@ export const PAGE_DATA = {
         { text: 'Edits that ', fontClass: '', colorClass: '', hoverClass: 'ah-hover-purple' },
         {
           text: 'converts',
-          fontClass: 'edits-serif-accent',
+          fontClass: 'service-serif-accent edits-serif-accent',
           colorClass: '',
           hoverClass: 'ah-hover-purple',
           breakAfter: true,
@@ -306,59 +307,17 @@ export default function EditsPage() {
       }}
     >
       {/* SECTION 1: HERO */}
-      <section className="edits-hero-wrap" aria-label="Hero Section">
-        <Image
-          src="/edits/hero-bg.webp"
-          alt="Atmospheric brand hero backdrop"
-          fill
-          priority
-          sizes="100vw"
-          quality={80}
-          className="edits-hero-bg-img"
-        />
-        <div className="edits-hero-overlay" aria-hidden="true" />
-
-        <div className="edits-hero-inner">
-          <div className="edits-hero-content">
-            <AnimatedHeading
-              as={PAGE_DATA.hero.heading.tag}
-              segments={PAGE_DATA.hero.heading.segments}
-              startDelay={200}
-              immediate={true}
-              className="edits-hero-h1"
-            />
-
-            <p className="edits-hero-sub">{PAGE_DATA.hero.subtitle}</p>
-
-            <div className="edits-hero-btns">
-              {PAGE_DATA.hero.buttons.map((btn, idx) => (
-                <Link
-                  key={`btn-${idx}`}
-                  href={btn.href}
-                  className={`clickable ${
-                    btn.variant === 'primary' ? 'edits-btn-primary' : 'edits-btn-secondary'
-                  }`}
-                >
-                  {btn.label}
-                </Link>
-              ))}
-            </div>
-
-            <div className="edits-trusted-row">
-              <div className="edits-trusted-img-wrap">
-                <Image
-                  src={PAGE_DATA.hero.trusted.image}
-                  alt={PAGE_DATA.hero.trusted.alt}
-                  width={94}
-                  height={42}
-                  className="edits-trusted-img"
-                />
-              </div>
-              <span className="edits-trusted-text">{PAGE_DATA.hero.trusted.text}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ServiceHero
+        id="hero"
+        bgImage="/edits/hero-bg.webp"
+        bgAlt="Atmospheric brand hero backdrop"
+        bgQuality={80}
+        headingTag={PAGE_DATA.hero.heading.tag}
+        headingSegments={PAGE_DATA.hero.heading.segments}
+        subtitle={PAGE_DATA.hero.subtitle}
+        buttons={PAGE_DATA.hero.buttons}
+        trusted={PAGE_DATA.hero.trusted}
+      />
 
       {/* SECTION 2: WHY IT MATTERS */}
       <section

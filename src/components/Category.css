@@ -217,7 +217,7 @@
   transform: rotate(25deg);
 }
 
-/* Front flap of the folder with translucent frosted glass look */
+/* Front flap of the folder — 100% solid & fully opaque */
 .folderFront {
   position: absolute;
   bottom: 0;
@@ -228,13 +228,11 @@
   pointer-events: none;
   border-radius: 0 0 28px 28px;
   overflow: hidden;
-  background: var(--folder-front-bg, rgba(182, 140, 245, 0.65));
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border-bottom: 1.5px solid rgba(255, 255, 255, 0.35);
-  border-left: 1.5px solid rgba(255, 255, 255, 0.35);
-  border-right: 1.5px solid rgba(255, 255, 255, 0.35);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 -8px 24px rgba(0, 0, 0, 0.08);
+  background: var(--folder-front-bg, #9b6ee5);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.40);
+  border-left: 1.5px solid rgba(255, 255, 255, 0.40);
+  border-right: 1.5px solid rgba(255, 255, 255, 0.40);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 -8px 24px rgba(0, 0, 0, 0.10);
   clip-path: polygon(
     0% 0%,
     38% 0%,
@@ -302,15 +300,16 @@
 /* Title on the front flap (bottom-left) */
 .folderTitle {
   position: absolute;
-  bottom: 24px;
+  bottom: 26px;
   left: 28px;
-  max-width: 230px;
+  max-width: 310px;
   font-family: 'Outfit', sans-serif;
   font-weight: 700;
-  font-size: 28px;
-  line-height: 1.15;
+  font-size: clamp(38px, 9cqw, 41px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
   color: #ffffff;
-  text-shadow: var(--folder-text-shadow, 0 2px 8px rgba(60, 30, 120, 0.35));
+  text-shadow: var(--folder-text-shadow, 0 2px 10px rgba(50, 20, 110, 0.45));
   z-index: 6;
   pointer-events: none;
   margin: 0;
@@ -454,7 +453,7 @@
     font-size: 11px;
   }
 
-  /* Frosted translucent purple front flap */
+  /* Solid opaque front flap */
   .categoryMobileCardFront {
     position: absolute;
     bottom: 0;
@@ -465,13 +464,11 @@
     pointer-events: none;
     border-radius: 0 0 22px 22px;
     overflow: hidden;
-    background: var(--folder-front-bg, rgba(182, 140, 245, 0.68));
-    backdrop-filter: blur(16px) saturate(160%);
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
-    border-bottom: 1.5px solid rgba(255, 255, 255, 0.35);
-    border-left: 1.5px solid rgba(255, 255, 255, 0.35);
-    border-right: 1.5px solid rgba(255, 255, 255, 0.35);
-    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 -8px 24px rgba(0, 0, 0, 0.08);
+    background: var(--folder-front-bg, #9b6ee5);
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.40);
+    border-left: 1.5px solid rgba(255, 255, 255, 0.40);
+    border-right: 1.5px solid rgba(255, 255, 255, 0.40);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 -8px 24px rgba(0, 0, 0, 0.10);
     clip-path: polygon(
       0% 0%,
       38% 0%,
@@ -503,13 +500,14 @@
     position: absolute;
     bottom: 16px;
     left: 16px;
-    max-width: 170px;
+    max-width: calc(100% - 76px);
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
-    font-size: clamp(20px, 5.5vw, 23px);
-    line-height: 1.15;
+    font-size: clamp(28px, 7.5vw, 32px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
     color: #ffffff;
-    text-shadow: var(--folder-text-shadow, 0 2px 8px rgba(60, 30, 120, 0.35));
+    text-shadow: var(--folder-text-shadow, 0 2px 10px rgba(50, 20, 110, 0.45));
     z-index: 6;
     pointer-events: none;
     margin: 0;

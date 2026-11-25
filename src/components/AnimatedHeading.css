@@ -54,8 +54,18 @@
 }
 
 .ah-heading.is-revealed .ah-letter-inner {
-  animation: ahLetterWave 2.6s ease-in-out infinite;
-  animation-delay: var(--ah-wave-delay, 0ms);
+  animation: none;
+}
+
+/* Desktop line break inside AnimatedHeading */
+.ah-desktop-br {
+  display: inline;
+}
+
+@media (max-width: 767px) {
+  .ah-desktop-br {
+    display: none !important;
+  }
 }
 
 /* Pause wave when off-screen for performance */

@@ -370,7 +370,11 @@ export default function PassageGallery({
     }
 
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth <= 768 || window.matchMedia?.("(pointer: coarse)")?.matches);
+    const targetDpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+    renderer.setPixelRatio(targetDpr);
     renderer.setSize(container.clientWidth, container.clientHeight, false);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
@@ -502,24 +506,18 @@ export default function PassageGallery({
       }
     };
 
-    const clonedTextureMap = new Map();
+    // 1x1 neutral dark placeholder DataTexture with valid image data (never triggers 'Texture marked for update but no image data found')
+    const placeholderTex = new THREE.DataTexture(
+      new Uint8Array([18, 10, 32, 255]),
+      1,
+      1,
+      THREE.RGBAFormat
+    );
+    placeholderTex.needsUpdate = true;
 
-    const loadedThumbTextures = items.map((item, pIdx) => {
-      const tex = textureLoader.load(item.thumb, () => {
-        const list = clonedTextureMap.get(pIdx);
-        if (list) {
-          list.forEach(({ cardTex, planeAspect }) => {
-            applyCover(cardTex, planeAspect);
-            cardTex.needsUpdate = true;
-          });
-        }
-      });
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.minFilter = THREE.LinearMipmapLinearFilter;
-      tex.generateMipmaps = true;
-      tex.anisotropy = maxAniso;
-      return tex;
-    });
+    // Track all created textures for complete disposal
+    const createdTextures = [];
+    const pendingCardsByPhoto = new Map();
 
     // Procedural accent gradient materials (kept as part of design)
     const accentTextures = [0, 1, 2, 3].map((v) => createAccentTexture(v));
@@ -600,26 +598,18 @@ export default function PassageGallery({
           const isWall = sIdx >= 10;
           const planeAspect = isWall ? tileZ / tileH : tileW / tileZ;
 
-          const baseTex = loadedThumbTextures[pIdx];
-          const cardTex = baseTex.clone();
-
-          if (baseTex.image && baseTex.image.width > 0) {
-            applyCover(cardTex, planeAspect);
-            cardTex.needsUpdate = true;
-          } else {
-            if (!clonedTextureMap.has(pIdx)) {
-              clonedTextureMap.set(pIdx, []);
-            }
-            clonedTextureMap.get(pIdx).push({ cardTex, planeAspect });
-          }
-
           material = new THREE.MeshStandardMaterial({
-            map: cardTex,
+            map: placeholderTex,
             roughness: 0.35,
             metalness: 0.05,
             side: THREE.DoubleSide
           });
           createdPhotoMaterials.push(material);
+
+          if (!pendingCardsByPhoto.has(pIdx)) {
+            pendingCardsByPhoto.set(pIdx, []);
+          }
+          pendingCardsByPhoto.get(pIdx).push({ material, planeAspect, isWall });
         } else {
           const aIdx = accentCursor % accentMaterials.length;
           accentCursor++;
@@ -659,6 +649,51 @@ export default function PassageGallery({
         }
       }
     }
+
+    // Texture sharing cache: key `${pIdx}_${isWall ? 'w' : 'f'}` -> THREE.Texture
+    const textureVariantCache = new Map();
+
+    // Asynchronously load thumbnail textures for cards. Textures are cloned ONLY after image has loaded!
+    pendingCardsByPhoto.forEach((cardList, pIdx) => {
+      const item = items[pIdx];
+      if (!item?.thumb) return;
+
+      textureLoader.load(
+        item.thumb,
+        (loadedTex) => {
+          if (!s.alive) {
+            loadedTex.dispose();
+            return;
+          }
+
+          loadedTex.colorSpace = THREE.SRGBColorSpace;
+          loadedTex.minFilter = THREE.LinearMipmapLinearFilter;
+          loadedTex.generateMipmaps = true;
+          loadedTex.anisotropy = maxAniso;
+          createdTextures.push(loadedTex);
+
+          cardList.forEach(({ material, planeAspect, isWall }) => {
+            if (!s.alive) return;
+            const key = `${pIdx}_${isWall ? 'w' : 'f'}`;
+            let variantTex = textureVariantCache.get(key);
+            if (!variantTex) {
+              // Clone ONLY when loadedTex.image is guaranteed to be valid and complete!
+              variantTex = loadedTex.clone();
+              applyCover(variantTex, planeAspect);
+              variantTex.needsUpdate = true;
+              textureVariantCache.set(key, variantTex);
+              createdTextures.push(variantTex);
+            }
+            material.map = variantTex;
+            material.needsUpdate = true;
+          });
+        },
+        undefined,
+        () => {
+          // Fallback on network/404 error: material keeps placeholderTex gracefully without warnings
+        }
+      );
+    });
 
     // 7. Interaction: Unified Pointer Events (Mouse, Touch, Pen) with Tap vs Swipe Disambiguation
     const raycaster = new THREE.Raycaster();
@@ -765,7 +800,10 @@ export default function PassageGallery({
       s.mouse.targetY = y * look * 1.5;
     };
 
+    let pointerDirty = true;
+
     const onPointerMove = (e) => {
+      pointerDirty = true;
       const rect = canvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
@@ -839,9 +877,18 @@ export default function PassageGallery({
       canvas.addEventListener("wheel", onWheel, { passive: false });
     }
 
-    // 8. Animation Loop
+    // 8. Animation Loop with Visibility Caching & Zero Per-Frame Allocations
     let lastTime = performance.now();
-    let rafId;
+    let rafId = null;
+    let isIntersecting = true;
+    let isPageVisible = typeof document !== "undefined" ? !document.hidden : true;
+
+    // Pre-allocated reusable vectors to prevent per-frame GC allocations
+    const tempTargetPos = new THREE.Vector3();
+    const tempScaleFocused = new THREE.Vector3(1.25, 1.25, 1.25);
+    const tempScaleHovered = new THREE.Vector3(1.05, 1.05, 1.05);
+
+    let raycastFrameCounter = 0;
 
     const animate = () => {
       if (!s.alive) return;
@@ -898,8 +945,10 @@ export default function PassageGallery({
         }
       });
 
-      // Hover highlight detection & desktop cursor feedback
-      if (!s.focusedMesh) {
+      // Hover highlight detection & desktop cursor feedback (throttled when pointer is still)
+      raycastFrameCounter++;
+      if (!s.focusedMesh && (pointerDirty || raycastFrameCounter % 4 === 0)) {
+        pointerDirty = false;
         camera.updateMatrixWorld();
         raycaster.setFromCamera(pointer, camera);
         const hits = raycaster.intersectObjects(photoMeshes, false);
@@ -939,12 +988,12 @@ export default function PassageGallery({
       // Update corridor tiles & wrap forward/backward
       allTiles.forEach((mesh) => {
         if (mesh === s.focusedMesh) {
-          // Smoothly animate focused photo to center front of camera
+          // Smoothly animate focused photo to center front of camera (no allocation)
           camera.updateMatrixWorld();
-          const targetPos = new THREE.Vector3(0, 0, -1.8).applyMatrix4(camera.matrixWorld);
-          mesh.position.lerp(targetPos, 0.12);
+          tempTargetPos.set(0, 0, -1.8).applyMatrix4(camera.matrixWorld);
+          mesh.position.lerp(tempTargetPos, 0.12);
           mesh.quaternion.slerp(camera.quaternion, 0.12);
-          mesh.scale.lerp(new THREE.Vector3(1.25, 1.25, 1.25), 0.12);
+          mesh.scale.lerp(tempScaleFocused, 0.12);
         } else {
           // Infinite wrap along Z
           if (mesh.position.z > camera.position.z + 2.5) {
@@ -955,9 +1004,9 @@ export default function PassageGallery({
             mesh.userData.originalPosition.z = mesh.position.z;
           }
 
-          // Subtle float hover scale
+          // Subtle float hover scale (reusing pre-allocated vectors)
           if (mesh === s.hoveredMesh) {
-            mesh.scale.lerp(new THREE.Vector3(1.05, 1.05, 1.05), 0.15);
+            mesh.scale.lerp(tempScaleHovered, 0.15);
           } else {
             mesh.scale.lerp(mesh.userData.originalScale, 0.15);
           }
@@ -967,7 +1016,37 @@ export default function PassageGallery({
       renderer.render(scene, camera);
     };
 
-    rafId = requestAnimationFrame(animate);
+    // Pause rendering when gallery is off-screen or tab is hidden
+    const updatePlayState = () => {
+      const shouldPlay = isIntersecting && isPageVisible && s.alive;
+      if (shouldPlay && !rafId) {
+        lastTime = performance.now();
+        rafId = requestAnimationFrame(animate);
+      } else if (!shouldPlay && rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    };
+
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          isIntersecting = entry.isIntersecting;
+          updatePlayState();
+        }
+      },
+      { threshold: 0 }
+    );
+    intersectionObserver.observe(container);
+
+    const onVisibilityChange = () => {
+      isPageVisible = typeof document !== "undefined" ? !document.hidden : true;
+      updatePlayState();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    // Initial play start
+    updatePlayState();
 
     // 9. Resize Handling
     const handleResize = () => {
@@ -984,8 +1063,13 @@ export default function PassageGallery({
 
     return () => {
       s.alive = false;
-      cancelAnimationFrame(rafId);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      intersectionObserver.disconnect();
       resizeObserver.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerdown", onPointerDown);
       canvas.removeEventListener("pointerup", onPointerUp);
@@ -1000,13 +1084,16 @@ export default function PassageGallery({
       rectRingGeom.dispose();
       gridMat.dispose();
 
-      createdPhotoMaterials.forEach((mat) => {
-        if (mat.map) mat.map.dispose();
-        mat.dispose();
+      placeholderTex.dispose();
+
+      createdTextures.forEach((tex) => {
+        try {
+          tex.dispose();
+        } catch {}
       });
 
-      loadedThumbTextures.forEach((tex) => {
-        tex.dispose();
+      createdPhotoMaterials.forEach((mat) => {
+        mat.dispose();
       });
 
       accentMaterials.forEach((mat) => {
@@ -1018,7 +1105,10 @@ export default function PassageGallery({
         mesh.userData.frameMat?.dispose();
       });
 
-      renderer.dispose();
+      try {
+        renderer.dispose();
+        renderer.forceContextLoss();
+      } catch {}
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
     };
   }, [items, colors, backgroundColor, speed, look, fov, lanes, photoFill, accentFill, interactive, focusOnClick, wheel, seed, ariaLabel, closeFocus]);

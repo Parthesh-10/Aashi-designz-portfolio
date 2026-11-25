@@ -1,0 +1,280 @@
+/* ============================================================
+   GraphicDesignHero.css — Viewport-aware sizing ensuring full frame visibility
+   ============================================================ */
+
+.gdh-hero-wrap {
+  position: relative;
+  width: 100%;
+  background: #0c0814;
+  overflow: hidden;
+  padding-top: var(--navbar-h, 66px);
+  box-sizing: border-box;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.gdh-hero-inner {
+  container-type: inline-size;
+  container-name: gdh-hero;
+  max-width: 1440px;
+  margin-inline: auto;
+  width: 100%;
+  flex: 1 1 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+  padding: clamp(32px, 5vh, 64px) clamp(20px, 4cqw, 48px);
+  min-height: clamp(580px, 82vh, 800px);
+}
+
+/* Background Image & Legibility Overlay */
+.gdh-hero-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.gdh-hero-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(12, 8, 20, 0.56) 0%,
+    rgba(12, 8, 20, 0.48) 45%,
+    rgba(12, 8, 20, 0.72) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+.gdh-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Main Headline */
+.gdh-h1 {
+  font-family: 'Outfit', sans-serif;
+  font-style: normal;
+  font-size: clamp(38px, min(7.5cqw, 10.2vh), 94px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  text-align: center;
+  max-width: 84cqw;
+  margin: 0 auto;
+}
+
+.gdh-desktop-br {
+  display: inline;
+}
+
+/* Italic Instrument Serif Accent */
+.gdh-serif-accent {
+  font-family: var(--font-instrument-serif, 'Instrument Serif', Georgia, serif) !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+  font-size: 1.08em;
+  display: inline-block;
+  transition: color 500ms cubic-bezier(0.22, 1, 0.36, 1),
+              text-shadow 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gdh-h1:hover .gdh-serif-accent {
+    color: #B58AEF;
+    text-shadow: 0 0 24px rgba(181, 138, 239, 0.45);
+  }
+}
+
+/* Subtitle */
+.gdh-sub {
+  font-family: 'Outfit', sans-serif;
+  font-style: normal;
+  font-size: clamp(15px, min(1.55cqw, 2.4vh), 20px);
+  font-weight: 400;
+  line-height: 1.38;
+  color: #ffffff;
+  max-width: 50cqw;
+  text-wrap: balance;
+  margin-top: clamp(18px, 2.8vh, 30px);
+  margin-bottom: 0;
+  text-align: center;
+  opacity: 0.95;
+}
+
+/* CTA Buttons */
+.gdh-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 1.4cqw, 18px);
+  margin-top: clamp(22px, 3.4vh, 36px);
+}
+
+.gdh-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #B28CE8;
+  color: #ffffff;
+  font-family: 'Outfit', sans-serif;
+  font-style: normal;
+  font-size: clamp(14px, min(1.25cqw, 1.9vh), 16px);
+  font-weight: 500;
+  height: clamp(42px, 5.2vh, 50px);
+  padding: 0 clamp(20px, 2.2cqw, 28px);
+  min-width: clamp(120px, 10cqw, 145px);
+  border-radius: 9999px;
+  border: none;
+  text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.gdh-btn-primary:hover {
+  background-color: #9f76db;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(178, 140, 232, 0.4);
+}
+
+.gdh-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-family: 'Outfit', sans-serif;
+  font-style: normal;
+  font-size: clamp(14px, min(1.25cqw, 1.9vh), 16px);
+  font-weight: 500;
+  height: clamp(42px, 5.2vh, 50px);
+  padding: 0 clamp(20px, 2.2cqw, 28px);
+  min-width: clamp(120px, 10cqw, 145px);
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.gdh-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.7);
+  transform: translateY(-2px);
+}
+
+/* Trusted By Row */
+.gdh-trusted-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.2cqw, 14px);
+  margin-top: clamp(26px, 4vh, 44px);
+}
+
+.gdh-trusted-img-wrap {
+  width: clamp(74px, 5.8cqw, 92px);
+  height: clamp(30px, 2.6cqw, 40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gdh-trusted-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.gdh-trusted-text {
+  font-family: 'Outfit', sans-serif;
+  font-style: normal;
+  font-size: clamp(13px, min(1.2cqw, 1.8vh), 15.5px);
+  font-weight: 400;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+  opacity: 0.92;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 767px) {
+  .gdh-desktop-br {
+    display: none !important;
+  }
+
+  .gdh-hero-wrap {
+    min-height: auto;
+    padding-top: var(--navbar-h, 66px);
+  }
+
+  .gdh-hero-inner {
+    aspect-ratio: auto;
+    min-height: 520px;
+    height: auto;
+    padding: 36px 20px 48px;
+  }
+
+  .gdh-h1 {
+    font-size: clamp(34px, 10vw, 52px);
+    line-height: 1.1;
+    max-width: 100%;
+    margin-top: 10px;
+  }
+
+  .gdh-sub {
+    font-size: 15px;
+    line-height: 1.4;
+    max-width: 100%;
+    margin-top: 16px;
+  }
+
+  .gdh-btns {
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+    width: 100%;
+  }
+
+  .gdh-btn-primary,
+  .gdh-btn-secondary {
+    font-size: 15px;
+    height: 48px;
+    padding: 0 24px;
+    min-width: 140px;
+    flex: 1 1 140px;
+  }
+
+  .gdh-trusted-row {
+    margin-top: 28px;
+    gap: 10px;
+  }
+
+  .gdh-trusted-img-wrap {
+    width: 68px;
+    height: 30px;
+  }
+
+  .gdh-trusted-text {
+    font-size: 14px;
+  }
+}

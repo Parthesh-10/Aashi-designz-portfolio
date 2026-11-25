@@ -179,7 +179,7 @@ export default function Header() {
 
                 <div className={`navbar-dropdown-menu ${servicesOpen ? 'visible' : ''}`}>
                   <Link
-                    href="/service/edits"
+                    href="/service/branding"
                     className="navbar-dropdown-link clickable"
                     onClick={() => setServicesOpen(false)}
                   >
@@ -343,9 +343,9 @@ export default function Header() {
               {mobileServicesOpen && (
                 <div id="mobile-services-dropdown" className="mobile-sublinks">
                   <Link
-                    href="/service/edits"
+                    href="/service/branding"
                     className={`mobile-sublink clickable ${
-                      pathname === '/service/edits' ? 'active' : ''
+                      pathname === '/service/branding' ? 'active' : ''
                     }`}
                     onClick={closeMenu}
                   >
