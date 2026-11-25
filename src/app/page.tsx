@@ -14,6 +14,7 @@ import resultsData from '@/constant/resultsData';
 import HeroIntro from '@/components/HeroIntro/HeroIntro';
 import HeroBanner from '@/components/HeroBanner/HeroBanner';
 import CupboardReveal from '@/components/CupboardReveal/CupboardReveal';
+import PageContainer from '@/components/PageContainer';
 
 export default function Home() {
   // Ported from public/js/index.js: animate .borderAnimate underline when fully in view
@@ -40,7 +41,7 @@ export default function Home() {
     <>
       {/* Intro overlay — mounts once, unmounts itself after animation */}
       <HeroIntro />
-      <div className="header container" data-intro="playing">
+      <PageContainer as="div" className="header container" data-intro="playing">
         <div className="nameHeading">
           <HeroBanner />
         </div>
@@ -88,19 +89,19 @@ export default function Home() {
             </Link>
           </div>
         </div>
-      </div>
+      </PageContainer>
 
-      <div>
+      <div className="box-border w-full px-6 md:px-10">
         <LogoSlider />
       </div>
       <CupboardReveal />
-      <div className="container">
+      <PageContainer className="container">
         <Category categoryDesc={categoryDesc} />
-      </div>
+      </PageContainer>
       <EmployeeSection />
       <ResultsSection resultsData={resultsData} />
       <WhatIfSection />
-      <div className="container4 container">
+      <PageContainer className="container4 container">
         <div className="banner">
           <div className="bannerText">
             <h1>
@@ -120,8 +121,8 @@ export default function Home() {
             </Link>
           </div>
         </div>
-      </div>
-      <div className="container5 container">
+      </PageContainer>
+      <PageContainer className="container5 container">
         <div className="dotContainer">
           <div className="dot"></div>
           <h6>Testimonial</h6>
@@ -134,10 +135,10 @@ export default function Home() {
         </p>
 
         <Slider />
-      </div>
-      <div className="container6 container">
+      </PageContainer>
+      <PageContainer className="container6 container">
         <Faq />
-      </div>
+      </PageContainer>
     </>
   );
 }

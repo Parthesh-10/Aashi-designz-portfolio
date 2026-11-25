@@ -3,11 +3,12 @@ import PassageSection from '@/components/PassageGallery/PassageSection';
 import ProblemSection from '@/components/ProblemSection/ProblemSection';
 import HandCarouselSection from '@/components/HandCarousel/HandCarouselSection';
 import Link from 'next/link';
+import PageContainer from '@/components/PageContainer';
 
 export default function About() {
   return (
     <>
-      <div className="aboutHeader">
+      <PageContainer as="div" className="aboutHeader">
   <div className="aboutContainer">
     <div className="aboutImg">
       <ProfileFrame />
@@ -105,9 +106,9 @@ export default function About() {
       </Link>
     </div>
   </div>
-</div>
+      </PageContainer>
 
-<div className="container2 container">
+      <PageContainer as="div" className="container2 container">
   <div className="aboutDiv">
     <h4>About Me</h4>
     <div>
@@ -135,7 +136,7 @@ export default function About() {
       </h6>
     </div>
   </div>
-</div>
+      </PageContainer>
 
 <PassageSection />
 

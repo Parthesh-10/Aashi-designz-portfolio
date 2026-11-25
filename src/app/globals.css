@@ -301,8 +301,24 @@
 
   /* ---- Shared layout container & hero ---- */
   .container {
-    margin: 1rem 0;
-    padding: 2rem 12rem 2rem;
+    margin: 1rem auto;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 2rem 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .container {
+      padding-left: 3rem;
+      padding-right: 3rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container {
+      padding-left: min(10.4vw, 200px);
+      padding-right: min(10.4vw, 200px);
+    }
   }
 
   .text {
@@ -339,7 +355,7 @@
   .header,
   .aboutHeader {
     overflow: hidden;
-    padding: 0rem 6rem 0;
+    padding: 0;
     position: relative;
     display: flex;
     justify-content: space-between;
@@ -1539,7 +1555,7 @@
       cursor: auto;
     }
     .container {
-      padding: 2rem;
+      padding: 2rem 1.5rem;
     }
     .nameHeading {
       font-size: 5rem;
@@ -1552,7 +1568,7 @@
     }
     .header,
     .aboutHeader {
-      padding: 0rem 2rem;
+      padding: 0;
       margin-top: 0rem;
     }
     .homeBanner {
@@ -1675,7 +1691,7 @@
       margin: 0 0 -2rem;
     }
     .container {
-      padding: 0.5rem calc(1rem + var(--mobile-extra-gutter));
+      padding: 0.5rem 1.5rem;
     }
     .headerContainer1,
     .headerContainer2 {
@@ -1919,9 +1935,7 @@
       padding: 0;
       overflow: visible;
       margin-top: 66px;
-      margin-left: 20px !important;
-      margin-right: 20px !important;
-      width: auto !important;
+      width: 100% !important;
     }
 
     .header::after {
@@ -2231,8 +2245,6 @@
     margin-top: 0 !important;
     padding-top: clamp(76px, 9.5vw, 88px) !important;
     padding-bottom: clamp(3.5rem, 8vw, 6rem) !important;
-    padding-left: clamp(1.25rem, 4vw, 2.5rem) !important;
-    padding-right: clamp(1.25rem, 4vw, 2.5rem) !important;
   }
 
   .aboutHeader .aboutContainer {
@@ -10546,9 +10558,7 @@ body.intro-scroll-lock {
 @media (max-width: 767px) {
   .header,
   .header.container {
-    margin-left: 20px !important;
-    margin-right: 20px !important;
-    width: auto !important;
+    width: 100% !important;
   }
 
   .homeBanner {
@@ -10611,18 +10621,6 @@ body.intro-scroll-lock {
 }
 
 /* Desktop layout (>= 768px) */
-@media (min-width: 768px) {
-  .header.container {
-    padding-left: 12rem !important;
-    padding-right: 12rem !important;
-  }
-}
-@media (max-width: 900px) and (min-width: 768px) {
-  .header.container {
-    padding-left: 2rem !important;
-    padding-right: 2rem !important;
-  }
-}
 
 @media (min-width: 768px) {
   .homeBanner {
