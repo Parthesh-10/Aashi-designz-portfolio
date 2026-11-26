@@ -24,6 +24,8 @@ export default function LazyVideo({
     const video = videoRef.current;
     if (!video) return;
 
+    video.muted = true;
+
     // Respect user's motion preferences
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
