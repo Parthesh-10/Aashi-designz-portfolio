@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import PageContainer from '@/components/PageContainer';
 import type { CSSPropertiesWithVars } from '@/types/css';
 
 export interface FloatingWidgetConfig {
@@ -316,7 +317,7 @@ export interface BrandDesignHeroProps {
 }
 
 export default function BrandDesignHero({
-  bgSrc = '/hero/service-hero.webp',
+  bgSrc = '/hero/service-hero.jpg',
   className = '',
 }: BrandDesignHeroProps) {
   const heroRef = useRef<HTMLElement>(null);
@@ -418,7 +419,7 @@ export default function BrandDesignHero({
   return (
     <section
       ref={heroRef}
-      className={`brand-hero-section ${isReady ? 'is-ready' : ''} ${isVisible ? 'is-visible' : 'is-offscreen'} ${className}`.trim()}
+      className={`brand-hero-section max-lg:!p-0 ${isReady ? 'is-ready' : ''} ${isVisible ? 'is-visible' : 'is-offscreen'} ${className}`.trim()}
       aria-label="Brand Design Services"
     >
       <noscript>
@@ -434,7 +435,7 @@ export default function BrandDesignHero({
         />
       </noscript>
 
-      <div className="brand-hero-bg-wrap">
+      <div className="brand-hero-bg-wrap relative overflow-hidden">
         <Image
           src={bgSrc}
           alt=""
@@ -442,7 +443,7 @@ export default function BrandDesignHero({
           priority
           sizes="100vw"
           quality={90}
-          className="brand-hero-bg-img"
+          className="brand-hero-bg-img object-cover"
           onLoad={handleImageLoad}
         />
         <div className="brand-hero-overlay" aria-hidden="true" />
@@ -734,40 +735,44 @@ export default function BrandDesignHero({
         </div>
       </div>
 
-      <h1 className="brand-hero-headline">
-        We&apos;ll make you want
-        <br />
-        to increase your
-        <br />
-        marketing budget!
-      </h1>
+      <PageContainer className="brand-hero-text-container pointer-events-none absolute inset-0 z-20 h-full w-full max-lg:static max-lg:flex max-lg:min-h-[100svh] max-lg:flex-col max-lg:justify-between max-lg:pt-[calc(var(--navbar-h,72px)+20px)] max-lg:pb-12 max-lg:pointer-events-auto">
+        <div className="relative h-full w-full max-lg:contents">
+          <h1 className="brand-hero-headline !right-0 !max-w-[32%] text-right pointer-events-auto">
+            We&apos;ll make you want
+            <br />
+            to increase your
+            <br />
+            marketing budget!
+          </h1>
 
-      <p className="brand-hero-message">
-        Because when marketing starts bringing in results, you&apos;ll want to do more of it.
-      </p>
+          <p className="brand-hero-message !left-0 lg:!top-[58%] !max-w-[31%] pointer-events-auto">
+            Because when marketing starts bringing in results, you&apos;ll want to do more of it.
+          </p>
 
-      <div className="brand-hero-buttons-row">
-        <Link href="/contact" className="bdh-btn-see-how clickable">
-          <video
-            ref={seeHowVideoRef}
-            className="bdh-btn-video"
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            aria-hidden="true"
-          >
-            <source src="/videos/comp.mp4" type="video/mp4" />
-          </video>
-          <span className="bdh-btn-video-overlay" aria-hidden="true" />
-          <span className="bdh-btn-border" aria-hidden="true" />
-          <span className="bdh-btn-text">See how?</span>
-        </Link>
-        <Link href="#services" className="bdh-btn-explore clickable">
-          <span>Explore services</span>
-        </Link>
-      </div>
+          <div className="brand-hero-buttons-row !left-0 pointer-events-auto">
+            <Link href="/contact" className="bdh-btn-see-how clickable">
+              <video
+                ref={seeHowVideoRef}
+                className="bdh-btn-video"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                aria-hidden="true"
+              >
+                <source src="/videos/comp.mp4" type="video/mp4" />
+              </video>
+              <span className="bdh-btn-video-overlay" aria-hidden="true" />
+              <span className="bdh-btn-border" aria-hidden="true" />
+              <span className="bdh-btn-text">See how?</span>
+            </Link>
+            <Link href="#services" className="bdh-btn-explore clickable">
+              <span>Explore services</span>
+            </Link>
+          </div>
+        </div>
+      </PageContainer>
     </section>
   );
 }

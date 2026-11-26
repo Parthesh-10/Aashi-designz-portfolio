@@ -70,7 +70,10 @@ export default function PassageSection() {
 
   return (
     <div className="passage-outer-container container" ref={sectionRef}>
-      <section className="passage-section-wrapper" aria-label="Passage Gallery Section">
+      <section
+        className="passage-section-wrapper overflow-hidden rounded-3xl md:rounded-[2rem] isolate"
+        aria-label="Passage Gallery Section"
+      >
         {hasWebGL && inView ? (
           <PassageGallery
             items={TUNNEL_IMAGES}

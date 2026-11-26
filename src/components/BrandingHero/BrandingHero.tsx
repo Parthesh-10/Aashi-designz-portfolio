@@ -32,11 +32,19 @@ export default function BrandingHero() {
           hoverClass: 'ah-hover-purple',
         },
       ]}
-      headingMaxWidth="92cqw"
-      subtitle="From strategy to storytelling, we build distinctive brand identities that look good, stand out, and stay remembered."
+      headingMaxWidth="100%"
+      headingClassName="!text-[clamp(2.15rem,6.1cqw,5.85rem)] !leading-[1.04] !max-w-full"
+      subtitleMaxWidth="74cqw"
+      subtitle={
+        <>
+          From strategy to storytelling, we build distinctive brand
+          <br className="hidden lg:block" />
+          {' '}identities that look good, stand out, and stay remembered.
+        </>
+      }
       buttons={[
         { label: 'Book a call', href: '/contact', variant: 'primary' },
-        { label: 'How It Works', href: '#how-it-works', variant: 'secondary' },
+        { label: 'How It Works', href: '#whats-included', variant: 'secondary' },
       ]}
       trusted={{
         image: '/edits/trusted.webp',

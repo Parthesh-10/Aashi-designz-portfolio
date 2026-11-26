@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import AnimatedHeading, { type AnimatedHeadingSegment } from '@/components/AnimatedHeading';
 import ServiceIntro, { type RawStatInput } from '@/components/ServiceIntro/ServiceIntro';
+import Reveal from '@/components/Reveal';
+import LazyVideo from '@/components/LazyVideo';
 
 export interface EditsDesignData {
   eyebrow: string;
@@ -46,30 +47,30 @@ export const DESIGN_EDIT_DATA: EditsDesignData = {
   ],
   stats: [
     {
-      target: 3,
-      unit: 's',
-      unitClass: 'de-stat-unit-s',
+      target: 10,
+      unit: '+',
+      unitClass: '',
       colorClass: '',
-      label: '3 s to catch attention',
-      captionLines: ['to catch attention'],
+      label: '10+ categories served',
+      captionLines: ['CATEGORIES', 'SERVED'],
       delay: 0,
     },
     {
-      target: 45,
-      unit: '%',
+      target: 360,
+      unit: '°',
       unitClass: '',
-      colorClass: 'de-stat-purple',
-      label: '45% more watch time',
-      captionLines: ['more watch time'],
+      colorClass: '',
+      label: '360° visual content, from concept to finish',
+      captionLines: ['VISUAL CONTENT, FROM', 'CONCEPT TO FINISH'],
       delay: 160,
     },
     {
-      target: 3,
-      unit: 'x',
+      target: 1,
+      unit: '',
       unitClass: '',
       colorClass: '',
-      label: '3x more saves',
-      captionLines: ['more saves'],
+      label: '1 consistent creative direction',
+      captionLines: ['CONSISTENT CREATIVE', 'DIRECTION'],
       delay: 320,
     },
   ],
@@ -88,74 +89,74 @@ export const OUR_WORK_DATA: EditsWorkData = {
     {
       id: 'work-1',
       type: 'reel',
-      brand: '[BRAND]',
-      views: '[__]K',
+      brand: 'Aashi Designz',
+      views: '120K',
       background: 'linear-gradient(180deg, #EDE3FA 0%, #AE88E8 100%)',
       poster: '',
-      video: '',
+      video: '/videos/work/work-01.mp4',
     },
     {
       id: 'work-2',
       type: 'reel',
-      brand: '[BRAND]',
-      views: '[__]K',
+      brand: 'GL Brand',
+      views: '95K',
       background: 'linear-gradient(180deg, #EAF77F 0%, #C9B4DC 55%, #AE88E8 100%)',
       poster: '',
-      video: '',
+      video: '/videos/work/work-02.mp4',
     },
     {
       id: 'work-3',
       type: 'reel',
-      brand: '[BRAND]',
-      views: '[__]K',
+      brand: 'Kiswah',
+      views: '180K',
       background: 'linear-gradient(180deg, #F8D6A8 0%, #F2B0AB 100%)',
       poster: '',
-      video: '',
+      video: '/videos/work/work-03.mp4',
     },
     {
       id: 'work-4',
       type: 'post',
-      brand: '[BRAND]',
-      views: '[__]K',
+      brand: 'Kochhars',
+      views: '240K',
       background: 'linear-gradient(160deg, #A8C4F8 0%, #AE88E8 100%)',
       poster: '',
-      video: '',
+      video: '/videos/work/work-04.mp4',
     },
     {
       id: 'work-5',
       type: 'brand kit',
-      brand: '[BRAND]',
-      views: '[__]K',
+      brand: 'Kochhars Intro',
+      views: '88K',
       background: 'linear-gradient(180deg, #F6DDEB 0%, #F8F0FA 100%)',
       poster: '',
-      video: '',
+      video: '/videos/work/work-05.mp4',
     },
     {
       id: 'work-6',
       type: 'reel',
-      brand: '[BRAND]',
-      views: '[__]K',
+      brand: 'Manifest',
+      views: '310K',
       background: 'linear-gradient(180deg, #E2CBFF 0%, #F2B0AB 100%)',
       poster: '',
-      video: '',
+      video: '/videos/work/work-06.mp4',
     },
     {
       id: 'work-7',
       type: 'post',
-      brand: '[BRAND]',
-      views: '[__]K',
+      brand: 'Next Burger',
+      views: '145K',
       background: 'linear-gradient(180deg, #EAF77F 0%, #A8C4F8 100%)',
       poster: '',
-      video: '',
+      video: '/videos/work/work-07.mp4',
     },
     {
       id: 'work-8',
       type: 'brand kit',
-      brand: '[BRAND]',
-      views: '[__]K',
+      brand: 'Tex Studio',
+      views: '75K',
       background: 'linear-gradient(180deg, #F8D6A8 0%, #AE88E8 100%)',
       poster: '',
-      video: '',
+      video: '/videos/work/work-08.mp4',
     },
   ],
   cta: {
@@ -178,7 +179,6 @@ export default function EditsShowcase({
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [isAtEnd, setIsAtEnd] = useState(false);
   const [canScroll, setCanScroll] = useState(true);
-  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
 
   const filteredCards = workData.cards.filter((card) => {
     if (activeFilter === 'All') return true;
@@ -240,7 +240,7 @@ export default function EditsShowcase({
 
   return (
     <section className="edits-showcase-section" aria-label="Design and Work Showcase">
-      <div className="edits-showcase-inner">
+      <div className="edits-showcase-inner edits-page-container">
         <ServiceIntro
           asBlock={true}
           eyebrow={designData.eyebrow}
@@ -251,135 +251,96 @@ export default function EditsShowcase({
 
         <div className="edits-ow-block">
           <div className="edits-ow-header">
-            <p className="edits-section-eyebrow edits-ow-eyebrow">{workData.eyebrow}</p>
-            <AnimatedHeading
-              as="h2"
-              segments={workData.headlineSegments}
-              threshold={0.35}
-              className="edits-ow-heading"
-            />
+            <Reveal delay={0}>
+              <p className="edits-section-eyebrow edits-ow-eyebrow">{workData.eyebrow}</p>
+            </Reveal>
+            <Reveal delay={120}>
+              <AnimatedHeading
+                as="h2"
+                segments={workData.headlineSegments}
+                threshold={0.35}
+                className="edits-ow-heading"
+              />
+            </Reveal>
 
-            <div className="ow-filters-group" role="group" aria-label="Filter work">
-              {workData.categories.map((cat) => {
-                const isActive = activeFilter === cat;
-                return (
-                  <button
-                    key={cat}
-                    type="button"
-                    aria-pressed={isActive}
-                    className={`ow-filter-pill ${isActive ? 'is-active' : ''}`}
-                    onClick={() => handleFilterClick(cat)}
-                  >
-                    {cat}
-                  </button>
-                );
-              })}
-            </div>
+            <Reveal delay={240}>
+              <div className="ow-filters-group" role="group" aria-label="Filter work">
+                {workData.categories.map((cat) => {
+                  const isActive = activeFilter === cat;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      aria-pressed={isActive}
+                      className={`ow-filter-pill ${isActive ? 'is-active' : ''}`}
+                      onClick={() => handleFilterClick(cat)}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
+            </Reveal>
           </div>
 
-          <div className="ow-carousel-outer" role="region" aria-label="Our work">
-            <div
-              ref={scrollerRef}
-              className={`ow-carousel-scroller ${isFading ? 'is-fading' : ''}`}
-              onScroll={handleScrollerScroll}
-              tabIndex={0}
-              aria-label="Scrollable cards gallery"
-            >
-              {filteredCards.map((card) => {
-                const isPlaying = playingVideoId === card.id;
-
-                return (
-                  <div
-                    key={card.id}
-                    className="ow-card"
-                    style={{ background: card.background }}
-                  >
-                    {card.video && isPlaying ? (
-                      <video
-                        src={card.video}
-                        autoPlay
-                        playsInline
-                        muted
-                        controls
-                        className="ow-card-video"
-                      />
-                    ) : null}
-
-                    {card.type === 'reel' && !isPlaying ? (
-                      <button
-                        type="button"
-                        aria-label={`Play ${card.brand} reel`}
-                        className="ow-play-btn"
-                        onClick={() => {
-                          if (card.video) setPlayingVideoId(card.id);
-                        }}
-                        tabIndex={card.video ? 0 : -1}
-                        style={{ cursor: card.video ? 'pointer' : 'default' }}
-                      >
-                        <svg
-                          className="ow-play-icon"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.28-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z" />
-                        </svg>
-                      </button>
-                    ) : null}
-
-                    <div className="ow-card-pill" aria-hidden="true">
-                      <span>
-                        {card.brand} · {card.views} views
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {canScroll ? (
-              <button
-                type="button"
-                aria-label={isAtEnd ? 'Scroll back to beginning' : 'Next cards'}
-                className={`ow-next-btn ${isAtEnd ? 'is-rotated' : ''}`}
-                onClick={handleNextClick}
+          <Reveal delay={360}>
+            <div className="ow-carousel-outer" role="region" aria-label="Our work">
+              <div
+                ref={scrollerRef}
+                className={`ow-carousel-scroller ${isFading ? 'is-fading' : ''}`}
+                onScroll={handleScrollerScroll}
+                tabIndex={0}
+                aria-label="Scrollable cards gallery"
               >
-                <svg
-                  className="ow-next-arrow"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </button>
-            ) : null}
-          </div>
+                {filteredCards.map((card) => {
+                  return (
+                    <div
+                      key={card.id}
+                      className="ow-card"
+                      style={{ background: card.background }}
+                    >
+                      {card.video ? (
+                        <LazyVideo
+                          src={card.video}
+                          poster={card.poster || undefined}
+                          ariaLabel={`${card.brand} ${card.type} video`}
+                        />
+                      ) : null}
 
-          <div className="ow-cta-container">
-            <Link href={workData.cta.href} className="ow-portfolio-btn">
-              <span className="ow-portfolio-text">{workData.cta.label}</span>
-              <span className="ow-portfolio-circle" aria-hidden="true">
-                <svg
-                  className="ow-portfolio-arrow"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                      <div className="ow-card-pill" aria-hidden="true">
+                        <span>
+                          {card.brand} · {card.views} views
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {canScroll ? (
+                <button
+                  type="button"
+                  aria-label={isAtEnd ? 'Scroll back to beginning' : 'Next cards'}
+                  className={`ow-next-btn ${isAtEnd ? 'is-rotated' : ''}`}
+                  onClick={handleNextClick}
                 >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </span>
-            </Link>
-          </div>
+                  <svg
+                    className="ow-next-arrow"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </button>
+              ) : null}
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>

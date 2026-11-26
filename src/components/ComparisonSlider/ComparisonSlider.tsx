@@ -59,6 +59,7 @@ export default function ComparisonSlider({
   const hasInteractedRef = useRef(false);
   const introRafIdRef = useRef<number | null>(null);
   const introDoneRef = useRef(false);
+  const hintTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const touchStartRef = useRef({ x: 0, y: 0, isDragging: false, isDetermined: false });
 
@@ -145,14 +146,22 @@ export default function ComparisonSlider({
     rafIdRef.current = requestAnimationFrame(stepLoop);
   }, [updateDOM, stopSpringLoop]);
 
-  const cancelIntro = useCallback(() => {
+  const abortIntro = useCallback(() => {
+    if (hintTimerRef.current) {
+      clearTimeout(hintTimerRef.current);
+      hintTimerRef.current = null;
+    }
     if (introRafIdRef.current) {
       cancelAnimationFrame(introRafIdRef.current);
       introRafIdRef.current = null;
     }
+  }, []);
+
+  const cancelIntro = useCallback(() => {
+    abortIntro();
     introDoneRef.current = true;
     hasInteractedRef.current = true;
-  }, []);
+  }, [abortIntro]);
 
   const setTargetPosition = useCallback(
     (newPos: number) => {
@@ -174,11 +183,18 @@ export default function ComparisonSlider({
   );
 
   const runIntroDemo = useCallback(() => {
-    if (introDoneRef.current || hasInteractedRef.current || prefersReducedMotionRef.current) return;
+    if (
+      introDoneRef.current ||
+      hasInteractedRef.current ||
+      prefersReducedMotionRef.current ||
+      Math.abs(currentPRef.current - 50) > 0.5
+    ) {
+      return;
+    }
     introDoneRef.current = true;
 
     let startTime = 0;
-    const { phase1End, pause1End, phase2End, pause2End, phase3End } = INTRO_KEYFRAMES;
+    const duration = 2400; // 2.4s ease-in-out hint
 
     const introStep = (now: number) => {
       if (hasInteractedRef.current) return;
@@ -186,31 +202,34 @@ export default function ComparisonSlider({
       const elapsed = now - startTime;
 
       let pos = 50;
-      if (elapsed <= phase1End) {
-        const t = elapsed / phase1End;
-        pos = 50 + (22 - 50) * easeInOutCubic(t);
-      } else if (elapsed <= pause1End) {
-        pos = 22;
-      } else if (elapsed <= phase2End) {
-        const t = (elapsed - pause1End) / (phase2End - pause1End);
-        pos = 22 + (78 - 22) * easeInOutCubic(t);
-      } else if (elapsed <= pause2End) {
-        pos = 78;
-      } else if (elapsed <= phase3End) {
-        const t = (elapsed - pause2End) / (phase3End - pause2End);
-        pos = 78 + (50 - 78) * easeOutCubic(t);
+      if (elapsed <= 800) {
+        // 50% -> ~38% over 800ms
+        const t = elapsed / 800;
+        pos = 50 + (38 - 50) * easeInOutCubic(t);
+      } else if (elapsed <= 1600) {
+        // ~38% -> ~62% over 800ms
+        const t = (elapsed - 800) / 800;
+        pos = 38 + (62 - 38) * easeInOutCubic(t);
+      } else if (elapsed <= duration) {
+        // ~62% -> 50% over 800ms
+        const t = (elapsed - 1600) / 800;
+        pos = 62 + (50 - 62) * easeInOutCubic(t);
       } else {
         pos = 50;
-        setTargetPosition(50);
+        currentPRef.current = 50;
+        targetPRef.current = 50;
+        updateDOM(50);
         return;
       }
 
-      setTargetPosition(pos);
+      currentPRef.current = pos;
+      targetPRef.current = pos;
+      updateDOM(pos);
       introRafIdRef.current = requestAnimationFrame(introStep);
     };
 
     introRafIdRef.current = requestAnimationFrame(introStep);
-  }, [setTargetPosition]);
+  }, [updateDOM]);
 
   const handleImageLoaded = useCallback((type: 'before' | 'after') => {
     if (type === 'before') beforeLoadedRef.current = true;
@@ -248,38 +267,41 @@ export default function ComparisonSlider({
     const intersectionObserver = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-            if (imagesReady) {
-              runIntroDemo();
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+            if (
+              !introDoneRef.current &&
+              !hasInteractedRef.current &&
+              !prefersReducedMotionRef.current &&
+              Math.abs(currentPRef.current - 50) < 0.5
+            ) {
+              if (!hintTimerRef.current) {
+                hintTimerRef.current = setTimeout(() => {
+                  hintTimerRef.current = null;
+                  if (
+                    !introDoneRef.current &&
+                    !hasInteractedRef.current &&
+                    !prefersReducedMotionRef.current &&
+                    Math.abs(currentPRef.current - 50) < 0.5
+                  ) {
+                    runIntroDemo();
+                  }
+                }, 600);
+              }
             }
           }
         }
       },
-      { threshold: [0.5] }
+      { threshold: [0.6] }
     );
     intersectionObserver.observe(cardEl);
 
     return () => {
+      abortIntro();
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       stopSpringLoop();
-      cancelIntro();
     };
-  }, [imagesReady, updateDOM, runIntroDemo, stopSpringLoop, cancelIntro]);
-
-  useEffect(() => {
-    if (imagesReady && !introDoneRef.current && !hasInteractedRef.current) {
-      const cardEl = cardRef.current;
-      if (cardEl) {
-        const rect = cardEl.getBoundingClientRect();
-        const vh = window.innerHeight || document.documentElement.clientHeight;
-        const visibleH = Math.min(rect.bottom, vh) - Math.max(rect.top, 0);
-        if (visibleH / rect.height >= 0.5) {
-          runIntroDemo();
-        }
-      }
-    }
-  }, [imagesReady, runIntroDemo]);
+  }, [updateDOM, runIntroDemo, stopSpringLoop, abortIntro]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     cancelIntro();
@@ -392,42 +414,42 @@ export default function ComparisonSlider({
   };
 
   return (
-    <div className="cs-wrapper">
+    <div className="cs-wrapper w-full flex flex-col items-center">
       <div
         ref={cardRef}
-        className={`cs-card ${isActive ? 'is-dragging' : ''}`}
+        className={`cs-card relative aspect-video mx-auto w-full lg:w-[71.1%] max-w-[1365px] rounded-3xl overflow-hidden isolate border-2 border-[#111113] bg-[#111113] select-none cursor-ew-resize touch-pan-y ${isActive ? 'is-dragging' : ''}`}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
         tabIndex={-1}
       >
-        <div className="cs-layer cs-layer-after" aria-hidden="true">
+        <div className="cs-layer cs-layer-after absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
           <Image
             src={afterSrc}
             alt={afterAlt}
             fill
-            sizes="(max-width: 900px) 100vw, 1380px"
-            quality={80}
+            sizes="(min-width: 1024px) 71vw, 100vw"
+            quality={85}
             priority={false}
             placeholder="blur"
             blurDataURL={afterBlur}
-            className="cs-img"
+            className="cs-img object-cover"
             onLoad={() => handleImageLoaded('after')}
           />
         </div>
 
-        <div ref={beforeLayerRef} className="cs-layer cs-layer-before" aria-hidden="true">
+        <div ref={beforeLayerRef} className="cs-layer cs-layer-before absolute inset-0 w-full h-full pointer-events-none z-[2]" aria-hidden="true">
           <Image
             src={beforeSrc}
             alt={beforeAlt}
             fill
-            sizes="(max-width: 900px) 100vw, 1380px"
-            quality={80}
+            sizes="(min-width: 1024px) 71vw, 100vw"
+            quality={85}
             priority={false}
             placeholder="blur"
             blurDataURL={beforeBlur}
-            className="cs-img"
+            className="cs-img object-cover"
             onLoad={() => handleImageLoaded('before')}
           />
         </div>

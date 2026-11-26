@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import PageContainer from '@/components/PageContainer';
 import {
   STRATEGY_CARD_CONFIG,
   FINISH_LINE_OPTIONS,
@@ -262,7 +263,7 @@ export default function FindYourFit() {
         businessName: formData.businessName.trim(),
         phone: `+91${formData.phone}`,
         whatsappOptIn: formData.whatsappOptIn,
-        sourcePage: '/service/branddesign',
+        sourcePage: '/services',
         hp_company_url: honeypot,
         submittedAt: new Date().toISOString(),
       };
@@ -708,7 +709,11 @@ export default function FindYourFit() {
   const isThankYou = currentScreen === 'thankyou';
 
   return (
-    <section className="findyourfit-wrapper container" aria-label="Find your fit qualification">
+    <PageContainer
+      as="section"
+      className="findyourfit-wrapper !mx-auto !w-full !px-6 md:!px-12 xl:!px-[min(10.4vw,200px)]"
+      aria-label="Find your fit qualification"
+    >
       <div ref={cardRef} className="findyourfit-card">
         {!isThankYou && (
           <header className="findyourfit-header">
@@ -765,6 +770,6 @@ export default function FindYourFit() {
           </div>
         </div>
       </div>
-    </section>
+    </PageContainer>
   );
 }

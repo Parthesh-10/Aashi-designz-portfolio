@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Instrument_Serif } from 'next/font/google';
 import AnimatedHeading, { type AnimatedHeadingSegment } from '@/components/AnimatedHeading';
+import Reveal from '@/components/Reveal';
 import type { CSSPropertiesWithVars } from '@/types/css';
 
 const instrumentSerif = Instrument_Serif({
@@ -234,13 +235,19 @@ export default function ServiceIntro({
   const content = (
     <div className="edits-de-block">
       <div className="edits-de-left">
-        {eyebrow && <p className="edits-section-eyebrow">{eyebrow}</p>}
-        <AnimatedHeading
-          as="h2"
-          segments={normalizedHeadline}
-          threshold={0.35}
-          className="edits-de-heading"
-        />
+        {eyebrow && (
+          <Reveal delay={0}>
+            <p className="edits-section-eyebrow">{eyebrow}</p>
+          </Reveal>
+        )}
+        <Reveal delay={120}>
+          <AnimatedHeading
+            as="h2"
+            segments={normalizedHeadline}
+            threshold={0.35}
+            className="edits-de-heading"
+          />
+        </Reveal>
       </div>
 
       <div className="edits-de-right">

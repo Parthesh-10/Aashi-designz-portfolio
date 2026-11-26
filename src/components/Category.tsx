@@ -21,6 +21,8 @@ export interface FolderCategory {
   backStart: string;
   backEnd: string;
   frontBg: string;
+  frontStart: string;
+  frontEnd: string;
   shadow: string;
   rim: string;
   textShadow: string;
@@ -37,6 +39,8 @@ export const FOLDER_CATEGORIES: FolderCategory[] = [
     backStart: '#e4d3fd',
     backEnd: '#c4a7f8',
     frontBg: '#aa7fe9',
+    frontStart: 'rgba(228, 211, 253, 0.70)',
+    frontEnd: 'rgba(170, 127, 233, 0.62)',
     shadow: 'rgba(165, 135, 225, 0.28)',
     rim: 'rgba(255, 255, 255, 0.75)',
     textShadow: '0 2px 10px rgba(65, 30, 120, 0.50)',
@@ -68,6 +72,8 @@ export const FOLDER_CATEGORIES: FolderCategory[] = [
     backStart: '#d8bffb',
     backEnd: '#b792f5',
     frontBg: '#9b6ee5',
+    frontStart: 'rgba(216, 191, 251, 0.70)',
+    frontEnd: 'rgba(155, 110, 229, 0.64)',
     shadow: 'rgba(150, 115, 225, 0.30)',
     rim: 'rgba(255, 255, 255, 0.70)',
     textShadow: '0 2px 10px rgba(60, 25, 120, 0.45)',
@@ -99,25 +105,27 @@ export const FOLDER_CATEGORIES: FolderCategory[] = [
     backStart: '#cbb0f8',
     backEnd: '#a77bf0',
     frontBg: '#8b5ade',
+    frontStart: 'rgba(203, 176, 248, 0.72)',
+    frontEnd: 'rgba(139, 90, 222, 0.66)',
     shadow: 'rgba(135, 95, 220, 0.32)',
     rim: 'rgba(255, 255, 255, 0.65)',
     textShadow: '0 2px 10px rgba(50, 20, 110, 0.40)',
-    destination: '/service/designstrategy',
+    destination: '/service/digital-marketing',
     cards: [
       {
         src: '/folder-content/digital-marketing/card-left.png',
         alt: 'Digital Marketing - Growth Analytics',
-        link: '/service/designstrategy',
+        link: '/service/digital-marketing',
       },
       {
         src: '/folder-content/digital-marketing/card-middle.png',
         alt: 'Digital Marketing - Search Console Performance',
-        link: '/service/designstrategy',
+        link: '/service/digital-marketing',
       },
       {
         src: '/folder-content/digital-marketing/card-right.png',
         alt: 'Digital Marketing - Conversion Funnel',
-        link: '/service/designstrategy',
+        link: '/service/digital-marketing',
         hasBadge: true,
       },
     ],
@@ -130,6 +138,8 @@ export const FOLDER_CATEGORIES: FolderCategory[] = [
     backStart: '#b99ff4',
     backEnd: '#9663ea',
     frontBg: '#7a45d4',
+    frontStart: 'rgba(185, 159, 244, 0.72)',
+    frontEnd: 'rgba(122, 69, 212, 0.68)',
     shadow: 'rgba(120, 75, 210, 0.34)',
     rim: 'rgba(255, 255, 255, 0.60)',
     textShadow: '0 2px 10px rgba(45, 15, 105, 0.35)',
@@ -161,6 +171,8 @@ export const FOLDER_CATEGORIES: FolderCategory[] = [
     backStart: '#a88beb',
     backEnd: '#844bdf',
     frontBg: '#6830c7',
+    frontStart: 'rgba(168, 139, 235, 0.74)',
+    frontEnd: 'rgba(104, 48, 199, 0.70)',
     shadow: 'rgba(105, 60, 185, 0.35)',
     rim: 'rgba(255, 255, 255, 0.55)',
     textShadow: '0 2px 10px rgba(40, 10, 95, 0.30)',
@@ -189,13 +201,15 @@ export const FOLDER_CATEGORIES: FolderCategory[] = [
 function FolderItem({ folder }: { folder: FolderCategory }) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const { title, backStart, backEnd, frontBg, shadow, rim, textShadow, cards, destination } = folder;
+  const { title, backStart, backEnd, frontBg, frontStart, frontEnd, shadow, rim, textShadow, cards, destination } = folder;
   const [cardLeft, cardMiddle, cardRight] = cards;
 
   const styleVars: CSSPropertiesWithVars = {
     '--folder-back-start': backStart,
     '--folder-back-end': backEnd,
     '--folder-front-bg': frontBg,
+    '--folder-front-start': frontStart,
+    '--folder-front-end': frontEnd,
     '--folder-shadow': shadow,
     '--folder-rim': rim,
     '--folder-text-shadow': textShadow,
@@ -348,6 +362,8 @@ export default function Category({}: CategoryProps) {
     '--folder-back-start': activeCategory.backStart,
     '--folder-back-end': activeCategory.backEnd,
     '--folder-front-bg': activeCategory.frontBg,
+    '--folder-front-start': activeCategory.frontStart,
+    '--folder-front-end': activeCategory.frontEnd,
     '--folder-shadow': activeCategory.shadow,
     '--folder-rim': activeCategory.rim,
     '--folder-text-shadow': activeCategory.textShadow,

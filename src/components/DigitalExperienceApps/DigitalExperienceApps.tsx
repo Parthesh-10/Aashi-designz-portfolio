@@ -170,7 +170,7 @@ export default function DigitalExperienceApps() {
             {
               text: 'A BETTER DIGITAL EXPERIENCE.',
               fontClass: 'bde-line-1',
-              colorClass: '',
+              colorClass: 'text-[#B388EB]',
               hoverClass: 'ah-hover-purple',
               breakAfter: true,
             },

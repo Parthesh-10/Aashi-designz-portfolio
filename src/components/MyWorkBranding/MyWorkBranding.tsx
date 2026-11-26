@@ -595,12 +595,9 @@ export default function MyWorkBranding({ slides = BRANDING_WORK_SLIDES }: MyWork
           </div>
 
           <Link
-            href="#"
+            href="/casestudy/synctrip"
             className="mwb-more-link"
             aria-label="View more case studies"
-            onClick={(e) => {
-              e.preventDefault();
-            }}
           >
             ...more
           </Link>

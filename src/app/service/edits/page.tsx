@@ -1,16 +1,21 @@
-'use client';
-
-import React, { useRef, useState, useEffect } from 'react';
+import React from 'react';
+import type { Metadata } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Instrument_Serif } from 'next/font/google';
 import AnimatedHeading from '@/components/AnimatedHeading';
 import ServiceHero from '@/components/ServiceHero/ServiceHero';
 import IncludedGallery from '@/components/IncludedGallery/IncludedGallery';
 import EditsShowcase from '@/components/EditsShowcase/EditsShowcase';
+import ClientFeedbackApps from '@/components/ClientFeedbackApps/ClientFeedbackApps';
+import Reveal from '@/components/Reveal';
 import type { CSSPropertiesWithVars } from '@/types/css';
 
-// Instrument Serif Italic loaded via next/font (identical to CupboardReveal setup)
+export const metadata: Metadata = {
+  title: 'Edits Service | Aashidesignz',
+  description: 'On-brand, ready-to-post designs and edits that look good, feel right, and get noticed.',
+};
+
+// Instrument Serif Italic loaded via next/font
 const instrumentSerif = Instrument_Serif({
   weight: '400',
   style: ['italic'],
@@ -192,138 +197,13 @@ export const PAGE_DATA = {
   },
 };
 
-/**
- * StatItem — Animated count-up and gentle desynchronized float
- */
-function StatItem({
-  stat,
-  isTriggered,
-}: {
-  stat: {
-    target: number;
-    delay: number;
-    floatClass: string;
-    colorClass: string;
-    unitClass: string;
-    unit: string;
-    ariaLabel?: string;
-    label?: string;
-    caption?: string;
-  };
-  isTriggered: boolean;
-}) {
-  const numRef = useRef<HTMLSpanElement>(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
-
-  useEffect(() => {
-    // If reduced motion is requested, immediately set final value
-    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      if (numRef.current) numRef.current.textContent = String(stat.target);
-      return;
-    }
-
-    if (!isTriggered || hasAnimated) return;
-
-    let rafId: number | undefined;
-    const startTimer = setTimeout(() => {
-      setHasAnimated(true);
-      const startTime = performance.now();
-      const duration = 1400; // 1400ms count-up with smooth ease-out
-
-      const animate = (currentTime: number) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        // Cubic ease-out: 1 - (1 - t)^3
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        const currentVal = Math.round(easeOut * stat.target);
-
-        if (numRef.current) {
-          numRef.current.textContent = String(currentVal);
-        }
-
-        if (progress < 1) {
-          rafId = requestAnimationFrame(animate);
-        } else if (numRef.current) {
-          numRef.current.textContent = String(stat.target);
-        }
-      };
-
-      rafId = requestAnimationFrame(animate);
-    }, stat.delay);
-
-    return () => {
-      clearTimeout(startTimer);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, [isTriggered, hasAnimated, stat.target, stat.delay]);
-
-  return (
-    <div
-      className={`edits-stat-outer ${isTriggered ? 'is-in-view' : ''}`}
-      style={{ transitionDelay: `${stat.delay}ms` }}
-    >
-      <div className={`edits-stat-inner-float ${stat.floatClass}`}>
-        <div className={`edits-stat-num-row ${stat.colorClass}`} aria-hidden="true">
-          <span ref={numRef} className="edits-stat-number">
-            0
-          </span>
-          <span className={`edits-stat-unit ${stat.unitClass}`}>{stat.unit}</span>
-        </div>
-        {/* Accessible screen reader announcement */}
-        <span className="sr-only">{stat.label}</span>
-        <div
-          className="edits-stat-caption"
-          style={{ transitionDelay: `${stat.delay + 150}ms` }}
-        >
-          {stat.caption}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function EditsPage() {
-  const statsRef = useRef(null);
-  const [statsTriggered, setStatsTriggered] = useState(false);
-
-  useEffect(() => {
-    // 4s safety fallback
-    const fallbackTimer = setTimeout(() => {
-      setStatsTriggered(true);
-    }, 4000);
-
-    const el = statsRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setStatsTriggered(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.4 } // 40% in view
-    );
-
-    observer.observe(el);
-
-    return () => {
-      clearTimeout(fallbackTimer);
-      observer.disconnect();
-    };
-  }, []);
+  const pageStyle: CSSPropertiesWithVars = {
+    '--font-instrument-serif': instrumentSerif.style.fontFamily,
+  };
 
   return (
-    <div
-      className="edits-page"
-      style={
-        {
-          '--font-instrument-serif': instrumentSerif.style.fontFamily,
-        } as CSSPropertiesWithVars
-      }
-    >
+    <div className="edits-page" style={pageStyle}>
       {/* SECTION 1: HERO */}
       <ServiceHero
         id="hero"
@@ -343,19 +223,27 @@ export default function EditsPage() {
         className="edits-why-wrap"
         aria-label="Why It Matters Section"
       >
-        <div className="edits-why-inner">
-          <div className="edits-eyebrow">{PAGE_DATA.whyItMatters.eyebrow}</div>
+        <div className="edits-why-inner edits-page-container">
+          <Reveal delay={0}>
+            <div className="edits-eyebrow">{PAGE_DATA.whyItMatters.eyebrow}</div>
+          </Reveal>
 
-          <AnimatedHeading
-            as={PAGE_DATA.whyItMatters.heading.tag}
-            segments={PAGE_DATA.whyItMatters.heading.segments}
-            threshold={0.35}
-            className="edits-why-h2"
-          />
+          <Reveal delay={120}>
+            <AnimatedHeading
+              as={PAGE_DATA.whyItMatters.heading.tag}
+              segments={PAGE_DATA.whyItMatters.heading.segments}
+              threshold={0.35}
+              className="edits-why-h2"
+            />
+          </Reveal>
 
           <div className="edits-cards-grid">
             {PAGE_DATA.whyItMatters.cards.map((card, idx) => (
-              <div key={`card-${idx}`} className="edits-card">
+              <Reveal
+                key={`card-${idx}`}
+                delay={240 + idx * 120}
+                className="edits-card"
+              >
                 <span className={`edits-card-pill ${card.tagClass}`}>{card.tag}</span>
                 <div className="edits-card-phone-wrap">
                   <Image
@@ -367,15 +255,26 @@ export default function EditsPage() {
                     sizes="(max-width: 768px) 85vw, 35vw"
                   />
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
 
-          <div ref={statsRef} className="edits-stats-row">
+          <div className="edits-stats-row">
             {PAGE_DATA.whyItMatters.stats.map((stat, idx) => (
-              <div key={`stat-${idx}`} className="edits-stat-col">
-                <StatItem stat={stat} isTriggered={statsTriggered} />
-              </div>
+              <Reveal
+                key={`stat-${idx}`}
+                delay={120 + idx * 120}
+                className="edits-stat-col"
+              >
+                <div className={`edits-stat-inner-float ${stat.floatClass}`}>
+                  <div className={`edits-stat-num-row ${stat.colorClass}`} aria-hidden="true">
+                    <span className="edits-stat-number">{stat.target}</span>
+                    {stat.unit && <span className={`edits-stat-unit ${stat.unitClass}`}>{stat.unit}</span>}
+                  </div>
+                  <span className="sr-only">{stat.label}</span>
+                  <div className="edits-stat-caption">{stat.caption}</div>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -394,17 +293,19 @@ export default function EditsPage() {
 
       {/* SECTION 6: HOW WE WORK (PRICING PLANS) */}
       <section className="edits-pricing-wrap" aria-label="How we work?">
-        <div className="edits-pricing-inner">
-          <div className="edits-pricing-header">
-            <h2 className="edits-pricing-h2">How we work?</h2>
-            <p className="edits-pricing-sub">
-              One month first. Then our discounted 3- and 6-month plans unlock.
-            </p>
-          </div>
+        <div className="edits-pricing-inner edits-page-container">
+          <Reveal delay={0}>
+            <div className="edits-pricing-header">
+              <h2 className="edits-pricing-h2">How we work?</h2>
+              <p className="edits-pricing-sub">
+                One month first. Then our discounted 3- and 6-month plans unlock.
+              </p>
+            </div>
+          </Reveal>
 
           <div className="edits-pricing-cards">
             {/* 1 Month Plan */}
-            <div className="edits-pricing-card edits-card-month-1">
+            <Reveal delay={120} className="edits-pricing-card edits-card-month-1">
               <div className="edits-card-top">
                 <h3 className="edits-card-title">1 Month Plan</h3>
                 <p className="edits-card-desc">
@@ -433,10 +334,10 @@ export default function EditsPage() {
                 </div>
                 <span className="edits-card-badge">WHERE WE BEGIN</span>
               </div>
-            </div>
+            </Reveal>
 
             {/* 3 Month Plan */}
-            <div className="edits-pricing-card edits-card-month-3">
+            <Reveal delay={240} className="edits-pricing-card edits-card-month-3">
               <div className="edits-card-top">
                 <h3 className="edits-card-title">3 Month Plan</h3>
                 <p className="edits-card-desc">
@@ -465,10 +366,10 @@ export default function EditsPage() {
                 </div>
                 <span className="edits-card-badge">UNLOCKS AFTER MONTH 1</span>
               </div>
-            </div>
+            </Reveal>
 
             {/* 6 Month Plan */}
-            <div className="edits-pricing-card edits-card-month-6">
+            <Reveal delay={360} className="edits-pricing-card edits-card-month-6">
               <div className="edits-card-top">
                 <h3 className="edits-card-title">6 Month Plan</h3>
                 <p className="edits-card-desc">
@@ -497,80 +398,19 @@ export default function EditsPage() {
                 </div>
                 <span className="edits-card-badge">UNLOCKS AFTER MONTH 1</span>
               </div>
-            </div>
+            </Reveal>
           </div>
 
-          <div className="edits-pricing-statement">
-            Let’s start with your <span className="edits-pricing-highlight">business goals</span> and build from there.
-          </div>
+          <Reveal delay={480}>
+            <div className="edits-pricing-statement">
+              Let’s start with your <span className="edits-pricing-highlight">business goals</span> and build from there.
+            </div>
+          </Reveal>
         </div>
       </section>
 
       {/* SECTION 7: CLIENT FEEDBACK */}
-      <section className="edits-feedback-wrap" aria-label="Client Feedback">
-        <div className="edits-feedback-inner">
-          <div className="edits-feedback-eyebrow">• CLIENT FEEDBACK</div>
-          <h2 className="edits-feedback-h2">
-            Don’t take it from me, take it<br className="edits-feedback-br" /> from them.
-          </h2>
-
-          <div className="edits-testimonials-row">
-            {[0, 1, 2, 3].map((idx) => (
-              <div key={`testimonial-${idx}`} className="edits-testimonial-card">
-                <div className="edits-testimonial-stars" aria-label="5 out of 5 stars">
-                  {[...Array(5)].map((_, sIdx) => (
-                    <svg
-                      key={`star-${sIdx}`}
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#FFFFFF"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                      className="edits-star-icon"
-                    >
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                  ))}
-                </div>
-
-                <p className="edits-testimonial-quote">
-                  “Working with Michael was a game-changer for our product. His ability to merge strategy with stunning visuals made our platform not only beautiful but incredibly user-friendly.”
-                </p>
-
-                <div className="edits-testimonial-author">
-                  <div className="edits-testimonial-avatar" aria-hidden="true">
-                    <svg
-                      width="26"
-                      height="26"
-                      viewBox="0 0 26 26"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle cx="13" cy="13" r="13" fill="#D4BBF7" />
-                      <circle cx="13" cy="10" r="4.5" fill="#313944" fillOpacity="0.75" />
-                      <path
-                        d="M5.5 22C6.8 17.5 9.5 16.5 13 16.5C16.5 16.5 19.2 17.5 20.5 22"
-                        stroke="#313944"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeOpacity="0.75"
-                      />
-                    </svg>
-                  </div>
-                  <div className="edits-testimonial-meta">
-                    <div className="edits-testimonial-name">Richa Bajaj</div>
-                    <div className="edits-testimonial-role">Content Strategist at Edurev</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ClientFeedbackApps />
 
       <noscript>
         <style
@@ -579,6 +419,7 @@ export default function EditsPage() {
               .ah-letter-outer { opacity: 1 !important; translate: none !important; }
               .edits-stat-outer { opacity: 1 !important; transform: none !important; }
               .edits-stat-caption { opacity: 1 !important; }
+              .reveal-float { opacity: 1 !important; transform: none !important; }
             `,
           }}
         />

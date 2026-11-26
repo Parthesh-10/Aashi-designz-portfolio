@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import PageContainer from '@/components/PageContainer';
 import type { CSSPropertiesWithVars } from '@/types/css';
 
 export interface HowWeDoItem {
@@ -30,7 +31,7 @@ export const CAROUSEL_DATA: HowWeDoItem[] = [
     imagePill: '200+ Brands',
     imageTitle: 'Branding & Strategy',
     imageSubtitle: 'for brands people remember',
-    link: '/service/branddesign',
+    link: '/service/branding',
     overlayLabel: 'BRANDING',
     overlayTitle: 'A brand people remember',
   },
@@ -44,7 +45,7 @@ export const CAROUSEL_DATA: HowWeDoItem[] = [
     imagePill: '300+ Brands',
     imageTitle: 'Design & Edit',
     imageSubtitle: 'for cohesive feeds',
-    link: '/service/graphicdesign',
+    link: '/service/edits',
     overlayLabel: 'DESIGN & EDIT',
     overlayTitle: 'Feeds that look like one brand',
   },
@@ -86,7 +87,7 @@ export const CAROUSEL_DATA: HowWeDoItem[] = [
     imagePill: '160+ Brands',
     imageTitle: 'Offline Marketing',
     imageSubtitle: 'for shops people walk into',
-    link: '/service/videoediting',
+    link: '/service/graphicdesign',
     overlayLabel: 'OFFLINE MARKETING',
     overlayTitle: 'Be seen where they walk',
   },
@@ -219,10 +220,10 @@ export default function HowWeDo() {
   };
 
   return (
-    <section className="howwedo-section">
-      <div className="howwedo-header-container container">
+    <section id="services" className="howwedo-section">
+      <PageContainer as="div" className="howwedo-header-container !px-6 md:!px-12 xl:!px-[min(10.4vw,200px)]">
         <h2 className="howwedo-title">How we do?</h2>
-        <Link href="/service/branddesign" className="howwedo-cta-pill">
+        <Link href="/service/branding" className="howwedo-cta-pill">
           <span>Pick one, Go deeper</span>
           <svg
             className="howwedo-cta-arrow"
@@ -241,7 +242,7 @@ export default function HowWeDo() {
             />
           </svg>
         </Link>
-      </div>
+      </PageContainer>
 
       <div
         className="howwedo-carousel-viewport"

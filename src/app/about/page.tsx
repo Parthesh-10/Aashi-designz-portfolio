@@ -14,8 +14,8 @@ export default function About() {
       <ProfileFrame />
     </div>
     <div className="aboutText">
-      <h1 className="about-hero-headline">
-        <span className="about-hero-line">
+      <h1 className="about-hero-headline text-balance max-w-full">
+        <span className="about-hero-line text-balance">
           Hi! I&apos;m{' '}
           <span className="hero-capsule hero-capsule-avatar hero-capsule-popout">
             <span className="hero-capsule-inner">
@@ -25,13 +25,13 @@ export default function About() {
                 aria-hidden="true"
                 width="144"
                 height="144"
-                className="hero-capsule-img"
+                className="hero-capsule-img shrink-0"
               />
             </span>
           </span>
           <span className="hero-text-pill">Ayushi</span>
         </span>{' '}
-        <span className="about-hero-line">
+        <span className="about-hero-line text-balance">
           a{' '}
           <span className="hero-capsule hero-capsule-posters hero-capsule-flush">
             <span className="hero-capsule-inner">
@@ -41,7 +41,7 @@ export default function About() {
                 aria-hidden="true"
                 width="170"
                 height="114"
-                className="hero-capsule-img"
+                className="hero-capsule-img shrink-0"
               />
             </span>
           </span>
@@ -54,17 +54,14 @@ export default function About() {
                 aria-hidden="true"
                 width="170"
                 height="114"
-                className="hero-capsule-img"
+                className="hero-capsule-img shrink-0"
               />
             </span>
           </span>{' '}
           Chandigarh
         </span>{' '}
-        <span className="about-hero-line">
-          Blending creativity with
-        </span>{' '}
-        <span className="about-hero-line">
-          technology{' '}
+        <span className="about-hero-line text-balance">
+          Blending creativity with technology{' '}
           <span className="hero-capsule hero-capsule-phone hero-capsule-popout">
             <span className="hero-capsule-inner">
               <img
@@ -73,12 +70,10 @@ export default function About() {
                 aria-hidden="true"
                 width="158"
                 height="156"
-                className="hero-capsule-img"
+                className="hero-capsule-img shrink-0"
               />
             </span>
-          </span>
-        </span>{' '}
-        <span className="about-hero-line">
+          </span>{' '}
           and{' '}
           <span className="hero-capsule hero-capsule-tape hero-capsule-flush">
             <span className="hero-capsule-inner">
@@ -88,7 +83,7 @@ export default function About() {
                 aria-hidden="true"
                 width="200"
                 height="114"
-                className="hero-capsule-img"
+                className="hero-capsule-img shrink-0"
               />
             </span>
           </span>{' '}

@@ -107,7 +107,7 @@ export default function MyWorkApps() {
         </ul>
 
         <div className="mw-cta-wrap">
-          <Link href="#" className="mw-btn">
+          <Link href="/casestudy/synctrip" className="mw-btn">
             <span className="mw-btn-text">View more case studies</span>
             <span className="mw-btn-circle" aria-hidden="true">
               <svg

@@ -146,10 +146,10 @@ export default function IncludedGrid({ data = DEFAULT_INCLUDED_GRID }: IncludedG
                     src={tile.image}
                     alt={tile.alt}
                     fill
-                    sizes="(min-width: 768px) 50vw, 100vw"
+                    sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                     quality={88}
                     loading="lazy"
-                    className="included-tile-img"
+                    className="included-tile-img object-cover"
                     style={tile.objectPosition ? { objectPosition: tile.objectPosition } : undefined}
                     placeholder={tile.blurDataURL ? 'blur' : 'empty'}
                     blurDataURL={tile.blurDataURL}

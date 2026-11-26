@@ -49,11 +49,11 @@ export default function WhyItMattersBranding() {
   return (
     <section
       id="why-it-matters"
-      className="wim-branding-section"
+      className="wim-branding-section px-6 lg:px-0"
       aria-label="Why it matters"
       style={sectionStyle}
     >
-      <div className="wim-branding-container">
+      <div className="wim-branding-container !max-w-[1920px]">
         <p className="wim-branding-eyebrow">WHY IT MATTERS</p>
 
         <AnimatedHeading
@@ -86,7 +86,7 @@ export default function WhyItMattersBranding() {
           />
         </div>
 
-        <div className="wim-stats-row">
+        <div className="wim-stats-row w-full lg:w-[71.1%] max-w-[1365px] mx-auto">
           {BRANDING_STATS.map((stat) => (
             <div key={stat.id} className="wim-stat-col">
               <span className={`wim-stat-num ${stat.isPurple ? 'is-purple' : ''}`}>

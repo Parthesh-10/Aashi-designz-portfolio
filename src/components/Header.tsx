@@ -5,6 +5,35 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getLenis } from './SmoothScroll';
 
+interface ServiceItem {
+  title: string;
+  desc: string;
+  href: string;
+}
+
+const SERVICE_ITEMS: ServiceItem[] = [
+  {
+    title: 'Design & edit',
+    desc: 'Marketing & social assets',
+    href: '/service/edits',
+  },
+  {
+    title: 'Branding & strategy',
+    desc: 'Visual identity & positioning',
+    href: '/service/branding',
+  },
+  {
+    title: 'Digital marketing',
+    desc: 'Ads, content & funnels',
+    href: '/service/digital-marketing',
+  },
+  {
+    title: 'Apps & websites',
+    desc: 'Web & app experiences',
+    href: '/service/uiuxdesign',
+  },
+];
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -13,6 +42,9 @@ export default function Header() {
   const pathname = usePathname();
   const [prevPathname, setPrevPathname] = useState(pathname);
   const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dropdownItemRef = useRef<HTMLLIElement | null>(null);
+  const triggerBtnRef = useRef<HTMLButtonElement | null>(null);
+  const dropdownMenuRef = useRef<HTMLDivElement | null>(null);
 
   const isServicesActive =
     pathname === '/services' ||
@@ -88,6 +120,48 @@ export default function Header() {
     };
   }, [isOpen]);
 
+  // Handle outside click & Escape key for desktop services dropdown
+  useEffect(() => {
+    if (!servicesOpen) return;
+
+    const handlePointerDown = (e: MouseEvent | TouchEvent) => {
+      if (
+        dropdownItemRef.current &&
+        !dropdownItemRef.current.contains(e.target as Node)
+      ) {
+        setServicesOpen(false);
+      }
+    };
+
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setServicesOpen(false);
+        triggerBtnRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+    document.addEventListener('keydown', handleEscKey);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [servicesOpen]);
+
+  // Close dropdown when focus moves outside of the dropdown item container
+  const handleDropdownBlur = (e: React.FocusEvent<HTMLLIElement>) => {
+    if (
+      dropdownItemRef.current &&
+      !dropdownItemRef.current.contains(e.relatedTarget as Node | null)
+    ) {
+      setServicesOpen(false);
+    }
+  };
+
   // Hover handlers for services dropdown with debounce to prevent flicker
   const handleServicesEnter = () => {
     if (dropdownTimeoutRef.current) {
@@ -100,6 +174,26 @@ export default function Header() {
     dropdownTimeoutRef.current = setTimeout(() => {
       setServicesOpen(false);
     }, 180);
+  };
+
+  const handleTriggerClick = () => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+    }
+    setServicesOpen((prev) => !prev);
+  };
+
+  const handleTriggerKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+      if (!servicesOpen) {
+        e.preventDefault();
+        setServicesOpen(true);
+        requestAnimationFrame(() => {
+          const firstLink = dropdownMenuRef.current?.querySelector<HTMLAnchorElement>('a');
+          firstLink?.focus();
+        });
+      }
+    }
   };
 
   return (
@@ -147,17 +241,23 @@ export default function Header() {
               </li>
 
               <li
+                ref={dropdownItemRef}
                 className="navbar-dropdown-item"
                 onMouseEnter={handleServicesEnter}
                 onMouseLeave={handleServicesLeave}
+                onBlur={handleDropdownBlur}
               >
-                <Link
-                  href="/service/edits"
-                  className={`navbar-link clickable ${
+                <button
+                  type="button"
+                  ref={triggerBtnRef}
+                  className={`navbar-link navbar-dropdown-trigger clickable ${
                     isServicesActive ? 'active' : ''
-                  }`}
+                  } ${servicesOpen ? 'dropdown-open' : ''}`}
                   aria-haspopup="true"
                   aria-expanded={servicesOpen}
+                  aria-controls="services-dropdown-menu"
+                  onClick={handleTriggerClick}
+                  onKeyDown={handleTriggerKeyDown}
                 >
                   <span>Services</span>
                   <svg
@@ -174,53 +274,48 @@ export default function Header() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                </Link>
+                </button>
 
-                <div className={`navbar-dropdown-menu ${servicesOpen ? 'visible' : ''}`}>
+                <div
+                  id="services-dropdown-menu"
+                  ref={dropdownMenuRef}
+                  className={`navbar-dropdown-menu ${servicesOpen ? 'visible' : ''}`}
+                  role="region"
+                  aria-label="Services menu"
+                >
+                  {/* First item: link to the Services overview page */}
                   <Link
-                    href="/service/edits"
-                    className="navbar-dropdown-link clickable"
+                    href="/services"
+                    className={`navbar-dropdown-link navbar-dropdown-overview clickable ${
+                      pathname === '/services' ? 'active' : ''
+                    }`}
                     onClick={() => setServicesOpen(false)}
                   >
-                    <span className="dropdown-link-title">Design</span>
-                    <span className="dropdown-link-desc">Marketing &amp; social assets</span>
+                    <span className="dropdown-link-title">Services</span>
+                    <span className="dropdown-link-desc">All services</span>
                   </Link>
 
-                  <Link
-                    href="/service/branding"
-                    className="navbar-dropdown-link clickable"
-                    onClick={() => setServicesOpen(false)}
+                  {/* Sub-group with individual service routes */}
+                  <ul
+                    className="navbar-dropdown-subgroup"
+                    role="group"
+                    aria-label="Individual services"
                   >
-                    <span className="dropdown-link-title">Branding</span>
-                    <span className="dropdown-link-desc">Visual identity &amp; positioning</span>
-                  </Link>
-
-                  <Link
-                    href="/service/uiuxdesign"
-                    className="navbar-dropdown-link clickable"
-                    onClick={() => setServicesOpen(false)}
-                  >
-                    <span className="dropdown-link-title">UI/UX</span>
-                    <span className="dropdown-link-desc">Web &amp; app experiences</span>
-                  </Link>
-
-                  <Link
-                    href="/service/designstrategy"
-                    className="navbar-dropdown-link clickable"
-                    onClick={() => setServicesOpen(false)}
-                  >
-                    <span className="dropdown-link-title">Design Strategy</span>
-                    <span className="dropdown-link-desc">Scalable design systems</span>
-                  </Link>
-
-                  <Link
-                    href="/service/videoediting"
-                    className="navbar-dropdown-link clickable"
-                    onClick={() => setServicesOpen(false)}
-                  >
-                    <span className="dropdown-link-title">Video Editing</span>
-                    <span className="dropdown-link-desc">Motion &amp; storytelling</span>
-                  </Link>
+                    {SERVICE_ITEMS.map((item) => (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          className={`navbar-dropdown-link navbar-dropdown-sublink clickable ${
+                            pathname === item.href ? 'active' : ''
+                          }`}
+                          onClick={() => setServicesOpen(false)}
+                        >
+                          <span className="dropdown-link-title">{item.title}</span>
+                          <span className="dropdown-link-desc">{item.desc}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </li>
             </ul>
@@ -340,53 +435,25 @@ export default function Header() {
               </div>
 
               {mobileServicesOpen && (
-                <div id="mobile-services-dropdown" className="mobile-sublinks">
-                  <Link
-                    href="/service/edits"
-                    className={`mobile-sublink clickable ${
-                      pathname === '/service/edits' ? 'active' : ''
-                    }`}
-                    onClick={closeMenu}
-                  >
-                    Design
-                  </Link>
-                  <Link
-                    href="/service/branding"
-                    className={`mobile-sublink clickable ${
-                      pathname === '/service/branding' ? 'active' : ''
-                    }`}
-                    onClick={closeMenu}
-                  >
-                    Branding
-                  </Link>
-                  <Link
-                    href="/service/uiuxdesign"
-                    className={`mobile-sublink clickable ${
-                      pathname === '/service/uiuxdesign' || pathname === '/service/graphicdesign' ? 'active' : ''
-                    }`}
-                    onClick={closeMenu}
-                  >
-                    UI/UX
-                  </Link>
-                  <Link
-                    href="/service/designstrategy"
-                    className={`mobile-sublink clickable ${
-                      pathname === '/service/designstrategy' ? 'active' : ''
-                    }`}
-                    onClick={closeMenu}
-                  >
-                    Design Strategy
-                  </Link>
-                  <Link
-                    href="/service/videoediting"
-                    className={`mobile-sublink clickable ${
-                      pathname === '/service/videoediting' ? 'active' : ''
-                    }`}
-                    onClick={closeMenu}
-                  >
-                    Video Editing
-                  </Link>
-                </div>
+                <ul
+                  id="mobile-services-dropdown"
+                  className="mobile-sublinks mobile-services-subgroup"
+                  aria-label="Individual services"
+                >
+                  {SERVICE_ITEMS.map((item) => (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className={`mobile-sublink clickable ${
+                          pathname === item.href ? 'active' : ''
+                        }`}
+                        onClick={closeMenu}
+                      >
+                        {item.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
 

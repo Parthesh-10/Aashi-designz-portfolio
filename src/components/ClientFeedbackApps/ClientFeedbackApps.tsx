@@ -1,9 +1,7 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
-import AnimatedHeading from '@/components/AnimatedHeading';
-import type { CSSPropertiesWithVars } from '@/types/css';
+import Reveal from '@/components/Reveal';
 
 export interface ClientFeedbackItem {
   id: string;
@@ -67,6 +65,9 @@ export interface ClientFeedbackAppsProps {
   showEyebrow?: boolean;
   className?: string;
   asBlock?: boolean;
+  items?: ClientFeedbackItem[];
+  animateReveal?: boolean;
+  usePageContainer?: boolean;
   children?: React.ReactNode;
 }
 
@@ -74,117 +75,86 @@ export default function ClientFeedbackApps({
   showEyebrow = true,
   className = '',
   asBlock = false,
+  items = TESTIMONIALS_DATA,
   children,
 }: ClientFeedbackAppsProps) {
+  const visibleItems = items.slice(0, 3);
+
   const content = (
-    <div className="cf-container">
-      <div className="cf-header-block">
-        {showEyebrow && (
-          <div className="cf-eyebrow">
-            <span className="cf-eyebrow-dot" aria-hidden="true" />
-            <span>CLIENT FEEDBACK</span>
-          </div>
-        )}
+    <div className="w-full box-border">
+      <Reveal delay={0}>
+        <div className="w-full text-left box-border">
+          {showEyebrow && (
+            <div className="dotContainer mb-1">
+              <div className="dot" aria-hidden="true" />
+              <span className="text-[16px] font-bold text-[#313944]">Client feedback</span>
+            </div>
+          )}
 
-        <AnimatedHeading
-          as="h2"
-          segments={[
-            {
-              text: "Don’t take it from me, take it",
-              fontClass: 'cf-line-1',
-              colorClass: '',
-              hoverClass: 'ah-hover-purple',
-              breakAfter: true,
-            },
-            {
-              text: 'from them.',
-              fontClass: 'cf-line-2',
-              colorClass: '',
-              hoverClass: 'ah-hover-purple',
-            },
-          ]}
-          threshold={0.35}
-          className="cf-h2"
-        />
-      </div>
+          <h2 className="m-0 mb-4 text-[34px] md:text-[54px] font-normal leading-[1.15] text-[#313944] text-left">
+            Don’t take it from me, take it from them.
+          </h2>
+        </div>
+      </Reveal>
 
-      <div className="cf-cards-wrap">
-        <ul className="cf-cards-row" tabIndex={0} aria-label="Client testimonials list">
-          {TESTIMONIALS_DATA.map((t) => {
-            const cardStyle: CSSPropertiesWithVars = {
-              '--card-tilt': `${t.tilt}deg`,
-              '--card-offset-y': `${t.offsetY}px`,
-            };
-            return (
-              <li key={t.id} className="cf-card-item" style={cardStyle}>
-                <div className="cf-card">
-                  <div className="cf-stars-row" aria-hidden="true">
-                    {[...Array(5)].map((_, sIdx) => (
-                      <svg
-                        key={`star-${sIdx}`}
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#FFFFFF"
-                        strokeWidth="1.3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="cf-star"
-                      >
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                      </svg>
-                    ))}
-                  </div>
+      <ul
+        className="list-none p-0 m-0 mt-10 md:mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-center w-full box-border"
+        aria-label="Client testimonials list"
+      >
+        {visibleItems.map((t, idx) => {
+          const isCenter = idx === 1;
+          return (
+            <Reveal
+              key={t.id}
+              as="li"
+              delay={idx * 120}
+              className={`min-w-0 flex flex-col justify-between rounded-[10px] p-8 text-white box-border ${
+                isCenter
+                  ? 'bg-[#222435] min-h-[300px] md:min-h-[336px] md:scale-[1.06] z-10'
+                  : 'bg-[#2d3047] min-h-[300px]'
+              }`}
+            >
+              <div className="w-8 h-8 mb-4 shrink-0" aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/img/quotes.svg" alt="" className="w-full h-full object-contain" />
+              </div>
 
-                  <blockquote className="cf-quote">
-                    &ldquo;{t.quote}&rdquo;
-                  </blockquote>
+              <blockquote className="m-0 p-0 text-white text-[15px] md:text-[16px] font-normal leading-relaxed text-left">
+                {t.quote}
+              </blockquote>
 
-                  <footer className="cf-author">
-                    <div className="cf-avatar-wrap">
-                      {t.avatar ? (
-                        <Image
-                          src={t.avatar}
-                          alt=""
-                          width={26}
-                          height={26}
-                          className="cf-avatar-img"
-                        />
-                      ) : (
-                        <div className="cf-avatar-initials">
-                          {t.name
-                            .split(' ')
-                            .map((n) => n[0])
-                            .join('')}
-                        </div>
-                      )}
-                    </div>
-                    <div className="cf-author-info">
-                      <cite className="cf-author-name">{t.name}</cite>
-                      <span className="cf-author-role">{t.role}</span>
-                    </div>
-                  </footer>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+              <div className="flex flex-col text-left mt-6">
+                <cite className="not-italic text-white text-[17px] md:text-[18px] font-semibold leading-snug">
+                  {t.name}
+                </cite>
+                <span className="text-white/80 text-[13px] md:text-[14px] font-normal leading-snug mt-0.5">
+                  {t.role}
+                </span>
+              </div>
+            </Reveal>
+          );
+        })}
+      </ul>
 
       {children}
     </div>
   );
 
   if (asBlock) {
-    return <div className={`cf-block-wrap ${className}`}>{content}</div>;
+    return (
+      <div
+        className={`w-full px-6 md:px-12 xl:px-[min(10.4vw,200px)] box-border ${className}`.trim()}
+      >
+        {content}
+      </div>
+    );
   }
 
   return (
     <section
       id="client-feedback"
-      className={`cf-section ${className}`}
-      aria-label="Client Feedback"
+      className={`w-full bg-white py-12 md:py-16 px-6 md:px-12 xl:px-[min(10.4vw,200px)] box-border overflow-hidden ${className}`.trim()}
+      aria-label="Client feedback"
     >
       {content}
     </section>

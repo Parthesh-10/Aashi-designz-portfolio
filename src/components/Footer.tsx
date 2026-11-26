@@ -49,6 +49,16 @@ export default function Footer() {
               </Link>
             </li>
             <li>
+              <Link className="clickable" href="/services">
+                <p>Services</p>
+              </Link>
+            </li>
+            <li>
+              <Link className="clickable" href="/contact">
+                <p>Contact</p>
+              </Link>
+            </li>
+            <li>
               <Link className="clickable" href="/privacypolicy">
                 <p>Privacy Policy</p>
               </Link>

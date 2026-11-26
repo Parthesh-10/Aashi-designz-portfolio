@@ -13,7 +13,6 @@ import categoryDesc from '@/constant/categoryData';
 import resultsData from '@/constant/resultsData';
 import HeroIntro from '@/components/HeroIntro/HeroIntro';
 import HeroBanner from '@/components/HeroBanner/HeroBanner';
-import CupboardReveal from '@/components/CupboardReveal/CupboardReveal';
 import PageContainer from '@/components/PageContainer';
 
 export default function Home() {
@@ -94,7 +93,6 @@ export default function Home() {
       <div className="box-border w-full px-6 md:px-10">
         <LogoSlider />
       </div>
-      <CupboardReveal />
       <PageContainer className="container">
         <Category categoryDesc={categoryDesc} />
       </PageContainer>

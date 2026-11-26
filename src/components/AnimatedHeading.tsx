@@ -12,6 +12,29 @@ export interface AnimatedHeadingSegment {
   breakAfter?: boolean;
 }
 
+export const AH_LETTER_STAGGER_MS = 38;
+export const AH_LETTER_DURATION_MS = 700;
+
+/**
+ * Computes the total time (in ms from mount) until the last letter of an
+ * immediate AnimatedHeading finishes its entrance transition.
+ */
+export function getAnimatedHeadingRevealMs(
+  segments: AnimatedHeadingSegment[] = [],
+  startDelay = 0
+): number {
+  const letterCount = segments.reduce((total, seg) => {
+    const nonSpaceChars = seg.text.replace(/\s+/g, '');
+    return total + Array.from(nonSpaceChars).length;
+  }, 0);
+
+  if (letterCount === 0) return startDelay;
+
+  const lastLetterIndex = letterCount - 1;
+  const lastEntranceDelay = startDelay + lastLetterIndex * AH_LETTER_STAGGER_MS;
+  return startDelay + lastEntranceDelay + AH_LETTER_DURATION_MS;
+}
+
 export interface AnimatedHeadingProps {
   as?: 'h1' | 'h2';
   segments?: AnimatedHeadingSegment[];
@@ -99,6 +122,73 @@ export default function AnimatedHeading({
   // Pre-calculate deterministic letter indices across segments and lines
   let globalLetterIndex = 0;
 
+  // Group segments into lines if breakAfter is specified to create explicit block-level spans on desktop
+  const lines: { segments: AnimatedHeadingSegment[]; lineIdx: number }[] = [];
+  let curLineSegments: AnimatedHeadingSegment[] = [];
+  segments.forEach((seg) => {
+    curLineSegments.push(seg);
+    if (seg.breakAfter) {
+      lines.push({ segments: curLineSegments, lineIdx: lines.length });
+      curLineSegments = [];
+    }
+  });
+  if (curLineSegments.length > 0) {
+    lines.push({ segments: curLineSegments, lineIdx: lines.length });
+  }
+
+  const renderSegmentWords = (segment: AnimatedHeadingSegment, segIdx: number) => {
+    const rawWords = segment.text.split(/(\s+)/);
+
+    return rawWords.map((part, partIdx) => {
+      if (/^\s+$/.test(part)) {
+        return (
+          <span key={`space-${segIdx}-${partIdx}`} className="ah-space">
+            {' '}
+          </span>
+        );
+      }
+
+      if (!part) return null;
+
+      const letters = Array.from(part).map((char, charIdx) => {
+        const letterIdx = globalLetterIndex++;
+        const entranceDelay = startDelay + letterIdx * AH_LETTER_STAGGER_MS;
+        const waveDelay = entranceDelay + AH_LETTER_DURATION_MS + letterIdx * 70;
+
+        const outerStyle: CSSPropertiesWithVars = {
+          '--ah-entrance-delay': `${entranceDelay}ms`,
+          ...segment.style,
+        };
+        const innerStyle: CSSPropertiesWithVars = {
+          '--ah-wave-delay': `${waveDelay}ms`,
+        };
+
+        return (
+          <span
+            key={`char-${segIdx}-${partIdx}-${charIdx}`}
+            className={`ah-letter-outer ${segment.colorClass || ''} ${
+              segment.hoverClass || 'ah-hover-purple'
+            }`}
+            style={outerStyle}
+          >
+            <span className="ah-letter-inner" style={innerStyle}>
+              {char}
+            </span>
+          </span>
+        );
+      });
+
+      return (
+        <span
+          key={`word-${segIdx}-${partIdx}`}
+          className={`ah-word ${segment.fontClass || ''}`}
+        >
+          {letters}
+        </span>
+      );
+    });
+  };
+
   return (
     <Tag
       ref={containerRef}
@@ -109,65 +199,25 @@ export default function AnimatedHeading({
       style={style}
     >
       <span aria-hidden="true" style={{ display: 'inline' }}>
-        {segments.map((segment, segIdx) => {
-          const rawWords = segment.text.split(/(\s+)/);
-
-          const renderedWords = rawWords.map((part, partIdx) => {
-            if (/^\s+$/.test(part)) {
-              return (
-                <span key={`space-${segIdx}-${partIdx}`} className="ah-space">
-                  {' '}
-                </span>
-              );
-            }
-
-            if (!part) return null;
-
-            const letters = Array.from(part).map((char, charIdx) => {
-              const letterIdx = globalLetterIndex++;
-              const entranceDelay = startDelay + letterIdx * 38;
-              const waveDelay = entranceDelay + 700 + letterIdx * 70;
-
-              const outerStyle: CSSPropertiesWithVars = {
-                '--ah-entrance-delay': `${entranceDelay}ms`,
-                ...segment.style,
-              };
-              const innerStyle: CSSPropertiesWithVars = {
-                '--ah-wave-delay': `${waveDelay}ms`,
-              };
-
-              return (
-                <span
-                  key={`char-${segIdx}-${partIdx}-${charIdx}`}
-                  className={`ah-letter-outer ${segment.colorClass || ''} ${
-                    segment.hoverClass || 'ah-hover-purple'
-                  }`}
-                  style={outerStyle}
-                >
-                  <span className="ah-letter-inner" style={innerStyle}>
-                    {char}
-                  </span>
-                </span>
-              );
-            });
-
-            return (
+        {lines.length > 1
+          ? lines.map((line) => (
               <span
-                key={`word-${segIdx}-${partIdx}`}
-                className={`ah-word ${segment.fontClass || ''}`}
+                key={`line-${line.lineIdx}`}
+                className="ah-line block lg:whitespace-nowrap text-balance"
               >
-                {letters}
+                {line.segments.map((segment, segIdx) => (
+                  <React.Fragment key={`seg-${line.lineIdx}-${segIdx}`}>
+                    {renderSegmentWords(segment, segIdx)}
+                  </React.Fragment>
+                ))}
               </span>
-            );
-          });
-
-          return (
-            <React.Fragment key={`seg-${segIdx}`}>
-              {renderedWords}
-              {segment.breakAfter && <br className="ah-desktop-br" />}
-            </React.Fragment>
-          );
-        })}
+            ))
+          : segments.map((segment, segIdx) => (
+              <React.Fragment key={`seg-${segIdx}`}>
+                {renderSegmentWords(segment, segIdx)}
+                {segment.breakAfter && <br className="ah-desktop-br" />}
+              </React.Fragment>
+            ))}
       </span>
       <noscript>
         <style

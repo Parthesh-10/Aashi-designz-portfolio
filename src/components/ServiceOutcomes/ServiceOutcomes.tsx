@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import PageContainer from '@/components/PageContainer';
 import { OUTCOMES_DATA, HAS_OUTCOMES_IMAGES } from '@/constant/outcomes';
 import type { CSSPropertiesWithVars } from '@/types/css';
 
@@ -394,13 +395,14 @@ export default function ServiceOutcomes() {
   }, []);
 
   return (
-    <section
+    <PageContainer
+      as="section"
       ref={sectionRef}
       id="outcomes"
-      className="outcomes-section container"
+      className="outcomes-section !mx-auto !w-full !px-6 md:!px-12 xl:!px-[min(10.4vw,200px)]"
       aria-label="Service Outcomes"
     >
-      <div ref={panelRef} className="outcomes-panel">
+      <div ref={panelRef} className="outcomes-panel w-full">
         <div
           ref={cardRef}
           className={`outcomes-floating-card ${isHovered && !isTouchDevice ? 'is-visible' : ''}`}
@@ -523,6 +525,6 @@ export default function ServiceOutcomes() {
           })}
         </div>
       </div>
-    </section>
+    </PageContainer>
   );
 }

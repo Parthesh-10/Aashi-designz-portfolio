@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import AnimatedHeading, { type AnimatedHeadingSegment } from '@/components/AnimatedHeading';
 import IncludedGrid, { type IncludedGridRow } from '@/components/IncludedGrid/IncludedGrid';
+import Reveal from '@/components/Reveal';
 
 export interface IncludedGalleryItem {
   id?: string;
@@ -88,23 +89,31 @@ export default function IncludedGallery({
       className={`included-gallery-wrap edits-included-wrap ${className}`}
       aria-label={`${heading} Section`}
     >
-      <div className="included-gallery-inner edits-included-inner">
-        <AnimatedHeading
-          as="h2"
-          segments={segments}
-          threshold={0.35}
-          className="included-gallery-h2 edits-included-h2"
-        />
-        {subtitle && (
-          <p
-            className={`included-gallery-sub edits-included-sub ${
-              subtitleUppercase ? 'is-uppercase' : ''
-            }`}
-          >
-            {subtitle}
-          </p>
-        )}
-        <IncludedGrid data={gridData} />
+      <div className="included-gallery-inner edits-included-inner w-full max-w-none px-0">
+        <div className="edits-page-container w-full">
+          <Reveal delay={0}>
+            <AnimatedHeading
+              as="h2"
+              segments={segments}
+              threshold={0.35}
+              className="included-gallery-h2 edits-included-h2"
+            />
+          </Reveal>
+          {subtitle && (
+            <Reveal delay={120}>
+              <p
+                className={`included-gallery-sub edits-included-sub ${
+                  subtitleUppercase ? 'is-uppercase' : ''
+                }`}
+              >
+                {subtitle}
+              </p>
+            </Reveal>
+          )}
+        </div>
+        <Reveal delay={240} className="included-grid-reveal-wrap w-full">
+          <IncludedGrid data={gridData} />
+        </Reveal>
       </div>
     </section>
   );

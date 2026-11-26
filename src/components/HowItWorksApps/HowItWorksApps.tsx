@@ -12,12 +12,6 @@ const instrumentSerif = Instrument_Serif({
   display: 'swap',
 });
 
-export const REVEAL_STAGGER_MS = 250;
-export const REVEAL_DURATION_MS = 450;
-export const STEP_DWELL_MS = 3000;
-export const TRANSITION_MS = 600;
-export const EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
-
 export interface HowItWorksStep {
   number: number;
   title: string;
@@ -75,119 +69,169 @@ export const STEPS_DATA: HowItWorksStep[] = [
   },
 ];
 
-type StepPhase = 'idle' | 'revealing' | 'autoplay';
 type StepVisualState = 'upcoming' | 'active' | 'completed';
 
 export default function HowItWorksApps() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const activeIndexRef = useRef<number>(0);
+  const stepItemRefs = useRef<(HTMLLIElement | null)[]>([]);
 
-  const [isHeaderRevealed, setIsHeaderRevealed] = useState(false);
-  const [revealedStepCount, setRevealedStepCount] = useState(0);
-  const [phase, setPhase] = useState<StepPhase>('idle');
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const [hasUserInteracted, setHasUserInteracted] = useState(false);
-  const [isInView, setIsInView] = useState(false);
-  const [isTabVisible, setIsTabVisible] = useState(true);
-
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(true);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Check reduced motion preference
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (typeof window === 'undefined') return undefined;
+
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const rafId = requestAnimationFrame(() => {
       if (mediaQuery.matches) {
-        const rafId = requestAnimationFrame(() => {
-          setPrefersReducedMotion(true);
-          setIsHeaderRevealed(true);
-          setRevealedStepCount(STEPS_DATA.length);
-          setActiveIndex(0);
-          setPhase('autoplay');
-          setHasUserInteracted(true);
-        });
-        return () => cancelAnimationFrame(rafId);
+        setPrefersReducedMotion(true);
       }
-    }
-    return undefined;
-  }, []);
+    });
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      setIsTabVisible(!document.hidden);
+    const listener = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
     };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    mediaQuery.addEventListener('change', listener);
+    return () => {
+      cancelAnimationFrame(rafId);
+      mediaQuery.removeEventListener('change', listener);
+    };
   }, []);
 
+  // Track viewport width for desktop scroll pinning (breakpoint 1024px)
   useEffect(() => {
-    if (prefersReducedMotion) return;
+    const rafId = requestAnimationFrame(() => {
+      setIsDesktop(window.innerWidth >= 1024);
+    });
 
-    const sectionEl = sectionRef.current;
-    if (!sectionEl) return;
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  // Desktop scroll-driven progression listener (RAF throttled, passive)
+  useEffect(() => {
+    if (!isDesktop || prefersReducedMotion) return undefined;
+
+    let rafId: number | null = null;
+
+    const updateScrollProgress = () => {
+      rafId = null;
+      const track = trackRef.current;
+      const stage = stageRef.current;
+      if (!track || !stage) return;
+
+      const rect = track.getBoundingClientRect();
+      const navbarH = 66;
+      const stickyH = window.innerHeight - navbarH;
+      const maxScroll = rect.height - stickyH;
+
+      if (maxScroll <= 0) return;
+
+      const scrollDistance = navbarH - rect.top;
+      const progress = Math.max(0, Math.min(1, scrollDistance / maxScroll));
+
+      // Continuously write progress to CSS custom property on stage
+      stage.style.setProperty('--steps-progress', progress.toFixed(4));
+
+      // Discrete step index update only when step bracket changes
+      const stepCount = STEPS_DATA.length;
+      const newIndex = Math.min(stepCount - 1, Math.max(0, Math.floor(progress * stepCount)));
+
+      if (newIndex !== activeIndexRef.current) {
+        activeIndexRef.current = newIndex;
+        setActiveIndex(newIndex);
+      }
+    };
+
+    const onScroll = () => {
+      if (rafId === null) {
+        rafId = requestAnimationFrame(updateScrollProgress);
+      }
+    };
+
+    // Initial calculation on mount
+    onScroll();
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+
+    return () => {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [isDesktop, prefersReducedMotion]);
+
+  // Mobile IntersectionObserver progression fallback (< 1024px)
+  useEffect(() => {
+    if (isDesktop || prefersReducedMotion) return undefined;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          setIsInView(entry.isIntersecting);
-
-          if (entry.isIntersecting && phase === 'idle') {
-            setPhase('revealing');
-            setIsHeaderRevealed(true);
-
-            STEPS_DATA.forEach((_, idx) => {
-              setTimeout(() => {
-                setRevealedStepCount((prev) => Math.max(prev, idx + 1));
-
-                if (idx === STEPS_DATA.length - 1) {
-                  setTimeout(() => {
-                    setPhase('autoplay');
-                    setActiveIndex(0);
-                  }, REVEAL_DURATION_MS);
-                }
-              }, (idx + 1) * REVEAL_STAGGER_MS);
-            });
+          if (entry.isIntersecting) {
+            const idxStr = entry.target.getAttribute('data-step-index');
+            if (idxStr !== null) {
+              const idx = parseInt(idxStr, 10);
+              if (!isNaN(idx) && idx !== activeIndexRef.current) {
+                activeIndexRef.current = idx;
+                setActiveIndex(idx);
+              }
+            }
           }
         });
       },
-      { threshold: 0.3 }
+      { rootMargin: '-20% 0px -40% 0px', threshold: 0.2 }
     );
 
-    observer.observe(sectionEl);
+    stepItemRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
     return () => observer.disconnect();
-  }, [phase, prefersReducedMotion]);
-
-  useEffect(() => {
-    if (
-      phase !== 'autoplay' ||
-      hasUserInteracted ||
-      !isInView ||
-      !isTabVisible ||
-      prefersReducedMotion
-    ) {
-      return;
-    }
-
-    if (activeIndex >= STEPS_DATA.length - 1) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setActiveIndex((prev) => prev + 1);
-    }, STEP_DWELL_MS);
-
-    return () => clearTimeout(timer);
-  }, [phase, activeIndex, hasUserInteracted, isInView, isTabVisible, prefersReducedMotion]);
+  }, [isDesktop, prefersReducedMotion]);
 
   const handleStepClick = useCallback((idx: number) => {
-    setHasUserInteracted(true);
-    setActiveIndex(idx);
+    const track = trackRef.current;
+    if (!track) return;
+
+    const rect = track.getBoundingClientRect();
+    const navbarH = 66;
+    const stickyH = window.innerHeight - navbarH;
+    const maxScroll = rect.height - stickyH;
+
+    if (maxScroll > 0 && window.innerWidth >= 1024) {
+      const stepCount = STEPS_DATA.length;
+      const targetProgress = (idx + 0.5) / stepCount;
+      const targetScrollY = window.scrollY + rect.top - navbarH + targetProgress * maxScroll;
+      window.scrollTo({ top: targetScrollY, behavior: 'smooth' });
+    } else {
+      activeIndexRef.current = idx;
+      setActiveIndex(idx);
+    }
   }, []);
 
   const sectionStyle: CSSPropertiesWithVars = {
     '--font-instrument-serif': instrumentSerif.style.fontFamily,
+    '--step-count': STEPS_DATA.length,
   };
 
   return (
     <section
       id="how-it-works"
-      ref={sectionRef}
+      ref={trackRef}
       className="hiw-section"
       aria-label="How it works"
       style={sectionStyle}
@@ -197,113 +241,113 @@ export default function HowItWorksApps() {
         style={{ position: 'absolute', top: 0, left: 0, height: 0, width: 0, visibility: 'hidden' }}
         aria-hidden="true"
       />
-      <div className="hiw-container">
-        <div className={`hiw-heading-block ${isHeaderRevealed ? 'is-revealed' : ''}`}>
-          <h2 className="hiw-heading">HOW IT WORKS?</h2>
-          <p className="hiw-sub">A clear process. Thoughtful design. No guesswork.</p>
-        </div>
+      <div ref={stageRef} className="hiw-sticky-stage">
+        <div className="hiw-container">
+          <div className="hiw-heading-block is-revealed">
+            <h2 className="hiw-heading">HOW IT WORKS?</h2>
+            <p className="hiw-sub">A clear process. Thoughtful design. No guesswork.</p>
+          </div>
 
-        <div className="hiw-row">
-          <div className="hiw-stepper-col">
-            <ol className="hiw-steps-list">
-              {STEPS_DATA.map((step, idx) => {
-                let state: StepVisualState = 'upcoming';
-                if (activeIndex >= 0) {
+          <div className="hiw-row">
+            <div className="hiw-stepper-col">
+              <div className="hiw-timeline-line-track" aria-hidden="true">
+                <div className="hiw-timeline-line-base" />
+                <div className="hiw-timeline-line-fill" />
+              </div>
+
+              <ol className="hiw-steps-list">
+                {STEPS_DATA.map((step, idx) => {
+                  let state: StepVisualState = 'upcoming';
                   if (idx < activeIndex) state = 'completed';
                   else if (idx === activeIndex) state = 'active';
                   else state = 'upcoming';
-                }
 
-                const isStepRevealed = prefersReducedMotion || idx < revealedStepCount;
-                const isDescriptionVisible = state !== 'completed';
+                  const isDescriptionVisible =
+                    prefersReducedMotion || !isDesktop || state === 'active';
 
-                return (
-                  <li
-                    key={`step-${step.number}`}
-                    className={`hiw-step-item hiw-state-${state} ${
-                      isStepRevealed ? 'is-step-revealed' : ''
-                    }`}
-                  >
-                    <div className="hiw-connector-track" aria-hidden="true">
-                      {idx > 0 && <span className="hiw-line-segment hiw-line-top" />}
-                      {idx < STEPS_DATA.length - 1 && (
-                        <span className="hiw-line-segment hiw-line-bottom" />
-                      )}
-                    </div>
-
-                    <button
-                      type="button"
-                      className="hiw-step-btn"
-                      onClick={() => handleStepClick(idx)}
-                      aria-expanded={state === 'active'}
-                      aria-current={state === 'active' ? 'step' : undefined}
-                      aria-controls={`hiw-desc-${idx}`}
+                  return (
+                    <li
+                      key={`step-${step.number}`}
+                      ref={(el) => {
+                        stepItemRefs.current[idx] = el;
+                      }}
+                      data-step-index={idx}
+                      className={`hiw-step-item hiw-state-${state} is-step-revealed`}
                     >
-                      <div className={`hiw-circle hiw-circle-${state}`}>
-                        <div className="hiw-circle-inner">
-                          <span
-                            className={`hiw-circle-num ${
-                              state === 'completed' ? 'hiw-num-hidden' : ''
-                            }`}
-                          >
-                            {step.number}
-                          </span>
-                          <span
-                            className={`hiw-circle-check ${
-                              state === 'completed' ? 'hiw-check-visible' : ''
-                            }`}
-                            aria-hidden="true"
-                          >
-                            <svg
-                              width="15"
-                              height="15"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="#EAFF80"
-                              strokeWidth="3.2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
+                      <button
+                        type="button"
+                        className="hiw-step-btn"
+                        onClick={() => handleStepClick(idx)}
+                        aria-expanded={state === 'active'}
+                        aria-current={state === 'active' ? 'step' : undefined}
+                        aria-controls={`hiw-desc-${idx}`}
+                      >
+                        <div className={`hiw-circle hiw-circle-${state}`}>
+                          <div className="hiw-circle-inner">
+                            <span
+                              className={`hiw-circle-num ${
+                                state === 'completed' ? 'hiw-num-hidden' : ''
+                              }`}
                             >
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="hiw-text-col">
-                        <span className="hiw-step-label">Step {step.number}</span>
-                        <span id={`hiw-title-${idx}`} className="hiw-step-title">
-                          {step.title}
-                        </span>
-
-                        <div
-                          id={`hiw-desc-${idx}`}
-                          className={`hiw-desc-wrap ${isDescriptionVisible ? 'is-visible' : ''}`}
-                          aria-labelledby={`hiw-title-${idx}`}
-                        >
-                          <div className="hiw-desc-inner">
-                            <p className="hiw-step-desc">{step.description}</p>
+                              {step.number}
+                            </span>
+                            <span
+                              className={`hiw-circle-check ${
+                                state === 'completed' ? 'hiw-check-visible' : ''
+                              }`}
+                              aria-hidden="true"
+                            >
+                              <svg
+                                width="15"
+                                height="15"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#EAFF80"
+                                strokeWidth="3.2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            </span>
                           </div>
                         </div>
-                      </div>
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
 
-          <div className={`hiw-laptop-col ${isHeaderRevealed ? 'is-revealed' : ''}`}>
-            <div className="hiw-laptop-sticky">
-              <Image
-                src="/images/how-it-works-laptop.png"
-                alt="Silver laptop mockup with clean blank display"
-                width={888}
-                height={626}
-                priority={false}
-                className="hiw-laptop-img"
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 46vw, 40vw"
-              />
+                        <div className="hiw-text-col">
+                          <span className="hiw-step-label">Step {step.number}</span>
+                          <span id={`hiw-title-${idx}`} className="hiw-step-title">
+                            {step.title}
+                          </span>
+
+                          <div
+                            id={`hiw-desc-${idx}`}
+                            className={`hiw-desc-wrap ${isDescriptionVisible ? 'is-visible' : ''}`}
+                            aria-labelledby={`hiw-title-${idx}`}
+                          >
+                            <div className="hiw-desc-inner">
+                              <p className="hiw-step-desc">{step.description}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+
+            <div className="hiw-laptop-col is-revealed">
+              <div className="hiw-laptop-sticky">
+                <Image
+                  src="/images/how-it-works-laptop.png"
+                  alt="Silver laptop mockup with clean blank display"
+                  width={888}
+                  height={626}
+                  priority={false}
+                  className="hiw-laptop-img"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 46vw, 40vw"
+                />
+              </div>
             </div>
           </div>
         </div>
